@@ -1,5 +1,6 @@
 package cn.edu.scut.patent.util;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -7,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
+
 import cn.edu.scut.patent.model.PatentDao;
 
 public class DatabaseHelper {
@@ -71,14 +74,15 @@ public class DatabaseHelper {
 					+ ", PROPOSER VARCHAR(300) NOT NULL"
 					+ ", PROPOSER_ADDRESS VARCHAR(500) NOT NULL"
 					+ ", INVENTOR VARCHAR(200) NOT NULL"
-					+ ", INTERNATIONAL_APPLY VARCHAR(200) NOT NULL"
-					+ ", INTERNATIONAL_PUBLICATION VARCHAR(50) NOT NULL"
-					+ ", INTO_DATE DATE NOT NULL"
+					+ ", INTERNATIONAL_APPLY VARCHAR(200)"
+					+ ", INTERNATIONAL_PUBLICATION VARCHAR(50)"
+					+ ", INTO_DATE DATE"
 					+ ", PTT_AGENCY_ORG VARCHAR(500) NOT NULL"
 					+ ", PTT_AGENCY_PERSON VARCHAR(200) NOT NULL"
-					+ ", PTT_ABSTRACT VARCHAR(10000) NOT NULL"
-					+ ", CLASS_NUM_G06Q VARCHAR(20) NOT NULL"
-					+ ", PTT_TYPE VARCHAR(4) NOT NULL)" + ";";
+					+ ", PTT_ABSTRACT VARCHAR(10000)"
+					+ ", CLASS_NUM_G06Q VARCHAR(200)"
+					+ ", PTT_TYPE VARCHAR(4)) " + ";";
+
 			System.out.println(sql);
 			PreparedStatement ps = con.prepareStatement(sql);
 			ps.executeUpdate();
@@ -94,12 +98,45 @@ public class DatabaseHelper {
 	}
 
 	/**
+	 * 按照Map<String, String>的格式写入数据库
+	 * 
+	 * @param map
+	 * @throws IOException
+	 */
+	public static void saveToDatabase(Map<String, String> map)
+			throws IOException {
+		if (map != null) {
+			PatentDao pttDao = new PatentDao();
+			pttDao.setPttName(map.get("pttName"));
+			pttDao.setApplyNum(map.get("applyNum"));
+			pttDao.setApplyDate(DateHelper.stringToDate(map.get("applyDate")
+					.toString()));
+			pttDao.setProposer(map.get("proposer"));
+			pttDao.setProposerAddress(map.get("proposerAddress"));
+			pttDao.setInventor(map.get("inventor"));
+			pttDao.setPttMainClassNum(map.get("pttMainClassNum"));
+			pttDao.setPttClassNum(map.get("pttClassNum"));
+			pttDao.setPttNum(map.get("pttNum"));
+			pttDao.setPttDate(DateHelper.stringToDate(map.get("pttDate")));
+			pttDao.setPttAgencyOrg(map.get("pttAgencyOrg"));
+			pttDao.setPttAgencyPerson(map.get("pttAgencyPerson"));
+			pttDao.setIntoDate(DateHelper.stringToDate(map.get("intoDate")));
+
+			if (writeToDb(pttDao)) {
+				System.out.println("写入数据库成功");
+			} else {
+				System.out.println("写入数据库失败");
+			}
+		}
+	}
+
+	/**
 	 * 按照专利的格式写入数据库
 	 * 
 	 * @param pttDao
 	 * @return
 	 */
-	public static Boolean writeToDb(PatentDao pttDao) {
+	private static Boolean writeToDb(PatentDao pttDao) {
 
 		if (!isExisted("PATENTS")) {
 			if (!createTablePATENTS()) {
@@ -107,51 +144,49 @@ public class DatabaseHelper {
 			}
 		}
 		try {
-			// Connection con = getConnection();
-			// Statement sta = con.createStatement();
-			//
-			// String sql =
-			// "INSERT INTO patents (PTT_NUM,APPLY_NUM,APPLY_DATE,PTT_NAME,PTT_DATE,PTT_MAIN_CLASS_NUM,PTT_CLASS_NUM,PROPOSER,"
-			// +
-			// "PROPOSER_ADDRESS,INVENTOR,PTT_AGENCY_ORG,PTT_AGENCY_PERSON,PTT_ABSTRACT,CLASS_NUM_G06Q,INTERNATIONAL_APPLY,INTERNATIONAL_PUBLICATION,INTO_DATE,PTT_TYPE) VALUES ('"
-			// + pttDao.getPttNum()
-			// + "','"
-			// + pttDao.getApplyNum()
-			// + "','"
-			// + pttDao.getApplyDate()
-			// + "','"
-			// + pttDao.getPttName()
-			// + "','"
-			// + pttDao.getPttDate()
-			// + "','"
-			// + pttDao.getPttMainClassNum()
-			// + "','"
-			// + pttDao.getPttClassNum()
-			// + "','"
-			// + pttDao.getProposer()
-			// + "','"
-			// + pttDao.getProposerAddress()
-			// + "','"
-			// + pttDao.getInventor()
-			// + "','"
-			// + pttDao.getPttAgencyOrg()
-			// + "','"
-			// + pttDao.getPttAgencyPerson()
-			// + "','"
-			// + pttDao.getPttAbstract()
-			// + "','"
-			// + pttDao.getClassNumG06Q()
-			// + "','"
-			// + pttDao.getInternationalApply()
-			// + "','"
-			// + pttDao.getInternationalPublication()
-			// + "','"
-			// + pttDao.getIntoDate() + "','" + pttDao.getPttType() + "')";
-			//
-			// System.out.println(sql);
-			// sta.execute(sql);
-			// sta.close();
-			// con.close();
+			Connection con = getConnection();
+			Statement sta = con.createStatement();
+
+			String sql = "INSERT INTO patents (PTT_NUM,APPLY_NUM,APPLY_DATE,PTT_NAME,PTT_DATE,PTT_MAIN_CLASS_NUM,PTT_CLASS_NUM,PROPOSER,"
+					+ "PROPOSER_ADDRESS,INVENTOR,PTT_AGENCY_ORG,PTT_AGENCY_PERSON,PTT_ABSTRACT,CLASS_NUM_G06Q,INTERNATIONAL_APPLY,INTERNATIONAL_PUBLICATION,INTO_DATE,PTT_TYPE) VALUES ('"
+					+ pttDao.getPttNum()
+					+ "','"
+					+ pttDao.getApplyNum()
+					+ "','"
+					+ pttDao.getApplyDate()
+					+ "','"
+					+ pttDao.getPttName()
+					+ "','"
+					+ pttDao.getPttDate()
+					+ "','"
+					+ pttDao.getPttMainClassNum()
+					+ "','"
+					+ pttDao.getPttClassNum()
+					+ "','"
+					+ pttDao.getProposer()
+					+ "','"
+					+ pttDao.getProposerAddress()
+					+ "','"
+					+ pttDao.getInventor()
+					+ "','"
+					+ pttDao.getPttAgencyOrg()
+					+ "','"
+					+ pttDao.getPttAgencyPerson()
+					+ "','"
+					+ pttDao.getPttAbstract()
+					+ "','"
+					+ pttDao.getClassNumG06Q()
+					+ "','"
+					+ pttDao.getInternationalApply()
+					+ "','"
+					+ pttDao.getInternationalPublication()
+					+ "','"
+					+ pttDao.getIntoDate() + "','" + pttDao.getPttType() + "')";
+
+			System.out.println(sql);
+			sta.execute(sql);
+			sta.close();
+			con.close();
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -239,10 +274,5 @@ public class DatabaseHelper {
 			e.printStackTrace();
 			return -1;
 		}
-	}
-
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		writeToDb(null);
 	}
 }

@@ -28,19 +28,19 @@ public class PatentDao {
 	// 专利代理人
 	private String pttAgencyPerson;
 	// 专利摘要
-	private String pttAbstract;
+	private String pttAbstract;//
 	// 商业方法类下的分类号
-	private String classNumG06Q;
+	private String classNumG06Q;//
 	// 国际申请
-	private String internationalApply;
+	private String internationalApply;//
 	// 国际公布
-	private String internationalPublication;
+	private String internationalPublication;//
 	// 进入国家日期
-	private Date intoDate;
+	private Date intoDate;//
 	// 专利类型（自定义）
-	private String pttType;
+	private String pttType;//
 	// 专利内容
-	private String content;
+	private String content;//
 
 	public String getContent() {
 		return content;
@@ -94,8 +94,8 @@ public class PatentDao {
 		return applyDate;
 	}
 
-	public void setApplyDate(Date applyDate) {
-		this.applyDate = applyDate;
+	public void setApplyDate(java.sql.Date date) {
+		this.applyDate = date;
 	}
 
 	public String getPttName() {
