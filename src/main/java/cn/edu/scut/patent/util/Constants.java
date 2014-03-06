@@ -2,7 +2,7 @@ package cn.edu.scut.patent.util;
 
 public class Constants {
 	// 索引文件(夹)的位置
-	public static String FILE_DIR_STRING = "E:/dir/test_file/zhuanli_unlock.pdf";
+	public static String FILE_DIR_STRING = "E:/dir/file";
 	// 存放索引文件的位置
 	public static String INDEX_DIR_STRING = "E:/dir/index";
 	// 获取PDF文档当中图片的存放位置

@@ -1,4 +1,4 @@
-package cn.edu.scut.patent.testing;
+package cn.edu.scut.patent.javabean;
 
 public class LoginForm {
 	private String username;

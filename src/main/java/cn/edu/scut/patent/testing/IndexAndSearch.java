@@ -3,6 +3,7 @@ package cn.edu.scut.patent.testing;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 import net.paoding.analysis.analyzer.PaodingAnalyzer;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.cjk.CJKAnalyzer;
@@ -29,6 +30,7 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 import ICTCLAS2014.Nlpir;
 import cn.edu.scut.patent.util.CheckHelper;
 import cn.edu.scut.patent.util.Constants;
+import cn.edu.scut.patent.util.FileHelper;
 import cn.edu.scut.patent.util.PDFHelper;
 import cn.edu.scut.patent.ICTCLASAnalyzer.ICTCLASAnalyzer;
 
@@ -51,21 +53,41 @@ public class IndexAndSearch {
 	}
 
 	/**
-	 * 索引
+	 * 索引入口
 	 * 
 	 * @throws Exception
 	 */
 	private static void index() throws Exception {
+		Map<String, String> map = FileHelper
+				.readfile(Constants.FILE_DIR_STRING);
+		int i = 1;
+		for (Map.Entry<String, String> entry : map.entrySet()) {
+			System.out
+					.println(i++
+							+ "##########################################################");
+			index(entry.getValue());
+		}
+	}
+
+	/**
+	 * 索引程序的执行
+	 * 
+	 * @param dir_string
+	 * @throws Exception
+	 */
+	private static void index(String dir_string) throws Exception {
 		// 索引文件(夹)的位置
-		File fileDir = new File(Constants.FILE_DIR_STRING);
+		File fileDir = new File(dir_string);
 		Analyzer analyzer = new ICTCLASAnalyzer(Version.LUCENE_46);
 		// Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_46);
 		// 存放索引文件的位置
 		Directory directory = FSDirectory.open(new File(
 				Constants.INDEX_DIR_STRING));
-		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_46,
+		IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_46,
 				analyzer);
-		IndexWriter indexWriter = new IndexWriter(directory, iwc);
+		// 设置打开索引模式为创建或追加
+		config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+		IndexWriter indexWriter = new IndexWriter(directory, config);
 		// 索引开始的时间
 		long startTime = new Date().getTime();
 		Document document = PDFHelper.getDocumentFromPDF(fileDir);

@@ -41,10 +41,10 @@ public class DatabaseHelper {
 					+ table_name + "' ;";
 			ResultSet rs = sta.executeQuery(sql);
 			if (rs.next()) {
-				System.out.println("数据表PATENTS已经存在");
+				System.out.println("数据表" + table_name + "已经存在");
 				return true;
 			} else {
-				System.out.println("数据表PATENTS不存在");
+				System.out.println("数据表" + table_name + "不存在");
 				return false;
 			}
 		} catch (Exception e) {
@@ -80,8 +80,8 @@ public class DatabaseHelper {
 					+ ", PTT_AGENCY_ORG VARCHAR(500) NOT NULL"
 					+ ", PTT_AGENCY_PERSON VARCHAR(200) NOT NULL"
 					+ ", PTT_ABSTRACT VARCHAR(10000)"
-					+ ", CLASS_NUM_G06Q VARCHAR(200)"
-					+ ", PTT_TYPE VARCHAR(4)) " + ";";
+					+ ", CLASS_NUM_G06Q VARCHAR(200)" + ", PTT_TYPE VARCHAR(4)"
+					+ ", TRIZ_NUM VARCHAR(200))" + ";";
 
 			System.out.println(sql);
 			PreparedStatement ps = con.prepareStatement(sql);
@@ -93,6 +93,29 @@ public class DatabaseHelper {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("不能创建数据表PATENTS");
+			return false;
+		}
+	}
+
+	/**
+	 * 更新Triz号码
+	 * @param PTT_NUM
+	 * @param TRIZ_NUM
+	 * @return
+	 */
+	public static Boolean updateTrizNumber(String PTT_NUM, String TRIZ_NUM) {
+		try {
+			Connection con = getConnection();
+			Statement sta = con.createStatement();
+			String sql = "UPDATE PATENTS SET TRIZ_NUM = '" + TRIZ_NUM
+					+ "' WHERE PTT_NUM = '" + PTT_NUM + "';";
+			System.out.println(sql);
+			sta.execute(sql);
+			sta.close();
+			con.close();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 	}
