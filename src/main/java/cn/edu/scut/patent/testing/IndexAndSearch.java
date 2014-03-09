@@ -3,22 +3,18 @@ package cn.edu.scut.patent.testing;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Map;
-import net.paoding.analysis.analyzer.PaodingAnalyzer;
+import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.cjk.CJKAnalyzer;
-import org.apache.lucene.analysis.cn.ChineseAnalyzer;
-import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
-import org.apache.lucene.analysis.core.StopAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -26,11 +22,8 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
-import org.wltea.analyzer.lucene.IKAnalyzer;
-import ICTCLAS2014.Nlpir;
-import cn.edu.scut.patent.util.CheckHelper;
+import cn.edu.scut.patent.model.PatentDao;
 import cn.edu.scut.patent.util.Constants;
-import cn.edu.scut.patent.util.FileHelper;
 import cn.edu.scut.patent.util.PDFHelper;
 import cn.edu.scut.patent.ICTCLASAnalyzer.ICTCLASAnalyzer;
 
@@ -40,42 +33,13 @@ import cn.edu.scut.patent.ICTCLASAnalyzer.ICTCLASAnalyzer;
  */
 public class IndexAndSearch {
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		try {
-			index();
-			// search("孙皓", "contents");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.exit(0);
-	}
-
-	/**
-	 * 索引入口
-	 * 
-	 * @throws Exception
-	 */
-	private static void index() throws Exception {
-		Map<String, String> map = FileHelper
-				.readfile(Constants.FILE_DIR_STRING);
-		int i = 1;
-		for (Map.Entry<String, String> entry : map.entrySet()) {
-			System.out
-					.println(i++
-							+ "##########################################################");
-			index(entry.getValue());
-		}
-	}
-
 	/**
 	 * 索引程序的执行
 	 * 
 	 * @param dir_string
 	 * @throws Exception
 	 */
-	private static void index(String dir_string) throws Exception {
+	public static void doIndex(String dir_string) throws Exception {
 		// 索引文件(夹)的位置
 		File fileDir = new File(dir_string);
 		Analyzer analyzer = new ICTCLASAnalyzer(Version.LUCENE_46);
@@ -90,14 +54,7 @@ public class IndexAndSearch {
 		IndexWriter indexWriter = new IndexWriter(directory, config);
 		// 索引开始的时间
 		long startTime = new Date().getTime();
-		Document document = PDFHelper.getDocumentFromPDF(fileDir);
-
-		// 打印分词结果
-		TextField textfield = (TextField) document.getField("contents");
-		String result = textfield.stringValue();
-		CheckHelper.printKeyWords(analyzer, result);
-		// testing analyzer
-		// testAllAnalyzer();
+		Document document = PDFHelper.getDocumentFromPDF(fileDir, analyzer);
 
 		indexWriter.addDocument(document);
 		// 提交事务
@@ -109,13 +66,11 @@ public class IndexAndSearch {
 	}
 
 	/**
-	 * 查询
+	 * 查询程序的执行
 	 * 
 	 * @throws IOException
 	 */
-	@SuppressWarnings("unused")
-	private static void search(String queryString, String field)
-			throws IOException {
+	public static void doSearch(PatentDao patentdao) throws IOException {
 		TopDocs td = null;
 		Query query = null;
 		Directory directory = FSDirectory.open(new File(
@@ -124,15 +79,36 @@ public class IndexAndSearch {
 		IndexSearcher searcher = new IndexSearcher(indexreader);
 		Analyzer analyzer = new ICTCLASAnalyzer(Version.LUCENE_46);
 		// Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_46);
-		try {
-			QueryParser queryParser = new QueryParser(Version.LUCENE_46, field,
-					analyzer);
-			query = queryParser.parse(queryString);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+		Map<String, String> map = patentdao.getAll();
+		String[] fields;
+		String[] stringQuery;
+		Occur[] flags;
+		if (map.size() > 0) {
+			System.out.println("size:" + map.size());
+			fields = new String[map.size()];
+			stringQuery = new String[map.size()];
+			flags = new Occur[map.size()];
+			int i = 0;
+			Set<String> keySet = map.keySet();
+			Iterator it = keySet.iterator();
+			while (it.hasNext()) {
+				String key = (String) it.next();
+				fields[i] = key;
+				String value = map.get(key);
+				stringQuery[i] = value;
+				flags[i++] = Occur.SHOULD;
+				System.out.println("key:" + key + "&value:" + value);
+			}
+			try {
+				query = MultiFieldQueryParser.parse(Version.LUCENE_46,
+						stringQuery, fields, flags, analyzer);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		if (searcher != null) {
+		if (query != null) {
 			td = searcher.search(query, 1000);
 			if (td.totalHits > 0) {
 				System.out.println("找到：" + td.totalHits + "个结果！");
@@ -146,40 +122,5 @@ public class IndexAndSearch {
 				System.out.println("没有找到任何结果！");
 			}
 		}
-	}
-
-	/**
-	 * 测试所有的analyzer
-	 * 
-	 * @throws IOException
-	 */
-	private static void testAllAnalyzer() throws IOException {
-		String text = "据悉，质检总局已将       最新 good news  有关情况再次通报美方，要求美方加强对输华玉米的产地来源、运输及仓储等环节的管控措施，有效避免输华玉米被未经我国农业部安全评估并批准的转基因品系污染。";
-
-		Analyzer standardAnalyzer = new StandardAnalyzer(Version.LUCENE_46);
-		CheckHelper.printKeyWords(standardAnalyzer, text);
-
-		Analyzer stopAnalyzer = new StopAnalyzer(Version.LUCENE_46);
-		CheckHelper.printKeyWords(stopAnalyzer, text);
-
-		Analyzer cjkAnalyzer = new CJKAnalyzer(Version.LUCENE_46);
-		CheckHelper.printKeyWords(cjkAnalyzer, text);
-
-		Analyzer chineseAnalyzer = new ChineseAnalyzer();
-		CheckHelper.printKeyWords(chineseAnalyzer, text);
-
-		Analyzer paodingAnalyzer = new PaodingAnalyzer();
-		CheckHelper.printKeyWords(paodingAnalyzer, text);
-
-		Analyzer ikAnalyzer = new IKAnalyzer();
-		CheckHelper.printKeyWords(ikAnalyzer, text);
-
-		Analyzer smartChineseAnalyzer = new SmartChineseAnalyzer(
-				Version.LUCENE_46);
-		CheckHelper.printKeyWords(smartChineseAnalyzer, text);
-
-		Analyzer ictclasAnalyzer = new ICTCLASAnalyzer(Version.LUCENE_46);
-		CheckHelper.printKeyWords(ictclasAnalyzer,
-				Nlpir.doNlpirString(text, null, null));
 	}
 }

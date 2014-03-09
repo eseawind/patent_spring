@@ -6,6 +6,33 @@
 <title>专利汇总页</title>
 </head>
 <body>
+<form name="searchForm" method="post" action="search">
+<table>
+<tr><td>申请号</td><td><input type="text" name="applyNum" value=""/></td></tr>
+<tr><td>申请日期</td><td><input type="text" name="applyDate" value=""/></td></tr>
+<tr><td>专利名称</td><td><input type="text" name="pttName" value=""/></td></tr>
+<tr><td>专利公开号</td><td><input type="text" name="pttNum" value=""/></td></tr>
+<tr><td>专利公开日</td><td><input type="text" name="pttDate" value=""/></td></tr>
+<tr><td>主分类号</td><td><input type="text" name="pttMainClassNum" value=""/></td></tr>
+<tr><td>分类号</td><td><input type="text" name="pttClassNum" value=""/></td></tr>
+<tr><td>申请（专利权）人</td><td><input type="text" name="proposer" value=""/></td></tr>
+<tr><td>申请人地址</td><td><input type="text" name="proposerAddress" value=""/></td></tr>
+<tr><td>发明（设计）人</td><td><input type="text" name="inventor" value=""/></td></tr>
+<tr><td>专利代理机构</td><td><input type="text" name="pttAgencyOrg" value=""/></td></tr>
+<tr><td>专利代理人</td><td><input type="text" name="pttAgencyPerson" value=""/></td></tr>
+<tr><td>专利摘要</td><td><input type="text" name="pttAbstract" value=""/></td></tr>
+<tr><td>商业方法类下的分类号</td><td><input type="text" name="classNumG06Q" value=""/></td></tr>
+<tr><td>国际申请</td><td><input type="text" name="internationalApply" value=""/></td></tr>
+<tr><td>国际公布</td><td><input type="text" name="internationalPublication" value=""/></td></tr>
+<tr><td><input type="submit" value="Search提交"></td><td><input type="reset" value="重置"></td></tr>
+</table>
+</form>
+
+<form name="indexForm" method="post" action="index">
+<table>
+<tr><td><input type="submit" value="Index提交"></td><td><input type="reset" value="重置"></td></tr>
+</table>
+</form>
 <%
 try{
 // 加载驱动

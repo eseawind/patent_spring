@@ -1,6 +1,8 @@
 package cn.edu.scut.patent.model;
 
 import java.sql.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PatentDao {
 	// 申请号
@@ -42,6 +44,68 @@ public class PatentDao {
 	// 专利内容
 	private String content;//
 
+	public Map<String, String> getAll(){
+		Map<String, String> map = new HashMap<String, String>();
+		if(applyNum != null){
+			map.put("applyNum", applyNum);
+		}
+		if(applyDate != null){
+			map.put("applyDate", applyDate.toString());
+		}
+		if(pttName != null){
+			map.put("pttName", pttName);
+		}
+		if(pttNum != null){
+			map.put("pttNum", pttNum);
+		}
+		if(pttDate != null){
+			map.put("pttDate", pttDate.toString());
+		}
+		if(pttMainClassNum != null){
+			map.put("pttMainClassNum", pttMainClassNum);
+		}
+		if(pttClassNum != null){
+			map.put("pttClassNum", pttClassNum);
+		}
+		if(proposer != null){
+			map.put("proposer", proposer);
+		}
+		if(proposerAddress != null){
+			map.put("proposerAddress", proposerAddress);
+		}
+		if(inventor != null){
+			map.put("inventor", inventor);
+		}
+		if(pttAgencyOrg != null){
+			map.put("pttAgencyOrg", pttAgencyOrg);
+		}
+		if(pttAgencyPerson != null){
+			map.put("pttAgencyPerson", pttAgencyPerson);
+		}
+		if(pttAbstract != null){
+			map.put("pttAbstract", pttAbstract);
+		}
+		if(classNumG06Q != null){
+			map.put("classNumG06Q", classNumG06Q);
+		}
+		if(internationalApply != null){
+			map.put("internationalApply", internationalApply);
+		}
+		if(internationalPublication != null){
+			map.put("internationalPublication", internationalPublication);
+		}
+		if(intoDate != null){
+			map.put("intoDate", intoDate.toString());
+		}
+		if(pttType != null){
+			map.put("pttType", pttType);
+		}
+		if(content != null){
+			map.put("content", content);
+		}
+		return map;
+	}
+	
 	public String getContent() {
 		return content;
 	}

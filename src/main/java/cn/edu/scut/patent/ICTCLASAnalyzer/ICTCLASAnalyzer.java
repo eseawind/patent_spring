@@ -34,12 +34,12 @@ public final class ICTCLASAnalyzer extends StopwordAnalyzerBase {
 				"an", "ag", "al", "b", "bg", "bl", "z", "r", "rr", "rz", "rzt",
 				"rzs", "rzv", "ry", "ryt", "rys", "ryv", "rg", "m", "mq", "q",
 				"qv", "qt", "d", "p", "pba", "pbei", "c", "cc", "u", "uzhe",
-				"ule", "uguo", "ude", "ude1", "ude2", "ude3", "usuo", "udeng", "uyy",
-				"udh", "uls", "ujl", "uzhi", "ulian", "uqj", "e", "y", "o",
-				"h", "k", "x", "xx", "xu", "w", "wkz", "wky", "wyb", "wyz",
-				"wyy", "wj", "ww", "wt", "wd", "wf", "wn", "wm", "ws", "wp",
-				"wb", "wh");
-		final CharArraySet stopSet = new CharArraySet(Version.LUCENE_CURRENT,
+				"ule", "uguo", "ude", "ude1", "ude2", "ude3", "usuo", "udeng",
+				"uyy", "udh", "uls", "ujl", "uzhi", "ulian", "uqj", "e", "y",
+				"o", "h", "k", "x", "xx", "xu", "w", "wkz", "wky", "wyb",
+				"wyz", "wyy", "wj", "ww", "wt", "wd", "wf", "wn", "wm", "ws",
+				"wp", "wb", "wh");
+		final CharArraySet stopSet = new CharArraySet(Version.LUCENE_46,
 				stopWords, false);
 		ENGLISH_STOP_WORDS_SET = CharArraySet.unmodifiableSet(stopSet);
 	}

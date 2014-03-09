@@ -4,21 +4,32 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.imageio.ImageIO;
+import net.paoding.analysis.analyzer.PaodingAnalyzer;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.cjk.CJKAnalyzer;
+import org.apache.lucene.analysis.cn.ChineseAnalyzer;
+import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
+import org.apache.lucene.analysis.core.StopAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
+import org.apache.lucene.util.Version;
 import org.apache.pdfbox.pdfparser.PDFParser;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
 import org.apache.pdfbox.util.PDFTextStripper;
+import org.wltea.analyzer.lucene.IKAnalyzer;
+import ICTCLAS2014.Nlpir;
+import cn.edu.scut.patent.ICTCLASAnalyzer.ICTCLASAnalyzer;
+import cn.edu.scut.patent.model.PatentDao;
 
 public class PDFHelper {
 
@@ -27,7 +38,8 @@ public class PDFHelper {
 	 * 
 	 * @throws Exception
 	 */
-	public static Document getDocumentFromPDF(File pdf) throws Exception {
+	public static Document getDocumentFromPDF(File pdf, Analyzer analyzer)
+			throws Exception {
 		// Document document = LucenePDFDocument.getDocument(pdf);
 		String pdfpath = pdf.getAbsolutePath();
 		// 创建输入流读取pdf文件
@@ -35,7 +47,7 @@ public class PDFHelper {
 		String result = "";
 		FileInputStream is = null;
 		PDDocument doc = null;
-		Map<String, String> map = null;
+		PatentDao patentdao = null;
 		try {
 			is = new FileInputStream(pdf);
 			PDFParser parser = new PDFParser(is);
@@ -49,8 +61,8 @@ public class PDFHelper {
 			// 转化图片
 			transferPDFToImages(doc, title, Constants.TYPE);
 			// 获取专利的各项属性
-			map = getPatentDetails(result);
-			DatabaseHelper.saveToDatabase(map);
+			patentdao = getPatentDetails(result);
+			DatabaseHelper.saveToDatabase(patentdao);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -72,8 +84,9 @@ public class PDFHelper {
 		}
 		Document document = new Document();
 		document.add(new TextField("title", title, Field.Store.YES));
-		document.add(new TextField("contents", result, Field.Store.YES));// 最后需要删除
 		document.add(new TextField("path", pdfpath, Field.Store.YES));
+
+		Map<String, String> map = patentdao.getAll();
 		// 遍历map把各项专利的属性加入到document当中
 		if (map != null) {
 			Set<String> keySet = map.keySet();
@@ -84,6 +97,10 @@ public class PDFHelper {
 				document.add(new TextField(key, value, Field.Store.YES));
 			}
 		}
+		// 打印分词结果
+		CheckHelper.printKeyWords(analyzer, patentdao);
+		// 测试所有Analyzer的分词结果
+		// testAllAnalyzer(patentdao);
 		return document;
 	}
 
@@ -146,86 +163,122 @@ public class PDFHelper {
 	/**
 	 * 获取专利的各个属性
 	 */
-	private static Map<String, String> getPatentDetails(String text) {
+	private static PatentDao getPatentDetails(String text) {
 		String[] result = text.split("\n");
-		Map<String, String> map = new HashMap<String, String>();
+		PatentDao patentdao = new PatentDao();
 
 		// 获取专利名称
 		for (int i = 0; i < result.length; i++) {
 			if (result[i].startsWith("SooPAT")) {
-				map.put("pttName", result[i + 1]);
+				patentdao.setPttName(result[i + 1]);
 			}
 		}
 		// 获取申请号
 		for (int i = 0; i < result.length; i++) {
 			if (result[i].startsWith("申请号：")) {
-				map.put("applyNum", result[i].substring(4));
+				patentdao.setApplyNum(result[i].substring(4));
 			}
 		}
 		// 获取申请日
 		for (int i = 0; i < result.length; i++) {
 			if (result[i].startsWith("申请日：")) {
-				map.put("applyDate", result[i].substring(4));
+				patentdao.setApplyDate(DateHelper.stringToDate(result[i]
+						.substring(4)));
 			}
 		}
 		// 获取申请(专利权)人
 		for (int i = 0; i < result.length; i++) {
 			if (result[i].startsWith("申请(专利权)人")) {
-				map.put("proposer", result[i].substring(8));
+				patentdao.setProposer(result[i].substring(8));
 			}
 		}
 		// 获取地址
 		for (int i = 0; i < result.length; i++) {
 			if (result[i].startsWith("地址")) {
-				map.put("proposerAddress", result[i].substring(3));
+				patentdao.setProposerAddress(result[i].substring(3));
 			}
 		}
 		// 获取发明(设计)人
 		for (int i = 0; i < result.length; i++) {
 			if (result[i].startsWith("发明(设计)人")) {
-				map.put("inventor", result[i].substring(7));
+				patentdao.setInventor(result[i].substring(7));
 			}
 		}
 		// 获取主分类号
 		for (int i = 0; i < result.length; i++) {
 			if (result[i].startsWith("主分类号")) {
-				map.put("pttMainClassNum", result[i].substring(5));
+				patentdao.setPttMainClassNum(result[i].substring(5));
 			}
 		}
 		// 获取分类号
 		for (int i = 0; i < result.length; i++) {
 			if (result[i].startsWith("分类号")) {
-				map.put("pttClassNum", result[i].substring(4));
+				patentdao.setPttClassNum(result[i].substring(4));
 			}
 		}
 		// 获取公开(公告)号
 		for (int i = 0; i < result.length; i++) {
 			if (result[i].startsWith("公开(公告)号")) {
-				map.put("pttNum", result[i].substring(7));
+				patentdao.setPttNum(result[i].substring(7));
 			}
 		}
 		// 获取公开(公告)日
 		for (int i = 0; i < result.length; i++) {
 			if (result[i].startsWith("公开(公告)日")) {
-				map.put("pttDate", result[i].substring(7));
+				patentdao.setPttDate(DateHelper.stringToDate(result[i]
+						.substring(7)));
 			}
 		}
 		// 获取专利代理机构
 		for (int i = 0; i < result.length; i++) {
 			if (result[i].startsWith("专利代理机构")) {
-				map.put("pttAgencyOrg", result[i].substring(7));
+				patentdao.setPttAgencyOrg(result[i].substring(7));
 			}
 		}
 		// 获取代理人
 		for (int i = 0; i < result.length; i++) {
 			if (result[i].startsWith("代理人")) {
-				map.put("pttAgencyPerson", result[i].substring(4));
+				patentdao.setPttAgencyPerson(result[i].substring(4));
 			}
 		}
 		// 获取进入国家日期
 		for (int i = 0; i < result.length; i++) {
-			map.put("intoDate", "2000-01-01");
+			patentdao.setIntoDate(DateHelper.stringToDate("2000-01-01"));
 		}
-		return map;
+		return patentdao;
+	}
+
+	/**
+	 * 测试所有的analyzer
+	 * 
+	 * @throws IOException
+	 */
+	private static void testAllAnalyzer(PatentDao patentdao) throws IOException {
+
+		Analyzer standardAnalyzer = new StandardAnalyzer(Version.LUCENE_46);
+		CheckHelper.printKeyWords(standardAnalyzer, patentdao);
+
+		Analyzer stopAnalyzer = new StopAnalyzer(Version.LUCENE_46);
+		CheckHelper.printKeyWords(stopAnalyzer, patentdao);
+
+		Analyzer cjkAnalyzer = new CJKAnalyzer(Version.LUCENE_46);
+		CheckHelper.printKeyWords(cjkAnalyzer, patentdao);
+
+		Analyzer chineseAnalyzer = new ChineseAnalyzer();
+		CheckHelper.printKeyWords(chineseAnalyzer, patentdao);
+
+		Analyzer paodingAnalyzer = new PaodingAnalyzer();
+		CheckHelper.printKeyWords(paodingAnalyzer, patentdao);
+
+		Analyzer ikAnalyzer = new IKAnalyzer();
+		CheckHelper.printKeyWords(ikAnalyzer, patentdao);
+
+		Analyzer smartChineseAnalyzer = new SmartChineseAnalyzer(
+				Version.LUCENE_46);
+		CheckHelper.printKeyWords(smartChineseAnalyzer, patentdao);
+
+		// Analyzer ictclasAnalyzer = new ICTCLASAnalyzer(Version.LUCENE_46);
+		// CheckHelper.printKeyWords(ictclasAnalyzer,
+		// Nlpir.doNlpirString(text, null, null));
 	}
 }

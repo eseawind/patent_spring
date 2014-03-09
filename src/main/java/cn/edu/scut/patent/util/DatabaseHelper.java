@@ -8,8 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Map;
-
 import cn.edu.scut.patent.model.PatentDao;
 
 public class DatabaseHelper {
@@ -99,6 +97,7 @@ public class DatabaseHelper {
 
 	/**
 	 * 更新Triz号码
+	 * 
 	 * @param PTT_NUM
 	 * @param TRIZ_NUM
 	 * @return
@@ -126,26 +125,9 @@ public class DatabaseHelper {
 	 * @param map
 	 * @throws IOException
 	 */
-	public static void saveToDatabase(Map<String, String> map)
-			throws IOException {
-		if (map != null) {
-			PatentDao pttDao = new PatentDao();
-			pttDao.setPttName(map.get("pttName"));
-			pttDao.setApplyNum(map.get("applyNum"));
-			pttDao.setApplyDate(DateHelper.stringToDate(map.get("applyDate")
-					.toString()));
-			pttDao.setProposer(map.get("proposer"));
-			pttDao.setProposerAddress(map.get("proposerAddress"));
-			pttDao.setInventor(map.get("inventor"));
-			pttDao.setPttMainClassNum(map.get("pttMainClassNum"));
-			pttDao.setPttClassNum(map.get("pttClassNum"));
-			pttDao.setPttNum(map.get("pttNum"));
-			pttDao.setPttDate(DateHelper.stringToDate(map.get("pttDate")));
-			pttDao.setPttAgencyOrg(map.get("pttAgencyOrg"));
-			pttDao.setPttAgencyPerson(map.get("pttAgencyPerson"));
-			pttDao.setIntoDate(DateHelper.stringToDate(map.get("intoDate")));
-
-			if (writeToDb(pttDao)) {
+	public static void saveToDatabase(PatentDao patentdao) throws IOException {
+		if (patentdao != null) {
+			if (writeToDb(patentdao)) {
 				System.out.println("写入数据库成功");
 			} else {
 				System.out.println("写入数据库失败");
