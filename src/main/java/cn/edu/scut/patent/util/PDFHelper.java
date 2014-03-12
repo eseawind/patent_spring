@@ -62,6 +62,7 @@ public class PDFHelper {
 			transferPDFToImages(doc, title, Constants.TYPE);
 			// 获取专利的各项属性
 			patentdao = getPatentDetails(result);
+			patentdao.setFileName(title);
 			DatabaseHelper.saveToDatabase(patentdao);
 
 		} catch (Exception e) {

@@ -43,6 +43,8 @@ public class PatentDao {
 	private String pttType;//
 	// 专利内容
 	private String content;//
+	// 文件名
+	private String fileName;
 
 	public Map<String, String> getAll(){
 		Map<String, String> map = new HashMap<String, String>();
@@ -270,5 +272,13 @@ public class PatentDao {
 			}
 		}
 		return "";
+	}
+	
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 }

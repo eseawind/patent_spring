@@ -26,16 +26,43 @@ public class DatabaseHelper {
 	}
 
 	/**
+	 * 判断数据库是否存在
+	 * 
+	 * @param
+	 * @return Boolean
+	 */
+	private static Boolean isDatabaseExisted(String db_name) {
+		try {
+			Connection con = getConnection();
+			Statement sta = con.createStatement();
+			String sql = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '"
+					+ db_name + "' ;";
+			ResultSet rs = sta.executeQuery(sql);
+			if (rs.next()) {
+				System.out.println("数据库" + db_name + "已经存在");
+				return true;
+			} else {
+				System.out.println("数据库" + db_name + "不存在");
+				return false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("isDatabaseExisted Error !");
+			return false;
+		}
+	}
+
+	/**
 	 * 判断数据表是否存在
 	 * 
 	 * @param
 	 * @return Boolean
 	 */
-	private static Boolean isExisted(String table_name) {
+	private static Boolean isTableExisted(String table_name) {
 		try {
 			Connection con = getConnection();
 			Statement sta = con.createStatement();
-			String sql = "SELECT table_name FROM information_schema.TABLES WHERE table_name = '"
+			String sql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '"
 					+ table_name + "' ;";
 			ResultSet rs = sta.executeQuery(sql);
 			if (rs.next()) {
@@ -47,21 +74,45 @@ public class DatabaseHelper {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("isExisted Error !");
+			System.out.println("isTableExisted Error !");
 			return false;
 		}
 	}
 
 	/**
-	 * 创建PATENTS数据表
+	 * 创建数据库patentdb
 	 * 
 	 * @param
 	 * @return Boolean
 	 */
-	private static Boolean createTablePATENTS() {
+	private static Boolean createDatabase() {
 		try {
 			Connection con = getConnection();
-			String sql = "CREATE TABLE PATENTS ("
+			String sql_create_database = "create database patentdb;";
+			System.out.println(sql_create_database);
+			PreparedStatement ps = con.prepareStatement(sql_create_database);
+			ps.executeUpdate();
+			ps.close();
+			con.close();
+			System.out.println("创建数据库patentdb成功");
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("创建数据库patentdb失败");
+			return false;
+		}
+	}
+
+	/**
+	 * 创建PATENTS和CLASSIFICATION数据表
+	 * 
+	 * @param
+	 * @return Boolean
+	 */
+	private static Boolean createTables() {
+		try {
+			Connection con = getConnection();
+			String sql_create_table_patents = "CREATE TABLE PATENTS ("
 					+ "APPLY_NUM VARCHAR(20) NOT NULL"
 					+ ", APPLY_DATE DATE NOT NULL"
 					+ ", PTT_NAME VARCHAR(200) NOT NULL"
@@ -79,18 +130,281 @@ public class DatabaseHelper {
 					+ ", PTT_AGENCY_PERSON VARCHAR(200) NOT NULL"
 					+ ", PTT_ABSTRACT VARCHAR(10000)"
 					+ ", CLASS_NUM_G06Q VARCHAR(200)" + ", PTT_TYPE VARCHAR(4)"
-					+ ", TRIZ_NUM VARCHAR(200))" + ";";
+					+ ", FILE_NAME VARCHAR(200) NOT NULL)" + " ENGINE = InnoDB"
+					+ ";";
 
-			System.out.println(sql);
-			PreparedStatement ps = con.prepareStatement(sql);
+			String sql_create_table_triz = "CREATE TABLE TRIZ ("
+					+ "TRIZ_NUM INT" + ", TRIZ_TEXT VARCHAR(200) NOT NULL"
+					+ ", PRIMARY KEY(TRIZ_NUM))" + " ENGINE = InnoDB" + ";";
+
+			String sql_create_table_classification = "CREATE TABLE CLASSIFICATION ("
+					+ "PTT_NUM VARCHAR(20)"
+					+ ", TRIZ_NUM INT"
+					+ ", PRIMARY KEY(PTT_NUM, TRIZ_NUM)"
+					+ ", FOREIGN KEY (PTT_NUM) REFERENCES PATENTS(PTT_NUM) ON DELETE RESTRICT ON UPDATE RESTRICT"
+					+ ", FOREIGN KEY (TRIZ_NUM) REFERENCES TRIZ(TRIZ_NUM) ON DELETE RESTRICT ON UPDATE RESTRICT)"
+					+ " ENGINE = InnoDB" + ";";
+
+			String sql_insert_into_triz = "INSERT INTO patentdb.TRIZ (TRIZ_NUM, TRIZ_TEXT) VALUES "
+					+ "('"
+					+ "1"
+					+ "','"
+					+ "分割原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "2"
+					+ "','"
+					+ "拆出原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "3"
+					+ "','"
+					+ "局部性质原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "4"
+					+ "','"
+					+ "不对称原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "5"
+					+ "','"
+					+ "组合原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "6"
+					+ "','"
+					+ "多功能原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "7"
+					+ "','"
+					+ "玛特廖什卡原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "8"
+					+ "','"
+					+ "重量补偿原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "9"
+					+ "','"
+					+ "预先反作用原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "10"
+					+ "','"
+					+ "预先作用原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "11"
+					+ "','"
+					+ "予先放枕头原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "12"
+					+ "','"
+					+ "等势原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "13"
+					+ "','"
+					+ "相反原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "14"
+					+ "','"
+					+ "球形原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "15"
+					+ "','"
+					+ "动态原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "16"
+					+ "','"
+					+ "局部作用或过量作用原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "17"
+					+ "','"
+					+ "向另一维度过渡的原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "18"
+					+ "','"
+					+ "机械振动原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "19"
+					+ "','"
+					+ "周期作用原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "20"
+					+ "','"
+					+ "连续有益作用原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "21"
+					+ "','"
+					+ "跃过原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "22"
+					+ "','"
+					+ "变害为利原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "23"
+					+ "','"
+					+ "反向联系原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "24"
+					+ "','"
+					+ "中介原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "25"
+					+ "','"
+					+ "自我服务原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "26"
+					+ "','"
+					+ "复制原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "27"
+					+ "','"
+					+ "用廉价的不持久性代替昂贵的持久性原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "28"
+					+ "','"
+					+ "代替力学原理原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "29"
+					+ "','"
+					+ "利用气动和液：压结构的原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "30"
+					+ "','"
+					+ "利用软壳和薄膜原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "31"
+					+ "','"
+					+ "利用多孔材料原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "32"
+					+ "','"
+					+ "改变颜色原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "33"
+					+ "','"
+					+ "一致原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "34"
+					+ "','"
+					+ "部分剔除和再生原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "35"
+					+ "','"
+					+ "改变物体聚合态原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "36"
+					+ "','"
+					+ "相变原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "37"
+					+ "','"
+					+ "利用热膨胀原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "38"
+					+ "','"
+					+ "利用强氧化剂原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "39"
+					+ "','"
+					+ "采用惰性介质原则"
+					+ "')"
+					+ ", "
+					+ "('"
+					+ "40"
+					+ "','"
+					+ "利用混合材料原则" + "');";
+
+			System.out.println(sql_create_table_patents);
+			System.out.println(sql_create_table_triz);
+			System.out.println(sql_create_table_classification);
+			System.out.println(sql_insert_into_triz);
+			PreparedStatement ps = con
+					.prepareStatement(sql_create_table_patents);
+			ps.executeUpdate();
+			ps = con.prepareStatement(sql_create_table_triz);
+			ps.executeUpdate();
+			ps = con.prepareStatement(sql_create_table_classification);
+			ps.executeUpdate();
+			ps = con.prepareStatement(sql_insert_into_triz);
 			ps.executeUpdate();
 			ps.close();
 			con.close();
-			System.out.println("创建数据表PATENTS成功");
+			System.out.println("创建数据表PATENTS、TRIZ和CLASSIFICATION，输入TRIZ数据成功");
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("不能创建数据表PATENTS");
+			System.out.println("创建数据表PATENTS、TRIZ和CLASSIFICATION，输入TRIZ数据失败");
 			return false;
 		}
 	}
@@ -143,8 +457,13 @@ public class DatabaseHelper {
 	 */
 	private static Boolean writeToDb(PatentDao pttDao) {
 
-		if (!isExisted("PATENTS")) {
-			if (!createTablePATENTS()) {
+		if (!isDatabaseExisted("patentdb")) {
+			if (!createDatabase()) {
+				return false;
+			}
+		}
+		if (!isTableExisted("PATENTS")) {
+			if (!createTables()) {
 				return false;
 			}
 		}
@@ -152,8 +471,8 @@ public class DatabaseHelper {
 			Connection con = getConnection();
 			Statement sta = con.createStatement();
 
-			String sql = "INSERT INTO patents (PTT_NUM,APPLY_NUM,APPLY_DATE,PTT_NAME,PTT_DATE,PTT_MAIN_CLASS_NUM,PTT_CLASS_NUM,PROPOSER,"
-					+ "PROPOSER_ADDRESS,INVENTOR,PTT_AGENCY_ORG,PTT_AGENCY_PERSON,PTT_ABSTRACT,CLASS_NUM_G06Q,INTERNATIONAL_APPLY,INTERNATIONAL_PUBLICATION,INTO_DATE,PTT_TYPE) VALUES ('"
+			String sql_insert_into_patents = "INSERT INTO patentdb.PATENTS (PTT_NUM,APPLY_NUM,APPLY_DATE,PTT_NAME,PTT_DATE,PTT_MAIN_CLASS_NUM,PTT_CLASS_NUM,PROPOSER,"
+					+ "PROPOSER_ADDRESS,INVENTOR,PTT_AGENCY_ORG,PTT_AGENCY_PERSON,PTT_ABSTRACT,CLASS_NUM_G06Q,INTERNATIONAL_APPLY,INTERNATIONAL_PUBLICATION,INTO_DATE,PTT_TYPE,FILE_NAME) VALUES ('"
 					+ pttDao.getPttNum()
 					+ "','"
 					+ pttDao.getApplyNum()
@@ -186,10 +505,19 @@ public class DatabaseHelper {
 					+ "','"
 					+ pttDao.getInternationalPublication()
 					+ "','"
-					+ pttDao.getIntoDate() + "','" + pttDao.getPttType() + "')";
+					+ pttDao.getIntoDate()
+					+ "','"
+					+ pttDao.getPttType()
+					+ "','" + pttDao.getFileName() + "')";
 
-			System.out.println(sql);
-			sta.execute(sql);
+			String sql_insert_into_classification = "INSERT INTO patentdb.CLASSIFICATION (PTT_NUM, TRIZ_NUM) VALUES ('"
+					+ pttDao.getPttNum() + "','" + "23" + "')";
+
+			System.out.println(sql_insert_into_patents);
+			System.out.println(sql_insert_into_classification);
+			sta.execute(sql_insert_into_patents);
+			sta.execute(sql_insert_into_classification);
+
 			sta.close();
 			con.close();
 			return true;
