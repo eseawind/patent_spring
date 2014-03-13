@@ -13,5 +13,9 @@
 	<mvc:annotation-driven />
 	<!-- 对包中的所有类进行扫描，以完成Bean创建和自动依赖注入的功能 需要更改 -->
 	<context:component-scan base-package="cn.edu.scut.patent" />
-	
+
+	<!-- 这里不能省略下面的bean。如果省略，将报：No mapping found for HTTP request with URI 错误 -->
+	<!-- DefaultAnnotationHandlerMapping 作用是将基于注解的映射 射到具体的Controller -->
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
 </beans>

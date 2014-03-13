@@ -5,9 +5,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import cn.edu.scut.patent.core.IndexAndSearch;
 import cn.edu.scut.patent.model.PatentDao;
-import cn.edu.scut.patent.testing.IndexAndSearch;
-import cn.edu.scut.patent.util.DateHelper;
+import cn.edu.scut.patent.util.StringHelper;
 
 @Controller
 public class SearchController {
@@ -26,7 +27,7 @@ public class SearchController {
 			patentdao.setApplyNum(request.getParameter("applyNum"));
 		}
 		if (request.getParameter("applyDate").replaceAll(" ", "") != "") {
-			patentdao.setApplyDate(DateHelper.stringToDate(request
+			patentdao.setApplyDate(StringHelper.stringToDate(request
 					.getParameter("applyDate")));
 		}
 		if (request.getParameter("pttName").replaceAll(" ", "") != "") {
@@ -36,7 +37,7 @@ public class SearchController {
 			patentdao.setPttNum(request.getParameter("pttNum"));
 		}
 		if (request.getParameter("pttDate").replaceAll(" ", "") != "") {
-			patentdao.setPttDate(DateHelper.stringToDate(request
+			patentdao.setPttDate(StringHelper.stringToDate(request
 					.getParameter("pttDate")));
 		}
 		if (request.getParameter("pttMainClassNum").replaceAll(" ", "") != "") {

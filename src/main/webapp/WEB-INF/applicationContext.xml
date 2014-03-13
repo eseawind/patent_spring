@@ -9,21 +9,26 @@
             http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd              
             http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-	<!-- 激活@Controller模式 -->
-	<mvc:annotation-driven />
-	<!-- 对包中的所有类进行扫描，以完成Bean创建和自动依赖注入的功能 需要更改 -->
-	<context:component-scan base-package="cn.edu.scut.patent" />
-
 	<bean
 		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
 
+	<!-- Resolver将把输出结果与输出界面相融合，为表现层提供呈现资源 -->
 	<bean id="viewResolver"
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<!-- 这里我们使用JSP页面作为输出 -->
+		<!-- 其余可选的viewClass还有: org.springframework.web.servlet.view.freemarker.FreeMarkerView 
+			(用于基于FreeMarker模板的表现层实现) org.springframework.web.servlet.view.velocity.VelocityView 
+			(用于基于velocity模板的表现层实现) 等。 -->
+		<!-- 指定了表现层资源的前缀 -->
 		<property name="prefix">
-			<value>/WEB-INF/view/</value>
+			<value>/view/</value>
 		</property>
+		<!-- 指定了表现层资源的后缀 -->
 		<property name="suffix">
 			<value>.jsp</value>
 		</property>
 	</bean>
+
+	<!-- 对静态资源文件的访问 -->
+	<mvc:default-servlet-handler />
 </beans>

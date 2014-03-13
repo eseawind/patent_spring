@@ -1,24 +1,28 @@
-<%@ page contentType="text/html; charset=utf-8" language="java" import="java.util.*,java.io.*"%>
-<%--<%
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page pageEncoding="utf-8"%>
+<%@ page language="java" import="java.util.*,java.io.*"%>
+<%
 String path = request.getContextPath();
 String basePath = request.getScheme() + "://"
     + request.getServerName() + ":" + request.getServerPort()
     + path + "/";
 %>
-<%
+<%--<%
    out.clear();
    out = pageContext.pushBody();
    response.setContentType("application/pdf");
 
    try {
-    String strPdfPath = new String("E://dir//test_file//zhuanli_unlock.pdf");
+	String path_dir = new String("E://dir//file//");
+	String file_name = request.getParameter("FILE_NAME");
+    String file_path = path_dir + file_name;
     //判断该路径下的文件是否存在
-    File file = new File(strPdfPath);
+    File file = new File(file_path);
     if (file.exists()) {
      DataOutputStream temps = new DataOutputStream(response
        .getOutputStream());
      DataInputStream in = new DataInputStream(
-       new FileInputStream(strPdfPath));
+       new FileInputStream(file_path));
 
      byte[] b = new byte[2048];
      while ((in.read(b)) != -1) {
@@ -28,12 +32,21 @@ String basePath = request.getScheme() + "://"
      in.close();
      temps.close();
     } else {
-     out.print(strPdfPath + " 文件不存在!");
+     out.print(file_path + " 文件不存在!");
     }
    } catch (Exception e) {
     out.println(e.getMessage());
    }
 %>--%>
+<%
+	String path_dir = new String("file/");
+	String file_name = java.net.URLEncoder.encode(request.getParameter("FILE_NAME"), "ISO-8859-1");
+	file_name = java.net.URLDecoder.decode(file_name, "UTF-8");
+    String file_path = path_dir + file_name;
+    String ptt_num = java.net.URLEncoder.encode(request.getParameter("PTT_NUM"), "ISO-8859-1");
+    ptt_num = java.net.URLDecoder.decode(ptt_num, "UTF-8");
+	
+%>
 <script type="text/javascript" language="javascript"> 
 function dyniframesize(down) { 
 var pTar = null; 
@@ -65,13 +78,15 @@ pTar.width = pTar.Document.body.scrollWidth;
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>PDF展示页</title>
 <link rel=stylesheet type="text/css" href="scut.css">
-<%--<base href="<%=basePath%>">--%>
+<base href="<%=basePath%>">
 </head>
 <body>
 <table>
 <tr>
 <td width="60%" height="100%">
-<iframe id="win" name="win" onload="Javascript:dyniframesize('win')" src="zhuanli_unlock.pdf" width="100%" height="100%"></iframe>
+<%=ptt_num%>
+<iframe id="win" name="win" onload="Javascript:dyniframesize('win')" src="<%=file_path%>" width="100%" height="100%"></iframe>
+</td>
 <!--<object data="zhuanli_unlock.pdf" type="application/pdf">
 <embed src="zhuanli_unlock.pdf" type="application/pdf" />
 </object>-->
@@ -80,6 +95,7 @@ pTar.width = pTar.Document.body.scrollWidth;
 <div id="showdialog">
 40个TRIZ原理
 <form name="submitForm" method="post" action="updateTrizNumber">
+<input type="hidden" name="PTT_NUM" value="<%=ptt_num%>"/>
 <table>
 <tr><td>
 <table>

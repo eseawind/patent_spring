@@ -183,7 +183,7 @@ public class PDFHelper {
 		// 获取申请日
 		for (int i = 0; i < result.length; i++) {
 			if (result[i].startsWith("申请日：")) {
-				patentdao.setApplyDate(DateHelper.stringToDate(result[i]
+				patentdao.setApplyDate(StringHelper.stringToDate(result[i]
 						.substring(4)));
 			}
 		}
@@ -226,7 +226,7 @@ public class PDFHelper {
 		// 获取公开(公告)日
 		for (int i = 0; i < result.length; i++) {
 			if (result[i].startsWith("公开(公告)日")) {
-				patentdao.setPttDate(DateHelper.stringToDate(result[i]
+				patentdao.setPttDate(StringHelper.stringToDate(result[i]
 						.substring(7)));
 			}
 		}
@@ -244,7 +244,7 @@ public class PDFHelper {
 		}
 		// 获取进入国家日期
 		for (int i = 0; i < result.length; i++) {
-			patentdao.setIntoDate(DateHelper.stringToDate("2000-01-01"));
+			patentdao.setIntoDate(StringHelper.stringToDate("2000-01-01"));
 		}
 		return patentdao;
 	}

@@ -1,5 +1,5 @@
 <%
-	request.getRequestDispatcher("/WEB-INF/view/showall.jsp")
+	request.getRequestDispatcher("/view/showall.jsp")
 			.forward(request, response);
 %>
 <%@ page language="java" pageEncoding="utf-8"%>

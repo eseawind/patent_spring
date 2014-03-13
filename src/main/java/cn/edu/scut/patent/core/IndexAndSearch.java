@@ -1,4 +1,4 @@
-package cn.edu.scut.patent.testing;
+package cn.edu.scut.patent.core;
 
 import java.io.File;
 import java.io.IOException;

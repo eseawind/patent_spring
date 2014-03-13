@@ -28,8 +28,8 @@ public class DatabaseHelper {
 	/**
 	 * 判断数据库是否存在
 	 * 
-	 * @param
-	 * @return Boolean
+	 * @param db_name
+	 * @return
 	 */
 	private static Boolean isDatabaseExisted(String db_name) {
 		try {
@@ -55,8 +55,8 @@ public class DatabaseHelper {
 	/**
 	 * 判断数据表是否存在
 	 * 
-	 * @param
-	 * @return Boolean
+	 * @param table_name
+	 * @return
 	 */
 	private static Boolean isTableExisted(String table_name) {
 		try {
@@ -75,6 +75,33 @@ public class DatabaseHelper {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("isTableExisted Error !");
+			return false;
+		}
+	}
+
+	/**
+	 * 判断PatentNumber是否存在于表CLASSIFICATION当中
+	 * 
+	 * @param PTT_NUM
+	 * @return
+	 */
+	public static Boolean isPatentNumberExisted(String PTT_NUM) {
+		try {
+			Connection con = getConnection();
+			Statement sta = con.createStatement();
+			String sql = "SELECT PTT_NUM FROM patentdb.CLASSIFICATION WHERE PTT_NUM = '"
+					+ PTT_NUM + "' ;";
+			ResultSet rs = sta.executeQuery(sql);
+			if (rs.next()) {
+				System.out.println("专利" + PTT_NUM + "已经分类！");
+				return true;
+			} else {
+				System.out.println("专利" + PTT_NUM + "还没有分类！");
+				return false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("isPatentNumberExisted Error !");
 			return false;
 		}
 	}
@@ -410,23 +437,60 @@ public class DatabaseHelper {
 	}
 
 	/**
+	 * 插入Triz号码
+	 * 
+	 * @param PTT_NUM
+	 * @param TRIZ_NUM
+	 * @return
+	 */
+	public static Boolean insertTrizNumber(String PTT_NUM, String[] TRIZ_NUM) {
+		try {
+			if (TRIZ_NUM.length < 1) {
+				return false;
+			}
+			Connection con = getConnection();
+			Statement sta = con.createStatement();
+			String sql_insert = "INSERT INTO patentdb.CLASSIFICATION (PTT_NUM, TRIZ_NUM) VALUES ";
+			for (int i = 0; i < TRIZ_NUM.length; i++) {
+				sql_insert += "('" + PTT_NUM + "','" + TRIZ_NUM[i] + "')";
+				if (i < TRIZ_NUM.length - 1) {
+					sql_insert += ",";
+				}
+			}
+			sql_insert += ";";
+			System.out.println(sql_insert);
+			sta.execute(sql_insert);
+			sta.close();
+			con.close();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/**
 	 * 更新Triz号码
 	 * 
 	 * @param PTT_NUM
 	 * @param TRIZ_NUM
 	 * @return
 	 */
-	public static Boolean updateTrizNumber(String PTT_NUM, String TRIZ_NUM) {
+	public static Boolean updateTrizNumber(String PTT_NUM, String[] TRIZ_NUM) {
 		try {
 			Connection con = getConnection();
 			Statement sta = con.createStatement();
-			String sql = "UPDATE PATENTS SET TRIZ_NUM = '" + TRIZ_NUM
-					+ "' WHERE PTT_NUM = '" + PTT_NUM + "';";
-			System.out.println(sql);
-			sta.execute(sql);
+			String sql_delete = "DELETE FROM patentdb.CLASSIFICATION WHERE PTT_NUM = '"
+					+ PTT_NUM + "';";
+			System.out.println(sql_delete);
+			sta.execute(sql_delete);
 			sta.close();
 			con.close();
-			return true;
+			if (insertTrizNumber(PTT_NUM, TRIZ_NUM)) {
+				return true;
+			} else {
+				return false;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -473,7 +537,7 @@ public class DatabaseHelper {
 
 			String sql_insert_into_patents = "INSERT INTO patentdb.PATENTS (PTT_NUM,APPLY_NUM,APPLY_DATE,PTT_NAME,PTT_DATE,PTT_MAIN_CLASS_NUM,PTT_CLASS_NUM,PROPOSER,"
 					+ "PROPOSER_ADDRESS,INVENTOR,PTT_AGENCY_ORG,PTT_AGENCY_PERSON,PTT_ABSTRACT,CLASS_NUM_G06Q,INTERNATIONAL_APPLY,INTERNATIONAL_PUBLICATION,INTO_DATE,PTT_TYPE,FILE_NAME) VALUES ('"
-					+ pttDao.getPttNum()
+					+ StringHelper.replaceSpecialCharacters(pttDao.getPttNum())
 					+ "','"
 					+ pttDao.getApplyNum()
 					+ "','"
@@ -511,7 +575,8 @@ public class DatabaseHelper {
 					+ "','" + pttDao.getFileName() + "')";
 
 			String sql_insert_into_classification = "INSERT INTO patentdb.CLASSIFICATION (PTT_NUM, TRIZ_NUM) VALUES ('"
-					+ pttDao.getPttNum() + "','" + "23" + "')";
+					+ StringHelper.replaceSpecialCharacters(pttDao.getPttNum())
+					+ "','" + "23" + "')";
 
 			System.out.println(sql_insert_into_patents);
 			System.out.println(sql_insert_into_classification);

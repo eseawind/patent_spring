@@ -3,7 +3,8 @@ package cn.edu.scut.patent.controller;
 import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import cn.edu.scut.patent.testing.IndexAndSearch;
+
+import cn.edu.scut.patent.core.IndexAndSearch;
 import cn.edu.scut.patent.util.Constants;
 import cn.edu.scut.patent.util.FileHelper;
 
