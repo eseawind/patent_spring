@@ -22,64 +22,63 @@ public class SearchController {
 	public void search(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		PatentDao patentdao = new PatentDao();
-
-		if (request.getParameter("applyNum").replaceAll(" ", "") != "") {
-			patentdao.setApplyNum(request.getParameter("applyNum"));
+		if (request.getParameter("APPLY_NUM").replaceAll(" ", "") != "") {
+			patentdao.setApplyNum(request.getParameter("APPLY_NUM"));
 		}
-		if (request.getParameter("applyDate").replaceAll(" ", "") != "") {
+		if (request.getParameter("APPLY_DATE").replaceAll(" ", "") != "") {
 			patentdao.setApplyDate(StringHelper.stringToDate(request
-					.getParameter("applyDate")));
+					.getParameter("APPLY_DATE")));
 		}
-		if (request.getParameter("pttName").replaceAll(" ", "") != "") {
-			patentdao.setPttName(request.getParameter("pttName"));
+		if (request.getParameter("PTT_NAME").replaceAll(" ", "") != "") {
+			patentdao.setPttName(request.getParameter("PTT_NAME"));
 		}
-		if (request.getParameter("pttNum").replaceAll(" ", "") != "") {
-			patentdao.setPttNum(request.getParameter("pttNum"));
+		if (request.getParameter("PTT_NUM").replaceAll(" ", "") != "") {
+			patentdao.setPttNum(request.getParameter("PTT_NUM"));
 		}
-		if (request.getParameter("pttDate").replaceAll(" ", "") != "") {
+		if (request.getParameter("PTT_DATE").replaceAll(" ", "") != "") {
 			patentdao.setPttDate(StringHelper.stringToDate(request
-					.getParameter("pttDate")));
+					.getParameter("PTT_DATE")));
 		}
-		if (request.getParameter("pttMainClassNum").replaceAll(" ", "") != "") {
+		if (request.getParameter("PTT_MAIN_CLASS_NUM").replaceAll(" ", "") != "") {
 			patentdao.setPttMainClassNum(request
-					.getParameter("pttMainClassNum"));
+					.getParameter("PTT_MAIN_CLASS_NUM"));
 		}
-		if (request.getParameter("pttClassNum").replaceAll(" ", "") != "") {
-			patentdao.setPttClassNum(request.getParameter("pttClassNum"));
+		if (request.getParameter("PTT_CLASS_NUM").replaceAll(" ", "") != "") {
+			patentdao.setPttClassNum(request.getParameter("PTT_CLASS_NUM"));
 		}
-		if (request.getParameter("proposer").replaceAll(" ", "") != "") {
-			patentdao.setProposer(request.getParameter("proposer"));
+		if (request.getParameter("PROPOSER").replaceAll(" ", "") != "") {
+			patentdao.setProposer(request.getParameter("PROPOSER"));
 		}
-		if (request.getParameter("proposerAddress").replaceAll(" ", "") != "") {
+		if (request.getParameter("PROPOSER_ADDRESS").replaceAll(" ", "") != "") {
 			patentdao.setProposerAddress(request
-					.getParameter("proposerAddress"));
+					.getParameter("PROPOSER_ADDRESS"));
 		}
-		if (request.getParameter("inventor").replaceAll(" ", "") != "") {
-			patentdao.setInventor(request.getParameter("inventor"));
+		if (request.getParameter("INVENTOR").replaceAll(" ", "") != "") {
+			patentdao.setInventor(request.getParameter("INVENTOR"));
 		}
-		if (request.getParameter("pttAgencyOrg").replaceAll(" ", "") != "") {
-			patentdao.setPttAgencyOrg(request.getParameter("pttAgencyOrg"));
-		}
-		if (request.getParameter("pttAgencyPerson").replaceAll(" ", "") != "") {
-			patentdao.setPttAgencyPerson(request
-					.getParameter("pttAgencyPerson"));
-		}
-		if (request.getParameter("pttAbstract").replaceAll(" ", "") != "") {
-			patentdao.setPttAbstract(request.getParameter("pttAbstract"));
-		}
-		if (request.getParameter("classNumG06Q").replaceAll(" ", "") != "") {
-			patentdao.setClassNumG06Q(request.getParameter("classNumG06Q"));
-		}
-		if (request.getParameter("internationalApply").replaceAll(" ", "") != "") {
+		if (request.getParameter("INTERNATIONAL_APPLY").replaceAll(" ", "") != "") {
 			patentdao.setInternationalApply(request
-					.getParameter("internationalApply"));
+					.getParameter("INTERNATIONAL_APPLY"));
 		}
-		if (request.getParameter("internationalPublication")
-				.replaceAll(" ", "") != "") {
+		if (request.getParameter("INTERNATIONAL_PUBLICATION").replaceAll(" ",
+				"") != "") {
 			patentdao.setInternationalPublication(request
-					.getParameter("internationalPublication"));
+					.getParameter("INTERNATIONAL_PUBLICATION"));
 		}
-
+		if (request.getParameter("INTO_DATE").replaceAll(" ", "") != "") {
+			patentdao.setPttDate(StringHelper.stringToDate(request
+					.getParameter("INTO_DATE")));
+		}
+		if (request.getParameter("PTT_AGENCY_ORG").replaceAll(" ", "") != "") {
+			patentdao.setPttAgencyOrg(request.getParameter("PTT_AGENCY_ORG"));
+		}
+		if (request.getParameter("PTT_AGENCY_PERSON").replaceAll(" ", "") != "") {
+			patentdao.setPttAgencyPerson(request
+					.getParameter("PTT_AGENCY_PERSON"));
+		}
+		if (request.getParameter("PTT_ABSTRACT").replaceAll(" ", "") != "") {
+			patentdao.setPttAbstract(request.getParameter("PTT_ABSTRACT"));
+		}
 		System.out.println("进入search啦！");
 		IndexAndSearch.doSearch(patentdao);
 	}

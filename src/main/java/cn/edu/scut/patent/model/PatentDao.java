@@ -49,55 +49,52 @@ public class PatentDao {
 	public Map<String, String> getAll(){
 		Map<String, String> map = new HashMap<String, String>();
 		if(applyNum != null){
-			map.put("applyNum", applyNum);
+			map.put("APPLY_NUM", applyNum);
 		}
 		if(applyDate != null){
-			map.put("applyDate", applyDate.toString());
+			map.put("APPLY_DATE", applyDate.toString());
 		}
 		if(pttName != null){
-			map.put("pttName", pttName);
+			map.put("PTT_NAME", pttName);
 		}
 		if(pttNum != null){
-			map.put("pttNum", pttNum);
+			map.put("PTT_NUM", pttNum);
 		}
 		if(pttDate != null){
-			map.put("pttDate", pttDate.toString());
+			map.put("PTT_DATE", pttDate.toString());
 		}
 		if(pttMainClassNum != null){
-			map.put("pttMainClassNum", pttMainClassNum);
+			map.put("PTT_MAIN_CLASS_NUM", pttMainClassNum);
 		}
 		if(pttClassNum != null){
-			map.put("pttClassNum", pttClassNum);
+			map.put("PTT_CLASS_NUM", pttClassNum);
 		}
 		if(proposer != null){
-			map.put("proposer", proposer);
+			map.put("PROPOSER", proposer);
 		}
 		if(proposerAddress != null){
-			map.put("proposerAddress", proposerAddress);
+			map.put("PROPOSER_ADDRESS", proposerAddress);
 		}
 		if(inventor != null){
-			map.put("inventor", inventor);
-		}
-		if(pttAgencyOrg != null){
-			map.put("pttAgencyOrg", pttAgencyOrg);
-		}
-		if(pttAgencyPerson != null){
-			map.put("pttAgencyPerson", pttAgencyPerson);
-		}
-		if(pttAbstract != null){
-			map.put("pttAbstract", pttAbstract);
-		}
-		if(classNumG06Q != null){
-			map.put("classNumG06Q", classNumG06Q);
+			map.put("INVENTOR", inventor);
 		}
 		if(internationalApply != null){
-			map.put("internationalApply", internationalApply);
+			map.put("INTERNATIONAL_APPLY", internationalApply);
 		}
 		if(internationalPublication != null){
-			map.put("internationalPublication", internationalPublication);
+			map.put("INTERNATIONAL_PUBLICATION", internationalPublication);
 		}
 		if(intoDate != null){
-			map.put("intoDate", intoDate.toString());
+			map.put("INTO_DATE", intoDate.toString());
+		}
+		if(pttAgencyOrg != null){
+			map.put("PTT_AGENCY_ORG", pttAgencyOrg);
+		}
+		if(pttAgencyPerson != null){
+			map.put("PTT_AGENCY_PERSON", pttAgencyPerson);
+		}
+		if(pttAbstract != null){
+			map.put("PTT_ABSTRACT", pttAbstract);
 		}
 		if(pttType != null){
 			map.put("pttType", pttType);

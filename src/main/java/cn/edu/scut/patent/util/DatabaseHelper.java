@@ -8,6 +8,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.TextField;
 import cn.edu.scut.patent.model.PatentDao;
 
 public class DatabaseHelper {
@@ -20,9 +26,37 @@ public class DatabaseHelper {
 	 */
 	private static Connection getConnection() throws Exception {
 		Class.forName("com.mysql.jdbc.Driver");
-		return DriverManager.getConnection("jdbc:mysql://"
-				+ Constants.MYSQL_URL, Constants.MYSQL_ACCOUNT,
-				Constants.MYSQL_PASSWORD);
+		return DriverManager.getConnection(Constants.MYSQL_URL,
+				Constants.MYSQL_ACCOUNT, Constants.MYSQL_PASSWORD);
+	}
+
+	/**
+	 * 检查MySQL数据库是否完整
+	 * 
+	 * @return
+	 */
+	private static Boolean checkMySQL() {
+		if (!isDatabaseExisted("patentdb")) {
+			if (!createDatabase()) {
+				return false;
+			}
+		}
+		if (!isTableExisted("PATENTS")) {
+			if (!createTablePATENTS()) {
+				return false;
+			}
+		}
+		if (!isTableExisted("TRIZ")) {
+			if (!createTableTRIZ()) {
+				return false;
+			}
+		}
+		if (!isTableExisted("CLASSIFICATION")) {
+			if (!createTableCLASSIFICATION()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -58,7 +92,7 @@ public class DatabaseHelper {
 	 * @param table_name
 	 * @return
 	 */
-	private static Boolean isTableExisted(String table_name) {
+	public static Boolean isTableExisted(String table_name) {
 		try {
 			Connection con = getConnection();
 			Statement sta = con.createStatement();
@@ -131,12 +165,12 @@ public class DatabaseHelper {
 	}
 
 	/**
-	 * 创建PATENTS和CLASSIFICATION数据表
+	 * 创建PATENTS数据表
 	 * 
 	 * @param
 	 * @return Boolean
 	 */
-	private static Boolean createTables() {
+	private static Boolean createTablePATENTS() {
 		try {
 			Connection con = getConnection();
 			String sql_create_table_patents = "CREATE TABLE PATENTS ("
@@ -159,19 +193,33 @@ public class DatabaseHelper {
 					+ ", CLASS_NUM_G06Q VARCHAR(200)" + ", PTT_TYPE VARCHAR(4)"
 					+ ", FILE_NAME VARCHAR(200) NOT NULL)" + " ENGINE = InnoDB"
 					+ ";";
+			System.out.println(sql_create_table_patents);
+			PreparedStatement ps = con
+					.prepareStatement(sql_create_table_patents);
+			ps.executeUpdate();
+			ps.close();
+			con.close();
+			System.out.println("创建数据表PATENTS数据成功");
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("创建数据表PATENTS失败");
+			return false;
+		}
+	}
 
+	/**
+	 * 创建TRIZ数据表
+	 * 
+	 * @param
+	 * @return Boolean
+	 */
+	private static Boolean createTableTRIZ() {
+		try {
+			Connection con = getConnection();
 			String sql_create_table_triz = "CREATE TABLE TRIZ ("
 					+ "TRIZ_NUM INT" + ", TRIZ_TEXT VARCHAR(200) NOT NULL"
 					+ ", PRIMARY KEY(TRIZ_NUM))" + " ENGINE = InnoDB" + ";";
-
-			String sql_create_table_classification = "CREATE TABLE CLASSIFICATION ("
-					+ "PTT_NUM VARCHAR(20)"
-					+ ", TRIZ_NUM INT"
-					+ ", PRIMARY KEY(PTT_NUM, TRIZ_NUM)"
-					+ ", FOREIGN KEY (PTT_NUM) REFERENCES PATENTS(PTT_NUM) ON DELETE RESTRICT ON UPDATE RESTRICT"
-					+ ", FOREIGN KEY (TRIZ_NUM) REFERENCES TRIZ(TRIZ_NUM) ON DELETE RESTRICT ON UPDATE RESTRICT)"
-					+ " ENGINE = InnoDB" + ";";
-
 			String sql_insert_into_triz = "INSERT INTO patentdb.TRIZ (TRIZ_NUM, TRIZ_TEXT) VALUES "
 					+ "('"
 					+ "1"
@@ -411,29 +459,114 @@ public class DatabaseHelper {
 					+ "40"
 					+ "','"
 					+ "利用混合材料原则" + "');";
-
-			System.out.println(sql_create_table_patents);
 			System.out.println(sql_create_table_triz);
-			System.out.println(sql_create_table_classification);
 			System.out.println(sql_insert_into_triz);
-			PreparedStatement ps = con
-					.prepareStatement(sql_create_table_patents);
-			ps.executeUpdate();
-			ps = con.prepareStatement(sql_create_table_triz);
-			ps.executeUpdate();
-			ps = con.prepareStatement(sql_create_table_classification);
+			PreparedStatement ps = con.prepareStatement(sql_create_table_triz);
 			ps.executeUpdate();
 			ps = con.prepareStatement(sql_insert_into_triz);
 			ps.executeUpdate();
 			ps.close();
 			con.close();
-			System.out.println("创建数据表PATENTS、TRIZ和CLASSIFICATION，输入TRIZ数据成功");
+			System.out.println("创建数据表TRIZ、输入TRIZ数据成功");
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("创建数据表PATENTS、TRIZ和CLASSIFICATION，输入TRIZ数据失败");
+			System.out.println("创建数据表TRIZ、输入TRIZ数据失败");
 			return false;
 		}
+	}
+
+	/**
+	 * 创建CLASSIFICATION数据表
+	 * 
+	 * @param
+	 * @return Boolean
+	 */
+	private static Boolean createTableCLASSIFICATION() {
+		try {
+			Connection con = getConnection();
+			String sql_create_table_classification = "CREATE TABLE CLASSIFICATION ("
+					+ "PTT_NUM VARCHAR(20)"
+					+ ", TRIZ_NUM INT"
+					+ ", PRIMARY KEY(PTT_NUM, TRIZ_NUM)"
+					+ ", FOREIGN KEY (PTT_NUM) REFERENCES PATENTS(PTT_NUM) ON DELETE RESTRICT ON UPDATE RESTRICT"
+					+ ", FOREIGN KEY (TRIZ_NUM) REFERENCES TRIZ(TRIZ_NUM) ON DELETE RESTRICT ON UPDATE RESTRICT)"
+					+ " ENGINE = InnoDB" + ";";
+			System.out.println(sql_create_table_classification);
+			PreparedStatement ps = con
+					.prepareStatement(sql_create_table_classification);
+			ps.executeUpdate();
+			ps.close();
+			con.close();
+			System.out.println("创建数据表CLASSIFICATION成功");
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("创建数据表CLASSIFICATION失败");
+			return false;
+		}
+	}
+
+	/**
+	 * 获取所有的专利数据
+	 * 
+	 * @return
+	 */
+	private static List<PatentDao> getAllPatents() {
+		if (!checkMySQL()) {
+			return null;
+		}
+		try {
+			Connection con = getConnection();
+			Statement sta = con.createStatement();
+			String sql = "SELECT * FROM PATENTS;";
+			ResultSet rs = sta.executeQuery(sql);
+			List<PatentDao> listPatent = transferDataToPatentDao(rs);
+			if (listPatent.size() == 0) {
+				return null;
+			} else {
+				return listPatent;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("获取所有专利数据有误 !");
+			return null;
+		}
+	}
+
+	/**
+	 * 把ResultSet转化为List<PatentDao>
+	 * 
+	 * @param rs
+	 * @return
+	 * @throws SQLException
+	 */
+	private static List<PatentDao> transferDataToPatentDao(ResultSet rs)
+			throws SQLException {
+		List<PatentDao> listPatent = new ArrayList<PatentDao>();
+		while (rs.next()) {
+			PatentDao pttDao = new PatentDao();
+			pttDao.setPttType(rs.getString("PTT_TYPE"));
+			pttDao.setApplyNum(rs.getString("APPLY_NUM"));
+			pttDao.setApplyDate(rs.getDate("APPLY_DATE"));
+			pttDao.setPttName(rs.getString("PTT_NAME"));
+			pttDao.setPttNum(rs.getString("PTT_NUM"));
+			pttDao.setPttDate(rs.getDate("PTT_DATE"));
+			pttDao.setPttMainClassNum(rs.getString("PTT_MAIN_CLASS_NUM"));
+			pttDao.setPttClassNum(rs.getString("PTT_CLASS_NUM"));
+			pttDao.setProposer(rs.getString("PROPOSER"));
+			pttDao.setProposerAddress(rs.getString("PROPOSER_ADDRESS"));
+			pttDao.setInventor(rs.getString("INVENTOR"));
+			pttDao.setInternationalApply(rs.getString("INTERNATIONAL_APPLY"));
+			pttDao.setInternationalPublication(rs
+					.getString("INTERNATIONAL_PUBLICATION"));
+			pttDao.setIntoDate(rs.getDate("INTO_DATE"));
+			pttDao.setPttAgencyOrg(rs.getString("PTT_AGENCY_ORG"));
+			pttDao.setPttAgencyPerson(rs.getString("PTT_AGENCY_PERSON"));
+			pttDao.setPttAbstract(rs.getString("PTT_ABSTRACT"));
+			listPatent.add(pttDao);
+		}
+		return listPatent;
 	}
 
 	/**
@@ -498,9 +631,9 @@ public class DatabaseHelper {
 	}
 
 	/**
-	 * 按照Map<String, String>的格式写入数据库
+	 * 按照专利的格式写入数据库的外部接口
 	 * 
-	 * @param map
+	 * @param patentdao
 	 * @throws IOException
 	 */
 	public static void saveToDatabase(PatentDao patentdao) throws IOException {
@@ -520,16 +653,8 @@ public class DatabaseHelper {
 	 * @return
 	 */
 	private static Boolean writeToDb(PatentDao pttDao) {
-
-		if (!isDatabaseExisted("patentdb")) {
-			if (!createDatabase()) {
-				return false;
-			}
-		}
-		if (!isTableExisted("PATENTS")) {
-			if (!createTables()) {
-				return false;
-			}
+		if (!checkMySQL()) {
+			return false;
 		}
 		try {
 			Connection con = getConnection();
@@ -591,6 +716,60 @@ public class DatabaseHelper {
 			System.out.println(pttDao.getPttNum());
 			return false;
 		}
+	}
+
+	/**
+	 * 从数据库获取索引数据
+	 * 
+	 * @throws Exception
+	 */
+	public static List<Document> getDocumentFromDatabase(Analyzer analyzer)
+			throws Exception {
+		List<PatentDao> listPatent = getAllPatents();
+		if (listPatent == null || listPatent.size() == 0) {
+			return null;
+		}
+		List<Document> listDocument = new ArrayList<Document>();
+		for (int i = 0; i < listPatent.size(); i++) {
+			PatentDao pttDao = listPatent.get(i);
+			Document document = new Document();
+			document.add(new TextField("PTT_TYPE", pttDao.getPttType(),
+					Field.Store.YES));
+			document.add(new TextField("APPLY_NUM", pttDao.getApplyNum(),
+					Field.Store.YES));
+			document.add(new TextField("APPLY_DATE", pttDao.getApplyDate()
+					.toString(), Field.Store.YES));
+			document.add(new TextField("PTT_NAME", pttDao.getPttName(),
+					Field.Store.YES));
+			document.add(new TextField("PTT_NUM", pttDao.getPttNum(),
+					Field.Store.YES));
+			document.add(new TextField("PTT_DATE", pttDao.getPttDate()
+					.toString(), Field.Store.YES));
+			document.add(new TextField("PTT_MAIN_CLASS_NUM", pttDao
+					.getPttMainClassNum(), Field.Store.YES));
+			document.add(new TextField("PTT_CLASS_NUM",
+					pttDao.getPttClassNum(), Field.Store.YES));
+			document.add(new TextField("PROPOSER", pttDao.getProposer(),
+					Field.Store.YES));
+			document.add(new TextField("PROPOSER_ADDRESS", pttDao
+					.getProposerAddress(), Field.Store.YES));
+			document.add(new TextField("INVENTOR", pttDao.getInventor(),
+					Field.Store.YES));
+			document.add(new TextField("INTERNATIONAL_APPLY", pttDao
+					.getInternationalApply(), Field.Store.YES));
+			document.add(new TextField("INTERNATIONAL_PUBLICATION", pttDao
+					.getInternationalPublication(), Field.Store.YES));
+			document.add(new TextField("INTO_DATE", pttDao.getIntoDate()
+					.toString(), Field.Store.YES));
+			document.add(new TextField("PTT_AGENCY_ORG", pttDao
+					.getPttAgencyOrg(), Field.Store.YES));
+			document.add(new TextField("PTT_AGENCY_PERSON", pttDao
+					.getPttAgencyPerson(), Field.Store.YES));
+			document.add(new TextField("PTT_ABSTRACT", pttDao.getPttAbstract(),
+					Field.Store.YES));
+			listDocument.add(document);
+		}
+		return listDocument;
 	}
 
 	/**

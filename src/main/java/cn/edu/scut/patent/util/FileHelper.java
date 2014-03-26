@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FileHelper {
-	
+
 	public static int count = 1;
 
 	/**
@@ -29,5 +29,21 @@ public class FileHelper {
 			}
 		}
 		return map;
+	}
+
+	/**
+	 * 判断文件夹目录下是否存在文件
+	 * 
+	 * @param filepath
+	 * @return
+	 */
+	public static boolean hasFiles(String filepath) {
+		File file = new File(filepath);
+		File[] fileList = file.listFiles();
+		if (fileList.length == 0) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 }

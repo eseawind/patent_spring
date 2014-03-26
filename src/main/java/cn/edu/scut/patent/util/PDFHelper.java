@@ -27,8 +27,6 @@ import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
 import org.apache.pdfbox.util.PDFTextStripper;
 import org.wltea.analyzer.lucene.IKAnalyzer;
-import ICTCLAS2014.Nlpir;
-import cn.edu.scut.patent.ICTCLASAnalyzer.ICTCLASAnalyzer;
 import cn.edu.scut.patent.model.PatentDao;
 
 public class PDFHelper {
@@ -162,7 +160,7 @@ public class PDFHelper {
 	}
 
 	/**
-	 * 获取专利的各个属性
+	 * 从SOOPAT的PDF专利文档获取专利的各个属性
 	 */
 	private static PatentDao getPatentDetails(String text) {
 		String[] result = text.split("\n");
