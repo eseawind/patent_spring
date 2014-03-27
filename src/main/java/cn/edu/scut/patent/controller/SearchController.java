@@ -1,11 +1,14 @@
 package cn.edu.scut.patent.controller;
 
 import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import cn.edu.scut.patent.core.IndexAndSearch;
 import cn.edu.scut.patent.model.PatentDao;
 import cn.edu.scut.patent.util.StringHelper;
@@ -80,6 +83,16 @@ public class SearchController {
 			patentdao.setPttAbstract(request.getParameter("PTT_ABSTRACT"));
 		}
 		System.out.println("进入search啦！");
-		IndexAndSearch.doSearch(patentdao);
+		List<PatentDao> patentList = IndexAndSearch.doSearch(patentdao);
+		
+		request.getSession().setAttribute("PATENTLIST", patentList);
+		//request.setAttribute("PATENTLIST", patentList);
+		RequestDispatcher re = request.getRequestDispatcher("view/searchresult.jsp");
+		try {
+			re.forward(request, response);
+		} catch (ServletException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

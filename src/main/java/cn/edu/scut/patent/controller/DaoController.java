@@ -44,13 +44,17 @@ public class DaoController {
 			HttpServletResponse response) {
 		String PTT_NUM = request.getParameter("PTT_NUM");
 		String[] TRIZ_NUM = request.getParameterValues("triz");
+		for(int i = 0; i < TRIZ_NUM.length; i++){
+			System.out.println(i + "@@" + TRIZ_NUM[i]);
+		}
+		System.out.println();
 		String result;
 		if (DatabaseHelper.updateTrizNumber(PTT_NUM, TRIZ_NUM)) {
 			result = "UPDATE SUCCESS!";
 		} else {
 			result = "UPDATE FAILED!";
 		}
-		ModelAndView mv = new ModelAndView("/index", "command", result);
+		ModelAndView mv = new ModelAndView("index", "command", result);
 		return mv;
 	}
 }

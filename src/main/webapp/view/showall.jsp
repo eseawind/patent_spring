@@ -57,7 +57,7 @@ String basePath = request.getScheme() + "://"
 <tr><td><input type="submit" value="Index提交"></td><td><input type="reset" value="重置"></td></tr>
 </table>
 </form>
-<%
+<%--<%
 try{
 // 加载驱动
 Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -83,6 +83,6 @@ conn.close();
 out.print("无数据");
 out.print(e.getMessage());
 }
-%>
+%>--%>
 </body>
 </html>
