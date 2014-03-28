@@ -370,12 +370,12 @@ public class GetPatents {
 		} catch (SocketTimeoutException e) {
 			System.err.println("页面无法下载,重试" + e.getMessage() + "    url:"
 					+ url.toString());
-			down(url, filename, type);
+			// down(url, filename, type);
 		} catch (SocketException e) {
 			// e.printStackTrace();
 			System.err.println("页面无法下载,重试" + e.getMessage() + "    url:"
 					+ url.toString());
-			down(url, filename, type);
+			// down(url, filename, type);
 		} catch (IOException e) {
 			System.err.println(e.getMessage() + "    url:" + url.toString());
 			down(repalceUrl(url), filename, type);

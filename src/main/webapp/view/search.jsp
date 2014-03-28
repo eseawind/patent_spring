@@ -19,14 +19,12 @@ String basePath = request.getScheme() + "://"
 <table>
 <tr>
 <td colspan="4">
-<input type="checkbox" id="FMZL" name="FMZL" value="Y" checked="checked">
+<input type="checkbox" name="FMZL" value="11" checked="checked">
 <label for="FMZL">发明</label>
-<input type="checkbox" id="SYXX" name="SYXX" value="Y" checked="checked">
+<input type="checkbox" name="SYXX" value="22" checked="checked">
 <label for="SYXX">实用新型</label>
-<input type="checkbox" id="WGZL" name="WGZL" value="Y" checked="checked">
+<input type="checkbox" name="WGSJ" value="33" checked="checked">
 <label for="WGZL" style="vertical-align:middle">外观设计</label>
-<input type="checkbox" id="FMSQ" name="FMSQ" value="Y">
-<label for="FMSQ">发明授权</label> 
 </td>
 </tr>
 <tr>
@@ -57,7 +55,7 @@ String basePath = request.getScheme() + "://"
 <tr><td><input type="submit" value="Index提交"></td><td><input type="reset" value="重置"></td></tr>
 </table>
 </form>
-<%--<%
+<%--显示所有的专利<%
 try{
 // 加载驱动
 Class.forName("com.mysql.jdbc.Driver").newInstance();

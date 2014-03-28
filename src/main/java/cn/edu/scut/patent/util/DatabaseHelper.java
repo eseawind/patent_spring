@@ -699,15 +699,8 @@ public class DatabaseHelper {
 					+ pttDao.getPttType()
 					+ "','" + pttDao.getFileName() + "')";
 
-			String sql_insert_into_classification = "INSERT INTO patentdb.CLASSIFICATION (PTT_NUM, TRIZ_NUM) VALUES ('"
-					+ StringHelper.replaceSpecialCharacters(pttDao.getPttNum())
-					+ "','" + "23" + "')";
-
 			System.out.println(sql_insert_into_patents);
-			System.out.println(sql_insert_into_classification);
 			sta.execute(sql_insert_into_patents);
-			sta.execute(sql_insert_into_classification);
-
 			sta.close();
 			con.close();
 			return true;

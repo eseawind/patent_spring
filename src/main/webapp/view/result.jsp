@@ -49,7 +49,7 @@
 
 					htmlString += "<tr>";
 					htmlString += "<td>" + (i + 1) + "</td>";
-					htmlString += "<td>" + "<a href='/patent_spring/view/showPDF.jsp?FILE_NAME=200810142584.pdf" + "&PTT_NUM=" + pttDao.getPttNum() + "'>" + pttDao.getPttName() + "</a>" + "</td>";
+					htmlString += "<td>" + "<a href='/patent_spring/view/showFile.jsp?FILE_NAME=200810142584.pdf" + "&PTT_NUM=" + pttDao.getPttNum() + "'>" + pttDao.getPttName() + "</a>" + "</td>";
 					htmlString += "<td>" + pttDao.getPttNum() + "</td>";
 					htmlString += "<td>" + pttDao.getInventor() + "</td>";
 					htmlString += "<td>" + pttDao.getProposer() + "</td>";
@@ -79,7 +79,7 @@
 							+ (pageNumber + 2) + "</a>";
 				}
 				if (pageNumber < pageTotal) {
-					htmlString += "<a href='/patent_spring/view/showresult.jsp'>下一页</a>";
+					htmlString += "<a href='/patent_spring/view/result.jsp'>下一页</a>";
 				}
 				htmlString += "共" + pageTotal + "页";
 			}

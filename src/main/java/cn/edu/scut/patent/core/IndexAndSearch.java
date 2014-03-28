@@ -57,7 +57,8 @@ public class IndexAndSearch {
 		IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_46,
 				analyzer);
 		// 设置打开索引模式为创建或追加
-		config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+		config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
+		// config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
 		IndexWriter indexWriter = new IndexWriter(directory, config);
 		// 索引开始的时间
 		long startTime = new Date().getTime();
@@ -137,8 +138,8 @@ public class IndexAndSearch {
 	 * 
 	 * @throws IOException
 	 */
-	public static List<PatentDao> doSearch(PatentDao patentdao)
-			throws IOException {
+	public static List<PatentDao> doSearch(PatentDao patentdao,
+			List<String> pttTypeList) throws IOException {
 		TopDocs td = null;
 		Query query = null;
 		Directory directory = FSDirectory.open(new File(
@@ -206,6 +207,15 @@ public class IndexAndSearch {
 				}
 				System.out.println("key:" + key + "&value:" + value);
 			}
+
+			BooleanQuery pttTypeBooleanQuery = new BooleanQuery();
+			for (int i = 0; i < pttTypeList.size(); i++) {
+				Query tempQuery = new TermQuery(new Term("PTT_TYPE",
+						pttTypeList.get(i)));
+				pttTypeBooleanQuery.add(tempQuery, Occur.SHOULD);
+			}
+			booleanQuery.add(pttTypeBooleanQuery, Occur.MUST);
+
 			query = booleanQuery;
 		}
 		// String[] fields;

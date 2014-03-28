@@ -1,8 +1,8 @@
 package cn.edu.scut.patent.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +24,17 @@ public class SearchController {
 	@RequestMapping(value = "search")
 	public void search(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
+		List<String> pttTypeList = new ArrayList<String>();
 		PatentDao patentdao = new PatentDao();
+		if (request.getParameter("FMZL") != null) {
+			pttTypeList.add(request.getParameter("FMZL"));
+		}
+		if (request.getParameter("SYXX") != null) {
+			pttTypeList.add(request.getParameter("SYXX"));
+		}
+		if (request.getParameter("WGSJ") != null) {
+			pttTypeList.add(request.getParameter("WGSJ"));
+		}
 		if (request.getParameter("APPLY_NUM").replaceAll(" ", "") != "") {
 			patentdao.setApplyNum(request.getParameter("APPLY_NUM"));
 		}
@@ -83,11 +93,11 @@ public class SearchController {
 			patentdao.setPttAbstract(request.getParameter("PTT_ABSTRACT"));
 		}
 		System.out.println("进入search啦！");
-		List<PatentDao> patentList = IndexAndSearch.doSearch(patentdao);
-		
+		List<PatentDao> patentList = IndexAndSearch.doSearch(patentdao,
+				pttTypeList);
+
 		request.getSession().setAttribute("PATENTLIST", patentList);
-		//request.setAttribute("PATENTLIST", patentList);
-		RequestDispatcher re = request.getRequestDispatcher("view/searchresult.jsp");
+		RequestDispatcher re = request.getRequestDispatcher("view/result.jsp");
 		try {
 			re.forward(request, response);
 		} catch (ServletException e) {
