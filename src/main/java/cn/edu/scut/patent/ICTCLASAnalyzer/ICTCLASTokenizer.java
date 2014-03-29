@@ -97,4 +97,24 @@ public final class ICTCLASTokenizer extends CharTokenizer {
 			return false;
 		}
 	}
+	
+//	/**
+//	 * 根据UnicodeBlock方法判断中文标点符号
+//	 * 
+//	 * 为了适应jdk1.6所作出的调整，jdk1.7版本为上述注释部分
+//	 * 
+//	 * @param c
+//	 * @return
+//	 */
+//	private boolean isChinesePunctuation(int c) {
+//		Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
+//		if (ub == Character.UnicodeBlock.GENERAL_PUNCTUATION
+//				|| ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
+//				|| ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS
+//				|| ub == Character.UnicodeBlock.CJK_COMPATIBILITY_FORMS) {
+//			return true;
+//		} else {
+//			return false;
+//		}
+//	}
 }

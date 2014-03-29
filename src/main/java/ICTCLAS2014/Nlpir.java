@@ -10,6 +10,9 @@ import com.sun.jna.Native;
  */
 public class Nlpir {
 
+	// 作为是否已经初始化的标记
+	private static int flag = 0;
+
 	/**
 	 * 定义接口CLibrary，继承自com.sun.jna.Library
 	 */
@@ -72,26 +75,30 @@ public class Nlpir {
 	}
 
 	/**
-	 * 供外界调用的静态方法，执行ICTCLAS分词
+	 * 执行ICTCLAS分词
 	 */
-	public static void doNlpir(String inputString, String[] addWord,
+	private static String doNlpir(String inputString, String[] addWord,
 			String[] deleteWord, String MaxKeyLimit) {
 		// ICTCLAS词库library(即Data文件夹)的相对路径
 		String library = Constants.ICTCLAS_LIBRARY_STRING;
 		// String system_charset = "GBK";//GBK----0
 		// String system_charset = "UTF-8";
-		int charset_type = 1;
-		int init_flag = CLibrary.Instance
-				.NLPIR_Init(library, charset_type, "0");
-		if (0 == init_flag) {
-			System.err.println("初始化失败！");
-			return;
+		int charset_type = 0;
+		if (flag == 0) {
+			int init_flag = CLibrary.Instance.NLPIR_Init(library, charset_type,
+					"0");
+			if (0 == init_flag) {
+				System.err.println("初始化失败！");
+				return null;
+			} else {
+				flag = 1;
+			}
 		}
 		String nativeBytes = null;
 		try {
 			System.out.println("输入的文本为： " + inputString);
 			nativeBytes = CLibrary.Instance.NLPIR_ParagraphProcess(inputString,
-					1);
+					0);
 			System.out.println("分词结果为： " + nativeBytes);
 
 			// 如果用户需要增加词典，则显示增加词典的效果
@@ -100,7 +107,7 @@ public class Nlpir {
 					CLibrary.Instance.NLPIR_AddUserWord(addWord[i]);
 				}
 				nativeBytes = CLibrary.Instance.NLPIR_ParagraphProcess(
-						inputString, 1);
+						inputString, 0);
 				System.out.println("增加用户词典后分词结果为： " + nativeBytes);
 			}
 
@@ -110,7 +117,7 @@ public class Nlpir {
 					CLibrary.Instance.NLPIR_DelUsrWord(deleteWord[i]);
 				}
 				nativeBytes = CLibrary.Instance.NLPIR_ParagraphProcess(
-						inputString, 1);
+						inputString, 0);
 				System.out.println("删除用户词典后分词结果为： " + nativeBytes);
 			}
 
@@ -123,58 +130,21 @@ public class Nlpir {
 				System.out.println("提取的关键词个数为：" + nCountKey);
 				System.out.println("关键词提取结果是：" + nativeByte);
 			}
-			CLibrary.Instance.NLPIR_Exit();
-		} catch (Exception ex) {
-			// TODO Auto-generated catch block
-			ex.printStackTrace();
-		}
-	}
-
-	public static String doNlpirString(String inputString, String[] addWord,
-			String[] deleteWord) {
-		// ICTCLAS词库library(即Data文件夹)的相对路径
-		String library = Constants.ICTCLAS_LIBRARY_STRING;
-		// String system_charset = "GBK";//GBK----0
-		// String system_charset = "UTF-8";
-		int charset_type = 1;
-		int init_flag = CLibrary.Instance
-				.NLPIR_Init(library, charset_type, "0");
-		if (0 == init_flag) {
-			System.err.println("初始化失败！");
-			return null;
-		}
-		String nativeBytes = null;
-		try {
-			System.out.println("输入的文本为： " + inputString);
-			nativeBytes = CLibrary.Instance.NLPIR_ParagraphProcess(inputString,
-					1);
-			System.out.println("分词结果为： " + nativeBytes);
-
-			// 如果用户需要增加词典，则显示增加词典的效果
-			if (addWord != null) {
-				for (int i = 0; i < addWord.length; i++) {
-					CLibrary.Instance.NLPIR_AddUserWord(addWord[i]);
-				}
-				nativeBytes = CLibrary.Instance.NLPIR_ParagraphProcess(
-						inputString, 1);
-				System.out.println("增加用户词典后分词结果为： " + nativeBytes);
-			}
-
-			// 如果用户需要删除词典，则显示删除词典的效果
-			if (deleteWord != null) {
-				for (int i = 0; i < deleteWord.length; i++) {
-					CLibrary.Instance.NLPIR_DelUsrWord(deleteWord[i]);
-				}
-				nativeBytes = CLibrary.Instance.NLPIR_ParagraphProcess(
-						inputString, 1);
-				System.out.println("删除用户词典后分词结果为： " + nativeBytes);
-			}
-			CLibrary.Instance.NLPIR_Exit();
+			// 以下注释了NLPIR的推出部分，以防止需要再次初始化。
+			// CLibrary.Instance.NLPIR_Exit();
 		} catch (Exception ex) {
 			// TODO Auto-generated catch block
 			ex.printStackTrace();
 		}
 		return nativeBytes;
+	}
+
+	/**
+	 * 供外界调用的静态方法，执行ICTCLAS分词
+	 */
+	public static String doNlpirString(String inputString, String[] addWord,
+			String[] deleteWord) {
+		return doNlpir(inputString, addWord, deleteWord, null);
 	}
 
 	/**
@@ -185,6 +155,8 @@ public class Nlpir {
 		String[] addWord = { "要求美方加强对输 n", "华玉米的产地来源 n" };
 		String[] delWord = { "要求美方加强对输 n" };
 		String maxKey = "10";
-		doNlpir(inputString, addWord, delWord, maxKey);
+		for (int i = 0; i < 100; i++) {
+			doNlpir(inputString, addWord, delWord, maxKey);
+		}
 	}
 }

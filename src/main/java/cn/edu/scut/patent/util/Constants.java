@@ -11,10 +11,10 @@ public class Constants {
 	public static String TRANSFER_PDF_TO_IMAGES_DIR_STRING = "E:/dir/images";
 	// 转化图片的类型
 	public static String TYPE = "TIF";
-	// 存放NLPIR.dll的相对路径
-	public static String NLPIR_DLL_STRING = "data/ICTCLAS2014/NLPIR";
-	// ICTCLAS词库library(即Data文件夹)的相对路径
-	public static String ICTCLAS_LIBRARY_STRING = "data/ICTCLAS2014";
+	// 存放NLPIR.dll的绝对路径
+	public static String NLPIR_DLL_STRING = "E:/code/Juno workplace/patent_spring/data/ICTCLAS2014/NLPIR";
+	// ICTCLAS词库library(即Data文件夹)的绝对路径
+	public static String ICTCLAS_LIBRARY_STRING = "E:/code/Juno workplace/patent_spring/data/ICTCLAS2014";
 	// MySql的访问路径
 	public static String MYSQL_URL = "jdbc:mysql://localhost/patentdb";
 	// MySql的账户名

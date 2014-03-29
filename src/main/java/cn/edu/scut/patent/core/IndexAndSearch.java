@@ -135,7 +135,9 @@ public class IndexAndSearch {
 
 	/**
 	 * 查询程序的执行
-	 * 
+	 * @param patentdao
+	 * @param pttTypeList
+	 * @return
 	 * @throws IOException
 	 */
 	public static List<PatentDao> doSearch(PatentDao patentdao,

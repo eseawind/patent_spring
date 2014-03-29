@@ -27,6 +27,7 @@ import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
 import org.apache.pdfbox.util.PDFTextStripper;
 import org.wltea.analyzer.lucene.IKAnalyzer;
+import ICTCLAS2014.Nlpir;
 import cn.edu.scut.patent.model.PatentDao;
 
 public class PDFHelper {
@@ -38,7 +39,6 @@ public class PDFHelper {
 	 */
 	public static Document getDocumentFromPDF(File pdf, Analyzer analyzer)
 			throws Exception {
-		// Document document = LucenePDFDocument.getDocument(pdf);
 		String pdfpath = pdf.getAbsolutePath();
 		// 创建输入流读取pdf文件
 		String title = pdf.getName();
@@ -57,7 +57,7 @@ public class PDFHelper {
 			// 获取图片
 			// getImagesInPDF(doc, title);
 			// 转化图片
-			transferPDFToImages(doc, title, Constants.TYPE);
+			// transferPDFToImages(doc, title, Constants.TYPE);
 			// 获取专利的各项属性
 			patentdao = getPatentDetails(result);
 			patentdao.setFileName(title);
@@ -82,7 +82,8 @@ public class PDFHelper {
 			}
 		}
 		Document document = new Document();
-		document.add(new TextField("title", title, Field.Store.YES));
+		document.add(new TextField("title", Nlpir.doNlpirString(title, null,
+				null), Field.Store.YES));
 		document.add(new TextField("path", pdfpath, Field.Store.YES));
 
 		Map<String, String> map = patentdao.getAll();
@@ -92,7 +93,7 @@ public class PDFHelper {
 			Iterator it = keySet.iterator();
 			while (it.hasNext()) {
 				String key = (String) it.next();
-				String value = map.get(key);
+				String value = Nlpir.doNlpirString(map.get(key), null, null);
 				document.add(new TextField(key, value, Field.Store.YES));
 			}
 		}

@@ -14,6 +14,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
+import ICTCLAS2014.Nlpir;
 import cn.edu.scut.patent.model.PatentDao;
 
 public class DatabaseHelper {
@@ -726,40 +727,44 @@ public class DatabaseHelper {
 		for (int i = 0; i < listPatent.size(); i++) {
 			PatentDao pttDao = listPatent.get(i);
 			Document document = new Document();
-			document.add(new TextField("PTT_TYPE", pttDao.getPttType(),
-					Field.Store.YES));
-			document.add(new TextField("APPLY_NUM", pttDao.getApplyNum(),
-					Field.Store.YES));
+			document.add(new TextField("PTT_TYPE", Nlpir.doNlpirString(
+					pttDao.getPttType(), null, null), Field.Store.YES));
+			document.add(new TextField("APPLY_NUM", Nlpir.doNlpirString(
+					pttDao.getApplyNum(), null, null), Field.Store.YES));
 			document.add(new TextField("APPLY_DATE", pttDao.getApplyDate()
 					.toString(), Field.Store.YES));
-			document.add(new TextField("PTT_NAME", pttDao.getPttName(),
-					Field.Store.YES));
-			document.add(new TextField("PTT_NUM", pttDao.getPttNum(),
-					Field.Store.YES));
+			document.add(new TextField("PTT_NAME", Nlpir.doNlpirString(
+					pttDao.getPttName(), null, null), Field.Store.YES));
+			document.add(new TextField("PTT_NUM", Nlpir.doNlpirString(
+					pttDao.getPttNum(), null, null), Field.Store.YES));
 			document.add(new TextField("PTT_DATE", pttDao.getPttDate()
 					.toString(), Field.Store.YES));
-			document.add(new TextField("PTT_MAIN_CLASS_NUM", pttDao
-					.getPttMainClassNum(), Field.Store.YES));
-			document.add(new TextField("PTT_CLASS_NUM",
-					pttDao.getPttClassNum(), Field.Store.YES));
-			document.add(new TextField("PROPOSER", pttDao.getProposer(),
+			document.add(new TextField("PTT_MAIN_CLASS_NUM", Nlpir
+					.doNlpirString(pttDao.getPttMainClassNum(), null, null),
 					Field.Store.YES));
-			document.add(new TextField("PROPOSER_ADDRESS", pttDao
-					.getProposerAddress(), Field.Store.YES));
-			document.add(new TextField("INVENTOR", pttDao.getInventor(),
+			document.add(new TextField("PTT_CLASS_NUM", Nlpir.doNlpirString(
+					pttDao.getPttClassNum(), null, null), Field.Store.YES));
+			document.add(new TextField("PROPOSER", Nlpir.doNlpirString(
+					pttDao.getProposer(), null, null), Field.Store.YES));
+			document.add(new TextField("PROPOSER_ADDRESS", Nlpir.doNlpirString(
+					pttDao.getProposerAddress(), null, null), Field.Store.YES));
+			document.add(new TextField("INVENTOR", Nlpir.doNlpirString(
+					pttDao.getInventor(), null, null), Field.Store.YES));
+			document.add(new TextField("INTERNATIONAL_APPLY", Nlpir
+					.doNlpirString(pttDao.getInternationalApply(), null, null),
 					Field.Store.YES));
-			document.add(new TextField("INTERNATIONAL_APPLY", pttDao
-					.getInternationalApply(), Field.Store.YES));
-			document.add(new TextField("INTERNATIONAL_PUBLICATION", pttDao
-					.getInternationalPublication(), Field.Store.YES));
+			document.add(new TextField("INTERNATIONAL_PUBLICATION", Nlpir
+					.doNlpirString(pttDao.getInternationalPublication(), null,
+							null), Field.Store.YES));
 			document.add(new TextField("INTO_DATE", pttDao.getIntoDate()
 					.toString(), Field.Store.YES));
-			document.add(new TextField("PTT_AGENCY_ORG", pttDao
-					.getPttAgencyOrg(), Field.Store.YES));
-			document.add(new TextField("PTT_AGENCY_PERSON", pttDao
-					.getPttAgencyPerson(), Field.Store.YES));
-			document.add(new TextField("PTT_ABSTRACT", pttDao.getPttAbstract(),
+			document.add(new TextField("PTT_AGENCY_ORG", Nlpir.doNlpirString(
+					pttDao.getPttAgencyOrg(), null, null), Field.Store.YES));
+			document.add(new TextField("PTT_AGENCY_PERSON", Nlpir
+					.doNlpirString(pttDao.getPttAgencyPerson(), null, null),
 					Field.Store.YES));
+			document.add(new TextField("PTT_ABSTRACT", Nlpir.doNlpirString(
+					pttDao.getPttAbstract(), null, null), Field.Store.YES));
 			listDocument.add(document);
 		}
 		return listDocument;
