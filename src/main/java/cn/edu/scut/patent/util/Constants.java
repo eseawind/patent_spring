@@ -12,9 +12,9 @@ public class Constants {
 	// 转化图片的类型
 	public static String TYPE = "TIF";
 	// 存放NLPIR.dll的绝对路径
-	public static String NLPIR_DLL_STRING = "E:/code/Juno workplace/patent_spring/data/ICTCLAS2014/NLPIR";
+	public static String NLPIR_DLL_STRING = "E:/dir/ICTCLAS2014/NLPIR";
 	// ICTCLAS词库library(即Data文件夹)的绝对路径
-	public static String ICTCLAS_LIBRARY_STRING = "E:/code/Juno workplace/patent_spring/data/ICTCLAS2014";
+	public static String ICTCLAS_LIBRARY_STRING = "E:/dir/ICTCLAS2014";
 	// MySql的访问路径
 	public static String MYSQL_URL = "jdbc:mysql://localhost/patentdb";
 	// MySql的账户名
