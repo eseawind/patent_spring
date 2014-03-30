@@ -54,7 +54,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>PDF展示页</title>
+<title>专利展示</title>
 <script type="text/javascript" language="javascript">
 	function dyniframesize(down) {
 		var pTar = null;
@@ -85,7 +85,8 @@
 <div class="image">
 <img src="img/school_badge.png"/>
 </div>
-	<table>
+<hr width=100%/>
+	<table border=0 cellspacing="10px" cellpadding="10px">
 		<tr>
 			<td width="60%" height="100%" class="pdf"><%=ptt_num%> <iframe id="win"
 					name="win" onload="Javascript:dyniframesize('win')"
@@ -141,7 +142,7 @@
 										htmlString += "</table></td><td><table>";
 									}
 								}
-								htmlString += "</table></td></tr><tr><td colspan='2' align='center' class='sub_res'><input type='submit' value='提交'></td></tr><tr><td colspan='2' align='center'><input type='reset' value='重置'></td></tr></table>";
+								htmlString += "</table></td></tr><tr><td colspan='2' align='center' class='sub_res'><input type='submit' value='提交'><input type='reset' value='重置'></td></tr></table>";
 								conn.close();
 								out.print(htmlString);
 							} catch (Exception e) {

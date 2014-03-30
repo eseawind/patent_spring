@@ -11,7 +11,7 @@ String basePath = request.getScheme() + "://"
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>专利汇总页</title>
+<title>专利检索</title>
 <base href="<%=basePath%>">
 <link rel="stylesheet" href="css/all.css" type="text/css">
 </head>
@@ -19,8 +19,9 @@ String basePath = request.getScheme() + "://"
 <div class="image">
 <img src="img/school_badge.png"/>
 </div>
+<hr width=100%/>
 <form name="searchForm" method="post" action="search">
-<table>
+<table cellpadding="20px" cellspacing="20px" border=0>
 <tr>
 <td colspan="4" class="td1">
 <input type="checkbox" name="FMZL" value="11" checked="checked">
@@ -55,7 +56,7 @@ String basePath = request.getScheme() + "://"
 </table>
 </form>
 <form name="indexForm" method="post" action="index">
-<table>
+<table border=0 cellspacing="20px" cellpadding="20px">
 <tr><td class="submit1"><input type="submit" value="Index提交"></td><td class="reset1"><input type="reset" value="重置"></td></tr>
 </table>
 </form>

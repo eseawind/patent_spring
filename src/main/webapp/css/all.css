@@ -17,7 +17,7 @@ img {
   width:100%;
   height:120px;
   margin:0 auto;
-  background:url(../img/bg1.png)no-repeat top center;
+  background:url(../img/bg1.png) no-repeat top center;
 
 }
 
@@ -76,4 +76,20 @@ table .reset1 input {
 .sub_res input{
    width:80px;
   height:30px;
+}
+
+
+.search {
+  width:900px;
+  margin:0 auto;
+}
+
+.search_top td{
+  background:#999;
+}
+
+
+.search table {
+  text-align:center;
+  border:solid 1px #999;
 }

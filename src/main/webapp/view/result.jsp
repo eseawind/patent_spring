@@ -23,6 +23,7 @@
 <div class="image">
 <img src="img/school_badge.png"/>
 </div>
+<hr width="100%"/>
 	<%
 		if (patentList == null) {
 			htmlString += "找不到任何检索结果";
@@ -47,7 +48,7 @@
 				} else {
 					final_item = totalItem;
 				}
-				htmlString += "<table><tr><td>序号</td><td>专利名称</td><td>公开号</td><td>发明人</td><td>申请人</td><td>专利公开日</td></tr>";
+				htmlString += "<table border=0 cellspacing='10px' cellpadding='10px'><tr class='search_top'><td width='5%'>序号</td><td width='24%'>专利名称</td><td width='15%'>公开号</td><td width='15%'>发明人</td><td width='15%'>申请人</td><td width='26%'>专利公开日</td></tr>";
 				for (int i = (pageNumber - 1) * count; i < final_item; i++) {
 					PatentDao pttDao = patentList.get(i);
 

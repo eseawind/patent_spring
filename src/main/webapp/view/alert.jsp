@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>Result</title>
+<title>执行结果</title>
 </head>
 <body>
 <%=request.getAttribute("command")%>
