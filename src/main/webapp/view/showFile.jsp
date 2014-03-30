@@ -78,13 +78,16 @@
 		}
 	}
 </script>
-<link rel=stylesheet type="text/css" href="scut.css">
 <base href="<%=basePath%>">
+<link rel="stylesheet" href="css/all.css" type="text/css">
 </head>
 <body>
+<div class="image">
+<img src="img/school_badge.png"/>
+</div>
 	<table>
 		<tr>
-			<td width="60%" height="100%"><%=ptt_num%> <iframe id="win"
+			<td width="60%" height="100%" class="pdf"><%=ptt_num%> <iframe id="win"
 					name="win" onload="Javascript:dyniframesize('win')"
 					src="<%=file_path%>" width="100%" height="100%"></iframe></td>
 			</td>
@@ -138,7 +141,7 @@
 										htmlString += "</table></td><td><table>";
 									}
 								}
-								htmlString += "</table></td></tr><tr><td colspan='2' align='center'><input type='submit' value='提交'></td></tr><tr><td colspan='2' align='center'><input type='reset' value='重置'></td></tr></table>";
+								htmlString += "</table></td></tr><tr><td colspan='2' align='center' class='sub_res'><input type='submit' value='提交'></td></tr><tr><td colspan='2' align='center'><input type='reset' value='重置'></td></tr></table>";
 								conn.close();
 								out.print(htmlString);
 							} catch (Exception e) {

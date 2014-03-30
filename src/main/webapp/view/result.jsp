@@ -17,8 +17,12 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>检索结果</title>
+<link rel="stylesheet" type="text/css" href="css/all.css">
 </head>
 <body>
+<div class="image">
+<img src="img/school_badge.png"/>
+</div>
 	<%
 		if (patentList == null) {
 			htmlString += "找不到任何检索结果";
@@ -43,7 +47,7 @@
 				} else {
 					final_item = totalItem;
 				}
-				htmlString += "<table><th><td>序号</td><td>专利名称</td><td>公开号</td><td>发明人</td><td>申请人</td><td>专利公开日</td></th></th>";
+				htmlString += "<table><tr><td>序号</td><td>专利名称</td><td>公开号</td><td>发明人</td><td>申请人</td><td>专利公开日</td></tr>";
 				for (int i = (pageNumber - 1) * count; i < final_item; i++) {
 					PatentDao pttDao = patentList.get(i);
 

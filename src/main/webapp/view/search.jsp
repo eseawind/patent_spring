@@ -13,12 +13,16 @@ String basePath = request.getScheme() + "://"
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>专利汇总页</title>
 <base href="<%=basePath%>">
+<link rel="stylesheet" href="css/all.css" type="text/css">
 </head>
 <body>
+<div class="image">
+<img src="img/school_badge.png"/>
+</div>
 <form name="searchForm" method="post" action="search">
 <table>
 <tr>
-<td colspan="4">
+<td colspan="4" class="td1">
 <input type="checkbox" name="FMZL" value="11" checked="checked">
 <label for="FMZL">发明</label>
 <input type="checkbox" name="SYXX" value="22" checked="checked">
@@ -31,28 +35,28 @@ String basePath = request.getScheme() + "://"
 <td colspan="4">
 </td>
 </tr>
-<tr><td><input type="button" value="申请号" class="RowButton"></td><td><input type="text" name="APPLY_NUM" value=""/></td>
-<td><input type="button" value="申请日期" class="RowButton"></td><td><input type="text" name="APPLY_DATE" value=""/></td></tr>
-<tr><td><input type="button" value="专利名称" class="RowButton"></td><td><input type="text" name="PTT_NAME" value=""/></td>
-<td><input type="button" value="专利公开号" class="RowButton"></td><td><input type="text" name="PTT_NUM" value=""/></td></tr>
-<tr><td><input type="button" value="专利公开日" class="RowButton"></td><td><input type="text" name="PTT_DATE" value=""/></td>
-<td><input type="button" value="主分类号" class="RowButton"></td><td><input type="text" name="PTT_MAIN_CLASS_NUM" value=""/></td></tr>
-<tr><td><input type="button" value="分类号" class="RowButton"></td><td><input type="text" name="PTT_CLASS_NUM" value=""/></td>
-<td><input type="button" value="申请（专利权）人" class="RowButton"></td><td><input type="text" name="PROPOSER" value=""/></td></tr>
-<tr><td><input type="button" value="申请人地址" class="RowButton"></td><td><input type="text" name="PROPOSER_ADDRESS" value=""/></td>
-<td><input type="button" value="发明（设计）人" class="RowButton"></td><td><input type="text" name="INVENTOR" value=""/></td></tr>
-<tr><td><input type="button" value="国际申请" class="RowButton"></td><td><input type="text" name="INTERNATIONAL_APPLY" value=""/></td>
-<td><input type="button" value="国际公布" class="RowButton"></td><td><input type="text" name="INTERNATIONAL_PUBLICATION" value=""/></td></tr>
-<tr><td><input type="button" value="初始日" class="RowButton"></td><td><input type="text" name="INTO_DATE" value=""/></td>
-<td><input type="button" value="专利代理机构" class="RowButton"></td><td><input type="text" name="PTT_AGENCY_ORG" value=""/></td></tr>
-<tr><td><input type="button" value="专利代理人" class="RowButton"></td><td><input type="text" name="PTT_AGENCY_PERSON" value=""/></td>
-<td><input type="button" value="专利摘要" class="RowButton"></td><td><input type="text" name="PTT_ABSTRACT" value=""/></td></tr>
-<tr><td colspan="2"><input type="submit" value="提交"></td><td colspan="2"><input type="reset" value="重置"></td></tr>
+<tr><td><input type="button" value="申请号" class="RowButton"></td><td><input type="text" name="APPLY_NUM" value="" class="RowInput"/></td>
+<td><input type="button" value="申请日期" class="RowButton"></td><td><input type="text" name="APPLY_DATE" value="" class="RowInput"/></td></tr>
+<tr><td><input type="button" value="专利名称" class="RowButton"></td><td><input type="text" name="PTT_NAME" value="" class="RowInput"/></td>
+<td><input type="button" value="专利公开号" class="RowButton"></td><td><input type="text" name="PTT_NUM" value="" class="RowInput"/></td></tr>
+<tr><td><input type="button" value="专利公开日" class="RowButton"></td><td><input type="text" name="PTT_DATE" value="" class="RowInput"/></td>
+<td><input type="button" value="主分类号" class="RowButton"></td><td><input type="text" name="PTT_MAIN_CLASS_NUM" value="" class="RowInput"/></td></tr>
+<tr><td><input type="button" value="分类号" class="RowButton"></td><td><input type="text" name="PTT_CLASS_NUM" value="" class="RowInput"/></td>
+<td><input type="button" value="申请（专利权）人" class="RowButton"></td><td><input type="text" name="PROPOSER" value="" class="RowInput"/></td></tr>
+<tr><td><input type="button" value="申请人地址" class="RowButton"></td><td><input type="text" name="PROPOSER_ADDRESS" value="" class="RowInput"/></td>
+<td><input type="button" value="发明（设计）人" class="RowButton"></td><td><input type="text" name="INVENTOR" value="" class="RowInput"/></td></tr>
+<tr><td><input type="button" value="国际申请" class="RowButton"></td><td><input type="text" name="INTERNATIONAL_APPLY" value="" class="RowInput"/></td>
+<td><input type="button" value="国际公布" class="RowButton"></td><td><input type="text" name="INTERNATIONAL_PUBLICATION" value="" class="RowInput"/></td></tr>
+<tr><td><input type="button" value="初始日" class="RowButton"></td><td><input type="text" name="INTO_DATE" value="" class="RowInput"/></td>
+<td><input type="button" value="专利代理机构" class="RowButton"></td><td><input type="text" name="PTT_AGENCY_ORG" value="" class="RowInput"/></td></tr>
+<tr><td><input type="button" value="专利代理人" class="RowButton"></td><td><input type="text" name="PTT_AGENCY_PERSON" value="" class="RowInput"/></td>
+<td><input type="button" value="专利摘要" class="RowButton"></td><td><input type="text" name="PTT_ABSTRACT" value="" class="RowInput"/></td></tr>
+<tr><td colspan="2" class="submit1"><input type="submit" value="提交"></td><td colspan="2" class="reset1"><input type="reset" value="重置"></td></tr>
 </table>
 </form>
 <form name="indexForm" method="post" action="index">
 <table>
-<tr><td><input type="submit" value="Index提交"></td><td><input type="reset" value="重置"></td></tr>
+<tr><td class="submit1"><input type="submit" value="Index提交"></td><td class="reset1"><input type="reset" value="重置"></td></tr>
 </table>
 </form>
 <%--显示所有的专利<%
