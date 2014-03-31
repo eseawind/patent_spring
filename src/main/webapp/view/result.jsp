@@ -3,11 +3,16 @@
 <%@ page language="java"
 	import="java.sql.*,java.util.*,java.net.*,cn.edu.scut.patent.model.PatentDao"%>
 <%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://"
+	+ request.getServerName() + ":" + request.getServerPort()
+	+ path + "/";
+%>
+<%
 	String htmlString = "";
 	int count = 10;
-	List<PatentDao> patentList = (ArrayList<PatentDao>) request
-			.getSession().getAttribute("PATENTLIST");
-	String pageString = (String) request.getAttribute("PAGE");
+	List<PatentDao> patentList = (ArrayList<PatentDao>) session.getAttribute("PATENTLIST");
+	String pageString = (String)request.getParameter("PAGE");
 	int pageNumber;
 	int pageTotal;
 	int totalItem;
@@ -17,7 +22,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>检索结果</title>
-<link rel="stylesheet" type="text/css" href="css/all.css">
+<base href="<%=basePath%>">
+<link rel="stylesheet" href="css/all.css" type="text/css">
 </head>
 <body>
 <div class="image">
@@ -63,30 +69,42 @@
 				}
 				htmlString += "</table>";
 				htmlString += "</br>一共搜索到" + totalItem + "条结果";
+				String href_root = "/patent_spring/view/result.jsp?PAGE=";
 				if (pageNumber > 1) {
-					htmlString += "<a href='http://www.baidu.com'>上一页</a>";
+					htmlString += "<a href='" + href_root + (pageNumber - 1) + "'>上一页</a>";
 				}
 				if (pageNumber - 2 > 0) {
-					htmlString += "<a href='http://www.baidu.com'>"
+					htmlString += "<a href='" + href_root + (pageNumber - 2) + "'>"
 							+ (pageNumber - 2) + "</a>";
 				}
 				if (pageNumber - 1 > 0) {
-					htmlString += "<a href='http://www.baidu.com'>"
+					htmlString += "<a href='" + href_root + (pageNumber - 1) + "'>"
 							+ (pageNumber - 1) + "</a>";
 				}
 				htmlString += pageNumber;
 				if (pageNumber + 1 <= pageTotal) {
-					htmlString += "<a href='http://www.baidu.com'>"
+					htmlString += "<a href='" + href_root + (pageNumber + 1) + "'>"
 							+ (pageNumber + 1) + "</a>";
 				}
 				if (pageNumber + 2 <= pageTotal) {
-					htmlString += "<a href='http://www.baidu.com'>"
+					htmlString += "<a href='" + href_root + (pageNumber + 2) + "'>"
 							+ (pageNumber + 2) + "</a>";
 				}
 				if (pageNumber < pageTotal) {
-					htmlString += "<a href='/patent_spring/view/result.jsp'>下一页</a>";
+					htmlString += "<a href='" + href_root + (pageNumber + 1) + "'>下一页</a>";
 				}
 				htmlString += "共" + pageTotal + "页";
+				htmlString += "转到第";
+				htmlString += "<select onchange='location.href=" + "this.options[this.selectedIndex].value;'>";
+				for(int i = 1; i <= pageTotal; i++){
+					htmlString += "<option value='"+ href_root + i + "' ";
+					if(i == pageNumber){
+						htmlString += "selected";
+					}
+					htmlString += ">" + i + "</option>";
+				}
+				htmlString += "</select>";
+				htmlString += "页";
 			}
 		}
 		out.print(htmlString);
