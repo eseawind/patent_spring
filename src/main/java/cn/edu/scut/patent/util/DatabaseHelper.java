@@ -722,16 +722,16 @@ public class DatabaseHelper {
 		for (int i = 0; i < listPatent.size(); i++) {
 			PatentDao pttDao = listPatent.get(i);
 			Document document = new Document();
-			document.add(new TextField("PTT_TYPE", Nlpir.doNlpirString(
-					pttDao.getPttType(), null, null), Field.Store.YES));
-			document.add(new TextField("APPLY_NUM", Nlpir.doNlpirString(
-					pttDao.getApplyNum(), null, null), Field.Store.YES));
+			document.add(new TextField("PTT_TYPE", pttDao.getPttType(),
+					Field.Store.YES));
+			document.add(new TextField("APPLY_NUM", pttDao.getApplyNum(),
+					Field.Store.YES));
 			document.add(new TextField("APPLY_DATE", pttDao.getApplyDate()
 					.toString(), Field.Store.YES));
 			document.add(new TextField("PTT_NAME", Nlpir.doNlpirString(
 					pttDao.getPttName(), null, null), Field.Store.YES));
-			document.add(new TextField("PTT_NUM", Nlpir.doNlpirString(
-					pttDao.getPttNum(), null, null), Field.Store.YES));
+			document.add(new TextField("PTT_NUM", pttDao.getPttNum(),
+					Field.Store.YES));
 			document.add(new TextField("PTT_DATE", pttDao.getPttDate()
 					.toString(), Field.Store.YES));
 			document.add(new TextField("PTT_MAIN_CLASS_NUM", Nlpir

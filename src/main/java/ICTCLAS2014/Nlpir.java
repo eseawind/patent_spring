@@ -83,6 +83,7 @@ public class Nlpir {
 		String library = Constants.ICTCLAS_LIBRARY_STRING;
 		// String system_charset = "GBK";//GBK----0
 		// String system_charset = "UTF-8";
+		// int charset_type = 1时main正常，int charset_type = 0时patent_spring正常。
 		int charset_type = 0;
 		if (flag == 0) {
 			int init_flag = CLibrary.Instance.NLPIR_Init(library, charset_type,

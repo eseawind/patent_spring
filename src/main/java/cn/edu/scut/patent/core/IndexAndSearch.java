@@ -135,6 +135,7 @@ public class IndexAndSearch {
 
 	/**
 	 * 查询程序的执行
+	 * 
 	 * @param patentdao
 	 * @param pttTypeList
 	 * @return
@@ -257,6 +258,9 @@ public class IndexAndSearch {
 					System.out.println("******第" + (i + 1) + "个结果******");
 					PatentDao pttDao = new PatentDao();
 					Document d = searcher.doc(sds[i].doc);
+					System.out.println("PTT_TYPE" + ":[" + d.get("PTT_TYPE")
+							+ "]");
+					pttDao.setPttType(d.get("PTT_TYPE"));
 					System.out.println("APPLY_NUM" + ":[" + d.get("APPLY_NUM")
 							+ "]");
 					pttDao.setApplyNum(d.get("APPLY_NUM"));

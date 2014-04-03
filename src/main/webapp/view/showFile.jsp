@@ -9,14 +9,24 @@
 	+ path + "/";
 %>
 <%
-	String path_dir = new String("file/");
-	String file_name = java.net.URLEncoder.encode(
-	request.getParameter("FILE_NAME"), "ISO-8859-1");
-	file_name = java.net.URLDecoder.decode(file_name, "UTF-8");
-	String file_path = path_dir + file_name;
-	String ptt_num = java.net.URLEncoder.encode(
-	request.getParameter("PTT_NUM"), "ISO-8859-1");
-	ptt_num = java.net.URLDecoder.decode(ptt_num, "UTF-8");
+	String path_dir = "http://view1.5ipatent.com/fulltextview.aspx?";
+	String APPLY_NUM = java.net.URLEncoder.encode(
+	request.getParameter("APPLY_NUM"), "ISO-8859-1");
+	APPLY_NUM = java.net.URLDecoder.decode(APPLY_NUM, "UTF-8");
+	String PTT_NUM = java.net.URLEncoder.encode(
+			request.getParameter("PTT_NUM"), "ISO-8859-1");
+	PTT_NUM = java.net.URLDecoder.decode(PTT_NUM, "UTF-8");
+	String PTT_TYPE = java.net.URLEncoder.encode(
+			request.getParameter("PTT_TYPE"), "ISO-8859-1");
+	PTT_TYPE = java.net.URLDecoder.decode(PTT_TYPE, "UTF-8");
+	String file_path = path_dir + "an=" + APPLY_NUM + "&patentclass=";
+	if(PTT_TYPE.equals("11")){
+		file_path += "1";
+	}else if(PTT_TYPE.equals("22")){
+		file_path += "2";
+	}else{
+		file_path += "3";
+	}
 	List<String> checkboxList = new ArrayList<String>();
 %>
 <%--直接在整个页面显示PDF<%
@@ -88,7 +98,7 @@
 <hr width=100%/>
 	<table border=0 cellspacing="10px" cellpadding="10px">
 		<tr>
-			<td width="60%" height="100%" class="pdf"><%=ptt_num%> <iframe id="win"
+			<td width="60%" height="100%" class="pdf"><%=PTT_NUM%><iframe id="win"
 					name="win" onload="Javascript:dyniframesize('win')"
 					src="<%=file_path%>" width="100%" height="100%"></iframe></td>
 			</td>
@@ -96,7 +106,7 @@
 				<div id="showdialog">
 					40个TRIZ原理
 					<form name="submitForm" method="post" action="updateTrizNumber">
-						<input type="hidden" name="PTT_NUM" value="<%=ptt_num%>" />
+						<input type="hidden" name="PTT_NUM" value="<%=PTT_NUM%>" />
 						<%
 							try {
 								// 加载驱动
@@ -111,7 +121,7 @@
 								Statement st = conn.createStatement();
 								//执行给定的SQL语句，该语句返回单个ResultSet对象。
 								String sqlCLASSIFICATION = "select * from CLASSIFICATION where PTT_NUM = '"
-										+ ptt_num + "';";
+										+ PTT_NUM + "';";
 								String sqlTRIZ = "select * from TRIZ;";
 								ResultSet rsCLASSIFICATION = st.executeQuery(sqlCLASSIFICATION);
 								List<String> classificationList = new ArrayList<String>();
