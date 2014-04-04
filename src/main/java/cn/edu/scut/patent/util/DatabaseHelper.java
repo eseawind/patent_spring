@@ -766,6 +766,62 @@ public class DatabaseHelper {
 	}
 
 	/**
+	 * 获取所有的TRIZ
+	 */
+	public static List<String> getAllTRIZ() {
+		if (!checkMySQL()) {
+			return null;
+		}
+		try {
+			Connection con = getConnection();
+			Statement sta = con.createStatement();
+			String sql = "SELECT * FROM TRIZ;";
+			ResultSet rs = sta.executeQuery(sql);
+			List<String> listTRIZ = new ArrayList<String>();
+			while (rs.next()) {
+				String temp = rs.getString("TRIZ_NUM")
+						+ rs.getString("TRIZ_TEXT");
+				listTRIZ.add(temp);
+			}
+			return listTRIZ;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("获取TRIZ原理有误 !");
+			return null;
+		}
+	}
+
+	/**
+	 * CLASSIFICATION统计TRIZ的个数
+	 */
+	public static List<String> getCount() {
+		if (!checkMySQL()) {
+			return null;
+		}
+		try {
+			Connection con = getConnection();
+			Statement sta = con.createStatement();
+			List<String> listCount = new ArrayList<String>();
+			for (int i = 1; i <= 40; i++) {
+				String sql = "SELECT count(*) FROM `CLASSIFICATION` WHERE `TRIZ_NUM`="
+						+ i + " group by `TRIZ_NUM`";
+				ResultSet rs = sta.executeQuery(sql);
+				if (rs.next()) {
+					String temp = rs.getString("count(*)");
+					listCount.add(temp);
+				} else {
+					listCount.add("0");
+				}
+			}
+			return listCount;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("获取Count有误 !");
+			return null;
+		}
+	}
+
+	/**
 	 * 
 	 */
 	public static void generateTDate() {
