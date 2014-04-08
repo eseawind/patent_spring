@@ -47,19 +47,19 @@ public class GetPatents {
 		GetPatents getPatents = new GetPatents();
 		// 获取商业专利方法专利列表页面，已知商业方法专利中发明型专利11525/27048个，实用新型专利888/3311个
 		// 在这里用了最笨的方法，一个页面专利数100/20，总共有发明型专利页面116/1353页，实用新型专利9/166页，所以用了两个for循环抓取专利列表页面
-		for (int i = 1; i <= 2; i++) {
-			getPatents.getPatentListPage("11", i);
-		}
-		for (int j = 1; j <= 2; j++) {
-			getPatents.getPatentListPage("22", j);
-		}
-		// 提取抓取下来的专利列表页面中每个专利的专利基本信息网页的URL
-		try {
-			getPatents.getAllUrls("11");
-			getPatents.getAllUrls("22");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		for (int i = 1; i <= 2; i++) {
+//			getPatents.getPatentListPage("11", i);
+//		}
+//		for (int j = 1; j <= 2; j++) {
+//			getPatents.getPatentListPage("22", j);
+//		}
+//		// 提取抓取下来的专利列表页面中每个专利的专利基本信息网页的URL
+//		try {
+//			getPatents.getAllUrls("11");
+//			getPatents.getAllUrls("22");
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		// 根据提取出来的专利基本信息页面的URL，抓取各专利基本信息网页
 		getPatents.downloadHtmls("11");
 		getPatents.downloadHtmls("22");
@@ -341,8 +341,8 @@ public class GetPatents {
 		try {
 			URLConnection uc = url.openConnection();
 
-			uc.setConnectTimeout(30000);
-			uc.setReadTimeout(60000);
+			uc.setConnectTimeout(300000);
+			uc.setReadTimeout(600000);
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					uc.getInputStream(), "gb2312"));
 			String tempbf;

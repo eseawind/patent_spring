@@ -30,21 +30,17 @@ public class PatentDao {
 	// 专利代理人
 	private String pttAgencyPerson;
 	// 专利摘要
-	private String pttAbstract;//
+	private String pttAbstract;
 	// 商业方法类下的分类号
-	private String classNumG06Q;//
+	private String classNumG06Q;
 	// 国际申请
-	private String internationalApply;//
+	private String internationalApply;
 	// 国际公布
-	private String internationalPublication;//
+	private String internationalPublication;
 	// 进入国家日期
-	private Date intoDate;//
-	// 专利类型（自定义）
-	private String pttType;//
-	// 专利内容
-	private String content;//
-	// 文件名
-	private String fileName;
+	private Date intoDate;
+	// 专利类型
+	private String pttType;
 
 	public Map<String, String> getAll(){
 		Map<String, String> map = new HashMap<String, String>();
@@ -99,18 +95,7 @@ public class PatentDao {
 		if(pttType != null){
 			map.put("pttType", pttType);
 		}
-		if(content != null){
-			map.put("content", content);
-		}
 		return map;
-	}
-	
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
 	}
 
 	public String getPttType() {
@@ -269,13 +254,5 @@ public class PatentDao {
 			}
 		}
 		return "";
-	}
-	
-	public String getFileName() {
-		return fileName;
-	}
-
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
 	}
 }

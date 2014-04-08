@@ -190,10 +190,10 @@ public class DatabaseHelper {
 					+ ", INTO_DATE DATE"
 					+ ", PTT_AGENCY_ORG VARCHAR(500) NOT NULL"
 					+ ", PTT_AGENCY_PERSON VARCHAR(200) NOT NULL"
-					+ ", PTT_ABSTRACT VARCHAR(10000)"
-					+ ", CLASS_NUM_G06Q VARCHAR(200)" + ", PTT_TYPE VARCHAR(4)"
-					+ ", FILE_NAME VARCHAR(200) NOT NULL)" + " ENGINE = InnoDB"
-					+ ";";
+					+ ", PTT_ABSTRACT VARCHAR(10000) NOT NULL"
+					+ ", PTT_TYPE VARCHAR(4) NOT NULL"
+					+ ", CLASS_NUM_G06Q VARCHAR(200) NOT NULL)"
+					+ " ENGINE = InnoDB" + ";";
 			System.out.println(sql_create_table_patents);
 			PreparedStatement ps = con
 					.prepareStatement(sql_create_table_patents);
@@ -657,7 +657,7 @@ public class DatabaseHelper {
 			Statement sta = con.createStatement();
 
 			String sql_insert_into_patents = "INSERT INTO patentdb.PATENTS (PTT_NUM,APPLY_NUM,APPLY_DATE,PTT_NAME,PTT_DATE,PTT_MAIN_CLASS_NUM,PTT_CLASS_NUM,PROPOSER,"
-					+ "PROPOSER_ADDRESS,INVENTOR,PTT_AGENCY_ORG,PTT_AGENCY_PERSON,PTT_ABSTRACT,CLASS_NUM_G06Q,INTERNATIONAL_APPLY,INTERNATIONAL_PUBLICATION,INTO_DATE,PTT_TYPE,FILE_NAME) VALUES ('"
+					+ "PROPOSER_ADDRESS,INVENTOR,PTT_AGENCY_ORG,PTT_AGENCY_PERSON,PTT_ABSTRACT,CLASS_NUM_G06Q,INTERNATIONAL_APPLY,INTERNATIONAL_PUBLICATION,INTO_DATE,PTT_TYPE) VALUES ('"
 					+ StringHelper.replaceSpecialCharacters(pttDao.getPttNum())
 					+ "','"
 					+ pttDao.getApplyNum()
@@ -690,10 +690,7 @@ public class DatabaseHelper {
 					+ "','"
 					+ pttDao.getInternationalPublication()
 					+ "','"
-					+ pttDao.getIntoDate()
-					+ "','"
-					+ pttDao.getPttType()
-					+ "','" + pttDao.getFileName() + "')";
+					+ pttDao.getIntoDate() + "','" + pttDao.getPttType() + "')";
 
 			System.out.println(sql_insert_into_patents);
 			sta.execute(sql_insert_into_patents);
