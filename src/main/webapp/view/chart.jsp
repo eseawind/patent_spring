@@ -44,11 +44,7 @@ String Data = (String) session.getAttribute("Data");
 	            },
 	            categories: [<%=X_Categories%>],
 	            labels: {
-                    style: {
-                        fontSize: '13px', 
-                        fontFamily: 'Verdana, sans-serif',
-                        writingMode:'tb-rl'    //文字竖排样式
-                    }
+	            	rotation: 90,//文字竖排样式
                 },
 	        },
 	        yAxis: {

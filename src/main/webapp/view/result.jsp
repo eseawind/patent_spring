@@ -68,33 +68,33 @@
 					htmlString += "</tr>";
 				}
 				htmlString += "</table>";
-				htmlString += "</br>一共搜索到" + totalItem + "条结果";
+				htmlString += "<table><tr><td>一共搜索到" + totalItem + "条结果</td><td>&nbsp;</td>";
 				String href_root = "/patent_spring/view/result.jsp?PAGE=";
 				if (pageNumber > 1) {
-					htmlString += "<a href='" + href_root + (pageNumber - 1) + "'>上一页</a>";
+					htmlString += "<td><a href='" + href_root + (pageNumber - 1) + "'>上一页</a></td><td>&nbsp;</td>";
 				}
 				if (pageNumber - 2 > 0) {
-					htmlString += "<a href='" + href_root + (pageNumber - 2) + "'>"
-							+ (pageNumber - 2) + "</a>";
+					htmlString += "<td><a href='" + href_root + (pageNumber - 2) + "'>"
+							+ (pageNumber - 2) + "</a></td><td>&nbsp;</td>";
 				}
 				if (pageNumber - 1 > 0) {
-					htmlString += "<a href='" + href_root + (pageNumber - 1) + "'>"
-							+ (pageNumber - 1) + "</a>";
+					htmlString += "<td><a href='" + href_root + (pageNumber - 1) + "'>"
+							+ (pageNumber - 1) + "</a></td><td>&nbsp;</td>";
 				}
-				htmlString += pageNumber;
+				htmlString += "<td>" + pageNumber + "</td><td>&nbsp;</td>";
 				if (pageNumber + 1 <= pageTotal) {
-					htmlString += "<a href='" + href_root + (pageNumber + 1) + "'>"
-							+ (pageNumber + 1) + "</a>";
+					htmlString += "<td><a href='" + href_root + (pageNumber + 1) + "'>"
+							+ (pageNumber + 1) + "</a></td><td>&nbsp;</td>";
 				}
 				if (pageNumber + 2 <= pageTotal) {
-					htmlString += "<a href='" + href_root + (pageNumber + 2) + "'>"
-							+ (pageNumber + 2) + "</a>";
+					htmlString += "<td><a href='" + href_root + (pageNumber + 2) + "'>"
+							+ (pageNumber + 2) + "</a></td><td>&nbsp;</td>";
 				}
 				if (pageNumber < pageTotal) {
-					htmlString += "<a href='" + href_root + (pageNumber + 1) + "'>下一页</a>";
+					htmlString += "<td><a href='" + href_root + (pageNumber + 1) + "'>下一页</a></td><td>&nbsp;</td>";
 				}
-				htmlString += "共" + pageTotal + "页";
-				htmlString += "转到第";
+				htmlString += "<td>共" + pageTotal + "页</td><td>&nbsp;</td>";
+				htmlString += "<td>转到第";
 				htmlString += "<select onchange='location.href=" + "this.options[this.selectedIndex].value;'>";
 				for(int i = 1; i <= pageTotal; i++){
 					htmlString += "<option value='"+ href_root + i + "' ";
@@ -104,7 +104,7 @@
 					htmlString += ">" + i + "</option>";
 				}
 				htmlString += "</select>";
-				htmlString += "页";
+				htmlString += "页</td></tr></table>";
 			}
 		}
 		out.print(htmlString);
