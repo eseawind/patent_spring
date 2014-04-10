@@ -9,7 +9,7 @@
 	+ path + "/";
 %>
 <%
-	String path_dir = "http://so.baiten.cn/detail/patentdetail/";
+	String path_dir = "http://so.baiten.cn/detail/patentdetail?";
 	String APPLY_NUM = java.net.URLEncoder.encode(
 	request.getParameter("APPLY_NUM"), "ISO-8859-1");
 	APPLY_NUM = java.net.URLDecoder.decode(APPLY_NUM, "UTF-8");
@@ -19,15 +19,17 @@
 	String PTT_TYPE = java.net.URLEncoder.encode(
 			request.getParameter("PTT_TYPE"), "ISO-8859-1");
 	PTT_TYPE = java.net.URLDecoder.decode(PTT_TYPE, "UTF-8");
-	String file_path = path_dir;
+	String file_path = path_dir + "type=";
 	if(PTT_TYPE.equals("11")){
 		file_path += "1";
 	}else if(PTT_TYPE.equals("22")){
 		file_path += "2";
-	}else{
+	}else if(PTT_TYPE.equals("33")){
 		file_path += "3";
+	}else{
+		file_path += "63";
 	}
-	file_path += "/" + "CN" + APPLY_NUM;
+	file_path += "&id=" + "CN" + APPLY_NUM;
 	List<String> checkboxList = new ArrayList<String>();
 %>
 <%--直接在整个页面显示PDF<%
