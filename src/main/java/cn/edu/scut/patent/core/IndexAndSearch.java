@@ -2,6 +2,7 @@ package cn.edu.scut.patent.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -23,6 +25,10 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.highlight.Highlighter;
+import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
+import org.apache.lucene.search.highlight.QueryScorer;
+import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
@@ -54,6 +60,9 @@ public class IndexAndSearch {
 		// 存放索引文件的位置
 		Directory directory = FSDirectory.open(new File(
 				Constants.INDEX_DIR_STRING));
+		if (IndexWriter.isLocked(directory)) {
+			IndexWriter.unlock(directory);
+		}
 		IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_46,
 				analyzer);
 		// 设置打开索引模式为创建或追加
@@ -131,6 +140,40 @@ public class IndexAndSearch {
 		} else {
 			System.out.println("PATENTS数据库已经存在，不需要进行专利信息保存到数据库工作，跳过。");
 		}
+	}
+
+	/**
+	 * 高亮显示设置
+	 * 
+	 * @param query
+	 * @param analyzer
+	 * @param result
+	 * @return
+	 */
+	private static String toHighlighter(Query query, Analyzer analyzer,
+			String result) {
+		try {
+			SimpleHTMLFormatter simpleHtmlFormatter = new SimpleHTMLFormatter(
+					"<font color=\"red\">", "</font>");
+			Highlighter highlighter = new Highlighter(simpleHtmlFormatter,
+					new QueryScorer(query));
+			TokenStream tokenStream1 = analyzer.tokenStream("text",
+					new StringReader(result));
+			String highlighterStr = highlighter.getBestFragment(tokenStream1,
+					result);
+			if(highlighterStr != null){
+				return highlighterStr;
+			}else{
+				return result;
+			}
+		} catch (InvalidTokenOffsetsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 	/**
@@ -221,35 +264,8 @@ public class IndexAndSearch {
 
 			query = booleanQuery;
 		}
-		// String[] fields;
-		// String[] stringQuery;
-		// Occur[] flags;
-		// if (map.size() > 0) {
-		// System.out.println("size:" + map.size());
-		// fields = new String[map.size()];
-		// stringQuery = new String[map.size()];
-		// flags = new Occur[map.size()];
-		// int i = 0;
-		// Set<String> keySet = map.keySet();
-		// Iterator it = keySet.iterator();
-		// while (it.hasNext()) {
-		// String key = (String) it.next();
-		// fields[i] = key;
-		// String value = map.get(key);
-		// stringQuery[i] = value;
-		// flags[i++] = Occur.SHOULD;
-		// System.out.println("key:" + key + "&value:" + value);
-		// }
-		// try {
-		// query = MultiFieldQueryParser.parse(Version.LUCENE_46,
-		// stringQuery, fields, flags, analyzer);
-		// } catch (ParseException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// }
 		if (query != null) {
-			td = searcher.search(query, 1000);
+			td = searcher.search(query, 1000000);// 这里填写最大输出结果数量
 			if (td.totalHits > 0) {
 				System.out.println("找到：" + td.totalHits + "个结果！");
 				List<PatentDao> patentList = new ArrayList<PatentDao>();
@@ -258,61 +274,87 @@ public class IndexAndSearch {
 					System.out.println("******第" + (i + 1) + "个结果******");
 					PatentDao pttDao = new PatentDao();
 					Document d = searcher.doc(sds[i].doc);
-					System.out.println("PTT_TYPE" + ":[" + d.get("PTT_TYPE")
+					String highlighterStr = toHighlighter(query, analyzer,
+							d.get("PTT_TYPE"));
+					System.out
+							.println("PTT_TYPE" + ":[" + highlighterStr + "]");
+					pttDao.setPttType(highlighterStr);
+					highlighterStr = toHighlighter(query, analyzer,
+							d.get("APPLY_NUM"));
+					System.out.println("APPLY_NUM" + ":[" + highlighterStr
 							+ "]");
-					pttDao.setPttType(d.get("PTT_TYPE"));
-					System.out.println("APPLY_NUM" + ":[" + d.get("APPLY_NUM")
-							+ "]");
-					pttDao.setApplyNum(d.get("APPLY_NUM"));
+					pttDao.setApplyNum(highlighterStr);
 					System.out.println("APPLY_DATE" + ":["
 							+ d.get("APPLY_DATE") + "]");
 					pttDao.setApplyDate(StringHelper.stringToDate(d
 							.get("APPLY_DATE")));
-					System.out.println("PTT_NAME" + ":[" + d.get("PTT_NAME")
-							+ "]");
-					pttDao.setPttName(d.get("PTT_NAME"));
-					System.out.println("PTT_NUM" + ":[" + d.get("PTT_NUM")
-							+ "]");
-					pttDao.setPttNum(d.get("PTT_NUM"));
+					highlighterStr = toHighlighter(query, analyzer,
+							d.get("PTT_NAME"));
+					System.out
+							.println("PTT_NAME" + ":[" + highlighterStr + "]");
+					pttDao.setPttName(highlighterStr);
+					highlighterStr = toHighlighter(query, analyzer,
+							d.get("PTT_NUM"));
+					System.out.println("PTT_NUM" + ":[" + highlighterStr + "]");
+					pttDao.setPttNum(highlighterStr);
 					System.out.println("PTT_DATE" + ":[" + d.get("PTT_DATE")
 							+ "]");
 					pttDao.setPttDate(StringHelper.stringToDate(d
 							.get("PTT_DATE")));
+					highlighterStr = toHighlighter(query, analyzer,
+							d.get("PTT_MAIN_CLASS_NUM"));
 					System.out.println("PTT_MAIN_CLASS_NUM" + ":["
-							+ d.get("PTT_MAIN_CLASS_NUM") + "]");
-					pttDao.setPttMainClassNum(d.get("PTT_MAIN_CLASS_NUM"));
-					System.out.println("PTT_CLASS_NUM" + ":["
-							+ d.get("PTT_CLASS_NUM") + "]");
-					pttDao.setPttClassNum(d.get("PTT_CLASS_NUM"));
-					System.out.println("PROPOSER" + ":[" + d.get("PROPOSER")
+							+ highlighterStr + "]");
+					pttDao.setPttMainClassNum(highlighterStr);
+					highlighterStr = toHighlighter(query, analyzer,
+							d.get("PTT_CLASS_NUM"));
+					System.out.println("PTT_CLASS_NUM" + ":[" + highlighterStr
 							+ "]");
-					pttDao.setProposer(d.get("PROPOSER"));
+					pttDao.setPttClassNum(highlighterStr);
+					highlighterStr = toHighlighter(query, analyzer,
+							d.get("PROPOSER"));
+					System.out
+							.println("PROPOSER" + ":[" + highlighterStr + "]");
+					pttDao.setProposer(highlighterStr);
+					highlighterStr = toHighlighter(query, analyzer,
+							d.get("PROPOSER_ADDRESS"));
 					System.out.println("PROPOSER_ADDRESS" + ":["
-							+ d.get("PROPOSER_ADDRESS") + "]");
-					pttDao.setProposerAddress(d.get("PROPOSER_ADDRESS"));
-					System.out.println("INVENTOR" + ":[" + d.get("INVENTOR")
-							+ "]");
-					pttDao.setInventor(d.get("INVENTOR"));
+							+ highlighterStr + "]");
+					pttDao.setProposerAddress(highlighterStr);
+					highlighterStr = toHighlighter(query, analyzer,
+							d.get("INVENTOR"));
+					System.out
+							.println("INVENTOR" + ":[" + highlighterStr + "]");
+					pttDao.setInventor(highlighterStr);
+					highlighterStr = toHighlighter(query, analyzer,
+							d.get("INTERNATIONAL_APPLY"));
 					System.out.println("INTERNATIONAL_APPLY" + ":["
-							+ d.get("INTERNATIONAL_APPLY") + "]");
-					pttDao.setInternationalApply(d.get("INTERNATIONAL_APPLY"));
+							+ highlighterStr + "]");
+					pttDao.setInternationalApply(highlighterStr);
+					highlighterStr = toHighlighter(query, analyzer,
+							d.get("INTERNATIONAL_PUBLICATION"));
 					System.out.println("INTERNATIONAL_PUBLICATION" + ":["
-							+ d.get("INTERNATIONAL_PUBLICATION") + "]");
-					pttDao.setInternationalPublication(d
-							.get("INTERNATIONAL_PUBLICATION"));
+							+ highlighterStr + "]");
+					pttDao.setInternationalPublication(highlighterStr);
 					System.out.println("INTO_DATE" + ":[" + d.get("INTO_DATE")
 							+ "]");
 					pttDao.setIntoDate(StringHelper.stringToDate(d
 							.get("INTO_DATE")));
-					System.out.println("PTT_AGENCY_ORG" + ":["
-							+ d.get("PTT_AGENCY_ORG") + "]");
-					pttDao.setPttAgencyOrg(d.get("PTT_AGENCY_ORG"));
+					highlighterStr = toHighlighter(query, analyzer,
+							d.get("PTT_AGENCY_ORG"));
+					System.out.println("PTT_AGENCY_ORG" + ":[" + highlighterStr
+							+ "]");
+					pttDao.setPttAgencyOrg(highlighterStr);
+					highlighterStr = toHighlighter(query, analyzer,
+							d.get("PTT_AGENCY_PERSON"));
 					System.out.println("PTT_AGENCY_PERSON" + ":["
-							+ d.get("PTT_AGENCY_PERSON") + "]");
-					pttDao.setPttAgencyPerson(d.get("PTT_AGENCY_PERSON"));
-					System.out.println("PTT_ABSTRACT" + ":["
-							+ d.get("PTT_ABSTRACT") + "]");
-					pttDao.setPttAbstract(d.get("PTT_ABSTRACT"));
+							+ highlighterStr + "]");
+					pttDao.setPttAgencyPerson(highlighterStr);
+					highlighterStr = toHighlighter(query, analyzer,
+							d.get("PTT_ABSTRACT"));
+					System.out.println("PTT_ABSTRACT" + ":[" + highlighterStr
+							+ "]");
+					pttDao.setPttAbstract(highlighterStr);
 					patentList.add(pttDao);
 				}
 				return patentList;
