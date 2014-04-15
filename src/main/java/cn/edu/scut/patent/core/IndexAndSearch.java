@@ -20,7 +20,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.PrefixQuery;
+import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
@@ -161,9 +161,9 @@ public class IndexAndSearch {
 					new StringReader(result));
 			String highlighterStr = highlighter.getBestFragment(tokenStream1,
 					result);
-			if(highlighterStr != null){
+			if (highlighterStr != null) {
 				return highlighterStr;
-			}else{
+			} else {
 				return result;
 			}
 		} catch (InvalidTokenOffsetsException e) {
@@ -209,7 +209,11 @@ public class IndexAndSearch {
 					Query tempQuery = new TermQuery(new Term(key, value));
 					booleanQuery.add(tempQuery, Occur.MUST);
 				} else if (key == "PTT_NAME") {
-					Query tempQuery = new PrefixQuery(new Term(key, value));
+					PhraseQuery tempQuery = new PhraseQuery();
+					for (String word : value.split(" ")) {
+						tempQuery.add(new Term(key, word));
+					}
+					tempQuery.setSlop(10);
 					booleanQuery.add(tempQuery, Occur.MUST);
 				} else if (key == "PTT_NUM") {
 					Query tempQuery = new TermQuery(new Term(key, value));
@@ -224,44 +228,74 @@ public class IndexAndSearch {
 					Query tempQuery = new TermQuery(new Term(key, value));
 					booleanQuery.add(tempQuery, Occur.MUST);
 				} else if (key == "PROPOSER") {
-					Query tempQuery = new PrefixQuery(new Term(key, value));
+					PhraseQuery tempQuery = new PhraseQuery();
+					for (String word : value.split(" ")) {
+						tempQuery.add(new Term(key, word));
+					}
+					tempQuery.setSlop(20);
 					booleanQuery.add(tempQuery, Occur.MUST);
 				} else if (key == "PROPOSER_ADDRESS") {
-					Query tempQuery = new PrefixQuery(new Term(key, value));
+					PhraseQuery tempQuery = new PhraseQuery();
+					for (String word : value.split(" ")) {
+						tempQuery.add(new Term(key, word));
+					}
+					tempQuery.setSlop(20);
 					booleanQuery.add(tempQuery, Occur.MUST);
 				} else if (key == "INVENTOR") {
-					Query tempQuery = new PrefixQuery(new Term(key, value));
+					PhraseQuery tempQuery = new PhraseQuery();
+					for (String word : value.split(" ")) {
+						tempQuery.add(new Term(key, word));
+					}
+					tempQuery.setSlop(10);
 					booleanQuery.add(tempQuery, Occur.MUST);
 				} else if (key == "INTERNATIONAL_APPLY") {
-					Query tempQuery = new PrefixQuery(new Term(key, value));
+					PhraseQuery tempQuery = new PhraseQuery();
+					for (String word : value.split(" ")) {
+						tempQuery.add(new Term(key, word));
+					}
+					tempQuery.setSlop(20);
 					booleanQuery.add(tempQuery, Occur.MUST);
 				} else if (key == "INTERNATIONAL_PUBLICATION") {
-					Query tempQuery = new PrefixQuery(new Term(key, value));
+					PhraseQuery tempQuery = new PhraseQuery();
+					for (String word : value.split(" ")) {
+						tempQuery.add(new Term(key, word));
+					}
+					tempQuery.setSlop(20);
 					booleanQuery.add(tempQuery, Occur.MUST);
 				} else if (key == "INTO_DATE") {
 					Query tempQuery = new TermQuery(new Term(key, value));
 					booleanQuery.add(tempQuery, Occur.MUST);
 				} else if (key == "PTT_AGENCY_ORG") {
-					Query tempQuery = new PrefixQuery(new Term(key, value));
+					PhraseQuery tempQuery = new PhraseQuery();
+					for (String word : value.split(" ")) {
+						tempQuery.add(new Term(key, word));
+					}
+					tempQuery.setSlop(20);
 					booleanQuery.add(tempQuery, Occur.MUST);
 				} else if (key == "PTT_AGENCY_PERSON") {
-					Query tempQuery = new PrefixQuery(new Term(key, value));
+					PhraseQuery tempQuery = new PhraseQuery();
+					for (String word : value.split(" ")) {
+						tempQuery.add(new Term(key, word));
+					}
+					tempQuery.setSlop(10);
 					booleanQuery.add(tempQuery, Occur.MUST);
 				} else if (key == "PTT_ABSTRACT") {
-					Query tempQuery = new PrefixQuery(new Term(key, value));
+					PhraseQuery tempQuery = new PhraseQuery();
+					for (String word : value.split(" ")) {
+						tempQuery.add(new Term(key, word));
+					}
+					tempQuery.setSlop(50);
 					booleanQuery.add(tempQuery, Occur.MUST);
 				}
 				System.out.println("key:" + key + "&value:" + value);
 			}
 
 			BooleanQuery pttTypeBooleanQuery = new BooleanQuery();
-			for (int i = 0; i < pttTypeList.size(); i++) {
-				Query tempQuery = new TermQuery(new Term("PTT_TYPE",
-						pttTypeList.get(i)));
+			for (String item : pttTypeList) {
+				Query tempQuery = new TermQuery(new Term("PTT_TYPE", item));
 				pttTypeBooleanQuery.add(tempQuery, Occur.SHOULD);
 			}
 			booleanQuery.add(pttTypeBooleanQuery, Occur.MUST);
-
 			query = booleanQuery;
 		}
 		if (query != null) {
