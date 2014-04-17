@@ -56,6 +56,8 @@ public class IndexAndSearch {
 	 */
 	public static void doIndexFromDatabase() throws Exception {
 		doIndexPrework();
+		// 索引开始的时间
+		long startTime = new Date().getTime();
 		Analyzer analyzer = new ICTCLASAnalyzer(Version.LUCENE_46);
 		// 存放索引文件的位置
 		Directory directory = FSDirectory.open(new File(
@@ -69,8 +71,6 @@ public class IndexAndSearch {
 		config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
 		// config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
 		IndexWriter indexWriter = new IndexWriter(directory, config);
-		// 索引开始的时间
-		long startTime = new Date().getTime();
 		List<Document> listDocument = DatabaseHelper
 				.getDocumentFromDatabase(analyzer);
 		if (listDocument == null || listDocument.size() == 0) {
@@ -82,9 +82,7 @@ public class IndexAndSearch {
 		// 提交事务
 		indexWriter.commit();
 		indexWriter.close();
-		// 索引结束的时间
-		long endTime = new Date().getTime();
-		System.out.println("一共花费了" + (endTime - startTime) + "毫秒完成索引！");
+		System.out.println(StringHelper.timer(startTime) + "索引！");
 	}
 
 	/**

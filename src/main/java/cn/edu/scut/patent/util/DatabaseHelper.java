@@ -25,7 +25,7 @@ public class DatabaseHelper {
 	 * @return
 	 * @throws Exception
 	 */
-	private static Connection getConnection() throws Exception {
+	public static Connection getConnection() throws Exception {
 		Class.forName("com.mysql.jdbc.Driver");
 		return DriverManager.getConnection(Constants.MYSQL_URL,
 				Constants.MYSQL_ACCOUNT, Constants.MYSQL_PASSWORD);
@@ -726,37 +726,38 @@ public class DatabaseHelper {
 			document.add(new TextField("APPLY_DATE", pttDao.getApplyDate()
 					.toString(), Field.Store.YES));
 			document.add(new TextField("PTT_NAME", Nlpir.doNlpirString(
-					pttDao.getPttName(), null, null), Field.Store.YES));
+					pttDao.getPttName(), 0, null, null), Field.Store.YES));
 			document.add(new TextField("PTT_NUM", pttDao.getPttNum(),
 					Field.Store.YES));
 			document.add(new TextField("PTT_DATE", pttDao.getPttDate()
 					.toString(), Field.Store.YES));
 			document.add(new TextField("PTT_MAIN_CLASS_NUM", Nlpir
-					.doNlpirString(pttDao.getPttMainClassNum(), null, null),
+					.doNlpirString(pttDao.getPttMainClassNum(), 0, null, null),
 					Field.Store.YES));
 			document.add(new TextField("PTT_CLASS_NUM", Nlpir.doNlpirString(
-					pttDao.getPttClassNum(), null, null), Field.Store.YES));
+					pttDao.getPttClassNum(), 0, null, null), Field.Store.YES));
 			document.add(new TextField("PROPOSER", Nlpir.doNlpirString(
-					pttDao.getProposer(), null, null), Field.Store.YES));
+					pttDao.getProposer(), 0, null, null), Field.Store.YES));
 			document.add(new TextField("PROPOSER_ADDRESS", Nlpir.doNlpirString(
-					pttDao.getProposerAddress(), null, null), Field.Store.YES));
-			document.add(new TextField("INVENTOR", Nlpir.doNlpirString(
-					pttDao.getInventor(), null, null), Field.Store.YES));
-			document.add(new TextField("INTERNATIONAL_APPLY", Nlpir
-					.doNlpirString(pttDao.getInternationalApply(), null, null),
+					pttDao.getProposerAddress(), 0, null, null),
 					Field.Store.YES));
-			document.add(new TextField("INTERNATIONAL_PUBLICATION", Nlpir
-					.doNlpirString(pttDao.getInternationalPublication(), null,
+			document.add(new TextField("INVENTOR", Nlpir.doNlpirString(
+					pttDao.getInventor(), 0, null, null), Field.Store.YES));
+			document.add(new TextField("INTERNATIONAL_APPLY", Nlpir
+					.doNlpirString(pttDao.getInternationalApply(), 0, null,
 							null), Field.Store.YES));
+			document.add(new TextField("INTERNATIONAL_PUBLICATION", Nlpir
+					.doNlpirString(pttDao.getInternationalPublication(), 0,
+							null, null), Field.Store.YES));
 			document.add(new TextField("INTO_DATE", pttDao.getIntoDate()
 					.toString(), Field.Store.YES));
 			document.add(new TextField("PTT_AGENCY_ORG", Nlpir.doNlpirString(
-					pttDao.getPttAgencyOrg(), null, null), Field.Store.YES));
+					pttDao.getPttAgencyOrg(), 0, null, null), Field.Store.YES));
 			document.add(new TextField("PTT_AGENCY_PERSON", Nlpir
-					.doNlpirString(pttDao.getPttAgencyPerson(), null, null),
+					.doNlpirString(pttDao.getPttAgencyPerson(), 0, null, null),
 					Field.Store.YES));
 			document.add(new TextField("PTT_ABSTRACT", Nlpir.doNlpirString(
-					pttDao.getPttAbstract(), null, null), Field.Store.YES));
+					pttDao.getPttAbstract(), 0, null, null), Field.Store.YES));
 			listDocument.add(document);
 		}
 		return listDocument;

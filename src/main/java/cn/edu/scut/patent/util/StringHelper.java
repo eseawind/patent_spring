@@ -3,6 +3,7 @@ package cn.edu.scut.patent.util;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,5 +37,27 @@ public class StringHelper {
 			dest = m.replaceAll("");
 		}
 		return dest;
+	}
+
+	/**
+	 * 计时器
+	 * 
+	 * @param startTime
+	 *            开始的时间（毫秒）
+	 * @return
+	 */
+	public static String timer(long startTime) {
+		// 结束的时间
+		long endTime = new Date().getTime();
+		int time = (int) ((endTime - startTime) / 1000);
+		int second = time % 60;
+		time /= 60;
+		int minute = time % 60;
+		time /= 60;
+		int hour = time % 24;
+		int day = time / 24;
+		String result = "一共花费了" + day + "天" + hour + "小时" + minute + "分钟"
+				+ second + "秒完成";
+		return result;
 	}
 }

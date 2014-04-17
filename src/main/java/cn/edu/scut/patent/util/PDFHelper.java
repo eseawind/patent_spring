@@ -81,7 +81,7 @@ public class PDFHelper {
 			}
 		}
 		Document document = new Document();
-		document.add(new TextField("title", Nlpir.doNlpirString(title, null,
+		document.add(new TextField("title", Nlpir.doNlpirString(title, 0, null,
 				null), Field.Store.YES));
 		document.add(new TextField("path", pdfpath, Field.Store.YES));
 
@@ -92,7 +92,7 @@ public class PDFHelper {
 			Iterator it = keySet.iterator();
 			while (it.hasNext()) {
 				String key = (String) it.next();
-				String value = Nlpir.doNlpirString(map.get(key), null, null);
+				String value = Nlpir.doNlpirString(map.get(key), 0, null, null);
 				document.add(new TextField(key, value, Field.Store.YES));
 			}
 		}

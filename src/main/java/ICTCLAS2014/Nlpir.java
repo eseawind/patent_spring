@@ -77,14 +77,13 @@ public class Nlpir {
 	/**
 	 * 执行ICTCLAS分词
 	 */
-	private static String doNlpir(String inputString, String[] addWord,
+	private static String doNlpir(String inputString, int charset_type, String[] addWord,
 			String[] deleteWord, String MaxKeyLimit) {
 		// ICTCLAS词库library(即Data文件夹)的相对路径
 		String library = Constants.ICTCLAS_LIBRARY_STRING;
 		// String system_charset = "GBK";//GBK----0
 		// String system_charset = "UTF-8";
 		// int charset_type = 1时main正常，int charset_type = 0时patent_spring正常。
-		int charset_type = 0;
 		if (flag == 0) {
 			int init_flag = CLibrary.Instance.NLPIR_Init(library, charset_type,
 					"0");
@@ -143,9 +142,9 @@ public class Nlpir {
 	/**
 	 * 供外界调用的静态方法，执行ICTCLAS分词
 	 */
-	public static String doNlpirString(String inputString, String[] addWord,
+	public static String doNlpirString(String inputString, int charset_type, String[] addWord,
 			String[] deleteWord) {
-		return doNlpir(inputString, addWord, deleteWord, null);
+		return doNlpir(inputString, charset_type, addWord, deleteWord, null);
 	}
 
 	/**
@@ -156,8 +155,6 @@ public class Nlpir {
 		String[] addWord = { "要求美方加强对输 n", "华玉米的产地来源 n" };
 		String[] delWord = { "要求美方加强对输 n" };
 		String maxKey = "10";
-		for (int i = 0; i < 100; i++) {
-			doNlpir(inputString, addWord, delWord, maxKey);
-		}
+		doNlpir(inputString, 1, addWord, delWord, maxKey);
 	}
 }
