@@ -148,9 +148,9 @@ public class PatentsPreprocess {
 
 				// 将专利名称和摘要分词
 				pttAWDM.setPtt_name(Nlpir.doNlpirString(
-						rs.getString("PTT_NAME"), 1, null, null));
+						rs.getString("PTT_NAME"), 0, null, null));
 				pttAWDM.setPtt_abstract(Nlpir.doNlpirString(
-						rs.getString("PTT_ABSTRACT"), 1, null, null));
+						rs.getString("PTT_ABSTRACT"), 0, null, null));
 
 				// 存入到patents_after_word_divide数据表
 				Statement sta2 = con.createStatement();
