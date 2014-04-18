@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=utf-8" %>
 <%@ page pageEncoding="utf-8"%>
-<%@ page language="java" import="java.sql.*,java.util.*,java.net.*"%>
+<%@ page language="java" import="java.sql.*,java.util.*,java.net.*,cn.edu.scut.patent.util.Constants"%>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme() + "://"
@@ -24,9 +24,16 @@ String basePath = request.getScheme() + "://"
 <tr><td class="submit1"><input type="submit" value="统计展示"></td></tr>
 </table>
 </form>
-<form name="technicalGrowthRateDataForm" method="post" action="technicalGrowthRateDataChart">
+<form name="technicalGrowthRateDataForm" method="post" action="technicalDataChart">
+<input type="hidden" name="INDICATOR_TYPE" value="<%=Constants.TECHNICAL_GROWTH_RATE_NUMBER%>" />
 <table border=0 cellspacing="20px" cellpadding="20px">
 <tr><td><input type="text" name="KEY_WORD" value="" class="RowInput"/></td><td class="submit1"><input type="submit" value="技术生长率"></td></tr>
+</table>
+</form>
+<form name="technicalMatureRateDataForm" method="post" action="technicalDataChart">
+<input type="hidden" name="INDICATOR_TYPE" value="<%=Constants.TECHNICAL_MATURE_RATE_NUMBER%>" />
+<table border=0 cellspacing="20px" cellpadding="20px">
+<tr><td><input type="text" name="KEY_WORD" value="" class="RowInput"/></td><td class="submit1"><input type="submit" value="技术成熟率"></td></tr>
 </table>
 </form>
 </body>

@@ -12,27 +12,35 @@ import cn.edu.scut.patent.core.Indicator;
 import cn.edu.scut.patent.model.IndicatorData;
 import cn.edu.scut.patent.model.IndicatorParam;
 import cn.edu.scut.patent.model.IndicatorValueItem;
+import cn.edu.scut.patent.util.Constants;
 import cn.edu.scut.patent.util.StringHelper;
 
 @Controller
-public class TechnicalGrowthRateDataChartController {
+public class TechnicalDataChartController {
 
 	/**
-	 * 展示技术生长率
+	 * 展示各种技术指标
 	 * 
 	 * @throws Exception
 	 */
-	@RequestMapping(value = "technicalGrowthRateDataChart")
+	@RequestMapping(value = "technicalDataChart")
 	public void technicalGrowthRateDataChart(HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 
 		String keyWord = request.getParameter("KEY_WORD");
+		int indicatorType = Integer.parseInt(request
+				.getParameter("INDICATOR_TYPE"));
 		IndicatorParam param = new IndicatorParam();
 		param.keyWord = keyWord;
-		IndicatorData indicatorData = Indicator
-				.getTechnicalGrowthRateData(param);
-		if(indicatorData == null){
-			
+		param.indicatorType = indicatorType;
+		IndicatorData indicatorData = new IndicatorData();
+		String Data = "";
+		if (indicatorType == Constants.TECHNICAL_GROWTH_RATE_NUMBER) {
+			indicatorData = Indicator.getTechnicalGrowthRateData(param);
+			Data += "{name: '技术生长率',data: [";
+		} else if (indicatorType == Constants.TECHNICAL_MATURE_RATE_NUMBER) {
+			indicatorData = Indicator.getTechnicalMatureRateData(param);
+			Data += "{name: '技术成熟率',data: [";
 		}
 		List<IndicatorValueItem> value11 = indicatorData.value11;
 		String X_Categories = "";
@@ -43,7 +51,6 @@ public class TechnicalGrowthRateDataChartController {
 			}
 		}
 
-		String Data = "{name: '技术生长率',data: [";
 		for (int i = 0; i < value11.size(); i++) {
 			Data += value11.get(i).value;
 			if (i != value11.size() - 1) {
@@ -56,7 +63,11 @@ public class TechnicalGrowthRateDataChartController {
 
 		HttpSession session = request.getSession();
 		session.setAttribute("Chart_Type", "spline");
-		session.setAttribute("Title", "技术生长率");
+		if (indicatorType == Constants.TECHNICAL_GROWTH_RATE_NUMBER) {
+			session.setAttribute("Title", "技术生长率");
+		} else if (indicatorType == Constants.TECHNICAL_MATURE_RATE_NUMBER) {
+			session.setAttribute("Title", "技术成熟率");
+		}
 		session.setAttribute("Subtitle", dateString);
 		session.setAttribute("X_Text", "年份");
 		session.setAttribute("Y_Text", "百分比");
