@@ -55,21 +55,6 @@ String basePath = request.getScheme() + "://"
 <tr><td colspan="2" class="submit1"><input type="submit" value="提交"></td><td colspan="2" class="reset1"><input type="reset" value="重置"></td></tr>
 </table>
 </form>
-<form name="indexForm" method="post" action="index">
-<table border=0 cellspacing="20px" cellpadding="20px">
-<tr><td class="submit1"><input type="submit" value="建立索引"></td></tr>
-</table>
-</form>
-<form name="chartForm" method="post" action="chart">
-<table border=0 cellspacing="20px" cellpadding="20px">
-<tr><td class="submit1"><input type="submit" value="统计展示"></td></tr>
-</table>
-</form>
-<form name="clusterForm" method="post" action="cluster">
-<table border=0 cellspacing="20px" cellpadding="20px">
-<tr><td class="submit1"><input type="submit" value="进行聚类"></td></tr>
-</table>
-</form>
 <%--显示所有的专利<%
 try{
 // 加载驱动

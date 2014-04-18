@@ -60,4 +60,36 @@ public class StringHelper {
 				+ second + "秒完成";
 		return result;
 	}
+
+	/**
+	 * 获得年份字符串
+	 * 
+	 * @param date
+	 *            格式应该为 year-month-day
+	 * @return
+	 */
+	public static String getYear(String date) {
+		String[] dateArr = date.split("-");
+		return dateArr[0];
+	}
+
+	/**
+	 * 获取当前的时间
+	 * 
+	 * @return
+	 */
+	public static String getTime() {
+		Date date = new Date();
+		String dateString = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
+				.format(date);
+		return dateString;
+	}
+
+	/**
+	 * 获得今年年份
+	 */
+	public static int getThisYear() {
+		String year = getYear(getTime());
+		return Integer.valueOf(year);
+	}
 }

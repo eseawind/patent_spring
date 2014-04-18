@@ -1,9 +1,6 @@
 package cn.edu.scut.patent.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -11,8 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import cn.edu.scut.patent.util.DatabaseHelper;
+import cn.edu.scut.patent.util.StringHelper;
 
 @Controller
 public class ChartController {
@@ -23,11 +20,10 @@ public class ChartController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "chart")
-	public void index(HttpServletRequest request, HttpServletResponse response)
+	public void chart(HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		Date date = new Date();
-		String dateString = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(date);
 		
+		String dateString = StringHelper.getTime();
 		String X_Categories = "";
 		List<String> listTRIZ = DatabaseHelper.getAllTRIZ();
 		for(int i = 0; i < listTRIZ.size(); i++){
