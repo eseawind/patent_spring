@@ -63,9 +63,20 @@ table .reset1 input {
 }
 
 .button1 input {
-    width:100px;
-  height:50px;
+	width:150px;
+	height:50px;
+	text-align: center;
+	vertical-align: middle;
+	top: 0px;
+	font-size: x-large;
+	font-weight: bold;
 }
+#button {
+	text-align: center;
+	vertical-align: middle;
+	padding: 30px;
+}
+
 
 .pdf iframe {
   margin:0 0 0 -5px;
@@ -102,11 +113,8 @@ table .reset1 input {
 	text-align: center;
 	vertical-align: middle;
 	font-weight: bold;
-}
-
-#button {
-	font-size: x-large;
-	text-align: center;
-	vertical-align: middle;
-	padding: 20px;
+	padding-top: 50px;
+	padding-right: 50px;
+	padding-bottom: 100px;
+	padding-left: 50px;
 }

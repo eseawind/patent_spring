@@ -20,14 +20,10 @@ String basePath = request.getScheme() + "://"
 <img src="img/school_badge.png"/>
 </div>
 <form name="indexForm" method="post" action="index">
-<table border=0 cellspacing="20px" cellpadding="20px">
-<tr><td class="submit1"><input type="submit" value="建立索引"></td></tr>
-</table>
+<p id="button" class="button1"><input type="submit" value="建立索引"></input></p>
 </form>
 <form name="clusterForm" method="post" action="cluster">
-<table border=0 cellspacing="20px" cellpadding="20px">
-<tr><td class="submit1"><input type="submit" value="进行聚类"></td></tr>
-</table>
+<p id="button" class="button1"><input type="submit" value="进行聚类"></input></p>
 </form>
 </body>
 </html>

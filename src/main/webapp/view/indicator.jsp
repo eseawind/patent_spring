@@ -20,20 +20,18 @@ String basePath = request.getScheme() + "://"
 <img src="img/school_badge.png"/>
 </div>
 <form name="chartForm" method="post" action="chart">
-<table border=0 cellspacing="20px" cellpadding="20px">
-<tr><td class="submit1"><input type="submit" value="统计展示"></td></tr>
-</table>
+<p id="button" class="button1"><input type="submit" value="统计展示"></input></p>
 </form>
 <form name="technicalGrowthRateDataForm" method="post" action="technicalDataChart">
 <input type="hidden" name="INDICATOR_TYPE" value="<%=Constants.TECHNICAL_GROWTH_RATE_NUMBER%>" />
 <table border=0 cellspacing="20px" cellpadding="20px">
-<tr><td><input type="text" name="KEY_WORD" value="" class="RowInput"/></td><td class="submit1"><input type="submit" value="技术生长率"></td></tr>
+<tr><td><input type="text" name="KEY_WORD" value="" class="RowInput"/></td><td><p id="button" class="button1"><input type="submit" value="技术生长率"></input></p></td></tr>
 </table>
 </form>
 <form name="technicalMatureRateDataForm" method="post" action="technicalDataChart">
 <input type="hidden" name="INDICATOR_TYPE" value="<%=Constants.TECHNICAL_MATURE_RATE_NUMBER%>" />
 <table border=0 cellspacing="20px" cellpadding="20px">
-<tr><td><input type="text" name="KEY_WORD" value="" class="RowInput"/></td><td class="submit1"><input type="submit" value="技术成熟率"></td></tr>
+<tr><td><input type="text" name="KEY_WORD" value="" class="RowInput"/></td><td><p id="button" class="button1"><input type="submit" value="技术成熟率"></input></p></td></tr>
 </table>
 </form>
 </body>
