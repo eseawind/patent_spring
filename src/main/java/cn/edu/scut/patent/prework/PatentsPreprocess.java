@@ -47,7 +47,7 @@ public class PatentsPreprocess {
 			// 将名称和摘要分词并存入patent_word_after_divide
 			pp.divideWordToDb();
 			System.out.println("将名称和摘要分词并存入patent_word_after_divide完成！");
-			System.out.println(StringHelper.timer(startTime));
+			System.out.println("一共花费了" + StringHelper.timer(startTime) + "完成");
 		}
 
 		// 如果数据表T_WORD_INFO已经存在的话，则跳过下述函数，不再浪费资源重复计算。
@@ -59,7 +59,7 @@ public class PatentsPreprocess {
 			pp.saveWordDicToDatabase();
 			// 更新patent_word_tf_df中的DF值
 			pp.countDF();
-			System.out.println(StringHelper.timer(startTime));
+			System.out.println("一共花费了" + StringHelper.timer(startTime) + "完成");
 		}
 
 		// 如果数据表PATENT_FEATURE_WORD已经存在的话，则跳过下述函数，不再浪费资源重复计算。
@@ -67,7 +67,7 @@ public class PatentsPreprocess {
 			long startTime = new Date().getTime();// 开始的时间
 			// 保存（word,maxTF,DF）值到t_word_info
 			pp.extractFeatureWord();
-			System.out.println(StringHelper.timer(startTime));
+			System.out.println("一共花费了" + StringHelper.timer(startTime) + "完成");
 		}
 
 		// 如果数据表PATENT_CLUSTER已经存在的话，则跳过下述函数，不再浪费资源重复计算。
@@ -75,12 +75,12 @@ public class PatentsPreprocess {
 			long startTime = new Date().getTime();// 开始的时间
 			pp.countAndSaveToDb(20);
 			pp.countStandardTFIDF();
-			System.out.println(StringHelper.timer(startTime));
+			System.out.println("一共花费了" + StringHelper.timer(startTime) + "完成");
 		}
 
 		long startTime = new Date().getTime();// 开始的时间
 		pp.cluster2(20);
-		System.out.println(StringHelper.timer(startTime));
+		System.out.println("一共花费了" + StringHelper.timer(startTime) + "完成");
 	}
 
 	public PatentsPreprocess() {

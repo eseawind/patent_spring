@@ -56,8 +56,7 @@ public class StringHelper {
 		time /= 60;
 		int hour = time % 24;
 		int day = time / 24;
-		String result = "一共花费了" + day + "天" + hour + "小时" + minute + "分钟"
-				+ second + "秒完成";
+		String result = day + "天" + hour + "时" + minute + "分" + second + "秒";
 		return result;
 	}
 

@@ -12,6 +12,7 @@
 	String htmlString = "";
 	int count = 10;
 	List<PatentDao> patentList = (ArrayList<PatentDao>) session.getAttribute("PATENTLIST");
+	String timeConsume = (String) session.getAttribute("TIMECONSUME");
 	String pageString = (String)request.getParameter("PAGE");
 	int pageNumber;
 	int pageTotal;
@@ -104,7 +105,9 @@
 					htmlString += ">" + i + "</option>";
 				}
 				htmlString += "</select>";
-				htmlString += "页</td></tr></table>";
+				htmlString += "页</td>";
+				htmlString += "<td>&nbsp;</td><td>耗时" + timeConsume + "</td>";
+				htmlString += "</tr></table>";
 			}
 		}
 		out.print(htmlString);

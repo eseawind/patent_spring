@@ -2,6 +2,7 @@ package cn.edu.scut.patent.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -24,6 +25,8 @@ public class SearchController {
 	@RequestMapping(value = "search")
 	public void search(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
+		// 检索开始的时间
+		long startTime = new Date().getTime();
 		List<String> pttTypeList = new ArrayList<String>();
 		PatentDao patentdao = new PatentDao();
 		if (request.getParameter("FMZL") != null) {
@@ -96,7 +99,9 @@ public class SearchController {
 		List<PatentDao> patentList = IndexAndSearch.doSearch(patentdao,
 				pttTypeList);
 
+		String timeConsume = StringHelper.timer(startTime);
 		request.getSession().setAttribute("PATENTLIST", patentList);
+		request.getSession().setAttribute("TIMECONSUME", timeConsume);
 		RequestDispatcher re = request.getRequestDispatcher("view/result.jsp");
 		try {
 			re.forward(request, response);

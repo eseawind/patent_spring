@@ -82,7 +82,7 @@ public class IndexAndSearch {
 		// 提交事务
 		indexWriter.commit();
 		indexWriter.close();
-		System.out.println(StringHelper.timer(startTime) + "索引！");
+		System.out.println("一共花费了" + StringHelper.timer(startTime) + "完成索引！");
 	}
 
 	/**
