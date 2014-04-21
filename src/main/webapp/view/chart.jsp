@@ -18,8 +18,9 @@ String Data = (String) session.getAttribute("Data");
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>统计页面</title>
-<script type="text/javascript" src="js/jQuery-1.8.2/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="js/jQuery-1.11.0/jquery-1.11.0.min.js"></script>
 <script type="text/javascript" src="js/Highcharts-3.0.10/highcharts.js"></script>
+<script type="text/javascript" src="js/Highcharts-3.0.10/highcharts-more.js"></script>
 <script src="js/Highcharts-3.0.10/modules/exporting.js"></script><!--图表导出功能-->
 <script src="js/Highcharts-3.0.10/themes/gray.js"></script><!--图表主题-->
 <script>
@@ -27,7 +28,8 @@ String Data = (String) session.getAttribute("Data");
 	    $('#container').highcharts({	//图表展示容器，与id保持一致
 	        chart: {
 				//指定图表的类型，默认是折线图（line）
-	            type: '<%=Chart_Type%>'
+	            type: '<%=Chart_Type%>',
+	            zoomType: 'xy'
 	        },
 	        title: {
 				//指定图表标题

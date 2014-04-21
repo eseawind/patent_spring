@@ -24,9 +24,9 @@ public class DaoController {
 		String[] TRIZ_NUM = request.getParameterValues("triz");
 		String result;
 		if (DatabaseHelper.insertTrizNumber(PTT_NUM, TRIZ_NUM)) {
-			result = "INSERT SUCCESS!";
+			result = "专利分类信息已存入数据库！感谢您的支持！";
 		} else {
-			result = "INSERT FAILED!";
+			result = "专利分类信息已存入数据库失败！";
 		}
 		ModelAndView mv = new ModelAndView("/index", "command", result);
 		return mv;
@@ -50,9 +50,9 @@ public class DaoController {
 		System.out.println();
 		String result;
 		if (DatabaseHelper.updateTrizNumber(PTT_NUM, TRIZ_NUM)) {
-			result = "UPDATE SUCCESS!";
+			result = "专利分类信息已存入数据库！感谢您的支持！";
 		} else {
-			result = "UPDATE FAILED!";
+			result = "专利分类信息已存入数据库失败！";
 		}
 		ModelAndView mv = new ModelAndView("alert", "command", result);
 		return mv;

@@ -120,12 +120,21 @@ public class PatentFeatureWordModel {
 	}
 
 	public void write() {
+		Connection con = null;
 		try {
-			Connection con = DatabaseHelper.getConnection();
+			con = DatabaseHelper.getConnection();
 			write(con);
-			con.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -134,17 +143,27 @@ public class PatentFeatureWordModel {
 	 * 
 	 */
 	public void updateTfidfValueStandard() {
+		Connection con = null;
+		Statement sta = null;
 		try {
-			Connection con = DatabaseHelper.getConnection();
-			Statement sta = con.createStatement();
-
+			con = DatabaseHelper.getConnection();
+			sta = con.createStatement();
 			sta.execute("update patent_feature_word SET TFIDF_VALUE_STANDARD = "
 					+ getTfidfValueStandard() + " WHERE ID=" + getId());
-
-			sta.close();
-			con.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 }

@@ -44,4 +44,6 @@ public class Constants {
 	public static int TECHNICAL_GROWTH_RATE_NUMBER = 101;
 	// 技术成熟率的指标号码
 	public static int TECHNICAL_MATURE_RATE_NUMBER = 102;
+	// 聚类的指标号码
+	public static int CLUSTER_NUMBER = 103;
 }

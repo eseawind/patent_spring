@@ -67,9 +67,11 @@ public class DatabaseHelper {
 	 * @return
 	 */
 	private static Boolean isDatabaseExisted(String db_name) {
+		Connection con = null;
+		Statement sta = null;
 		try {
-			Connection con = getConnection();
-			Statement sta = con.createStatement();
+			con = getConnection();
+			sta = con.createStatement();
 			String sql = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '"
 					+ db_name + "' ;";
 			ResultSet rs = sta.executeQuery(sql);
@@ -84,6 +86,18 @@ public class DatabaseHelper {
 			e.printStackTrace();
 			System.out.println("isDatabaseExisted Error !");
 			return false;
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -94,9 +108,11 @@ public class DatabaseHelper {
 	 * @return
 	 */
 	public static Boolean isTableExisted(String table_name) {
+		Connection con = null;
+		Statement sta = null;
 		try {
-			Connection con = getConnection();
-			Statement sta = con.createStatement();
+			con = getConnection();
+			sta = con.createStatement();
 			String sql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '"
 					+ table_name + "' ;";
 			ResultSet rs = sta.executeQuery(sql);
@@ -111,6 +127,18 @@ public class DatabaseHelper {
 			e.printStackTrace();
 			System.out.println("isTableExisted Error !");
 			return false;
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -121,9 +149,11 @@ public class DatabaseHelper {
 	 * @return
 	 */
 	public static Boolean isPatentNumberExisted(String PTT_NUM) {
+		Connection con = null;
+		Statement sta = null;
 		try {
-			Connection con = getConnection();
-			Statement sta = con.createStatement();
+			con = getConnection();
+			sta = con.createStatement();
 			String sql = "SELECT PTT_NUM FROM patentdb.CLASSIFICATION WHERE PTT_NUM = '"
 					+ PTT_NUM + "' ;";
 			ResultSet rs = sta.executeQuery(sql);
@@ -138,6 +168,18 @@ public class DatabaseHelper {
 			e.printStackTrace();
 			System.out.println("isPatentNumberExisted Error !");
 			return false;
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -148,20 +190,32 @@ public class DatabaseHelper {
 	 * @return Boolean
 	 */
 	private static Boolean createDatabase() {
+		Connection con = null;
+		PreparedStatement ps = null;
 		try {
-			Connection con = getConnection();
+			con = getConnection();
 			String sql_create_database = "create database patentdb;";
 			System.out.println(sql_create_database);
-			PreparedStatement ps = con.prepareStatement(sql_create_database);
+			ps = con.prepareStatement(sql_create_database);
 			ps.executeUpdate();
-			ps.close();
-			con.close();
 			System.out.println("创建数据库patentdb成功");
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("创建数据库patentdb失败");
 			return false;
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -172,8 +226,10 @@ public class DatabaseHelper {
 	 * @return Boolean
 	 */
 	private static Boolean createTablePATENTS() {
+		Connection con = null;
+		PreparedStatement ps = null;
 		try {
-			Connection con = getConnection();
+			con = getConnection();
 			String sql_create_table_patents = "CREATE TABLE PATENTS ("
 					+ "APPLY_NUM VARCHAR(20) NOT NULL"
 					+ ", APPLY_DATE DATE NOT NULL"
@@ -195,17 +251,26 @@ public class DatabaseHelper {
 					+ ", CLASS_NUM_G06Q VARCHAR(200) NOT NULL)"
 					+ " ENGINE = InnoDB" + ";";
 			System.out.println(sql_create_table_patents);
-			PreparedStatement ps = con
-					.prepareStatement(sql_create_table_patents);
+			ps = con.prepareStatement(sql_create_table_patents);
 			ps.executeUpdate();
-			ps.close();
-			con.close();
 			System.out.println("创建数据表PATENTS数据成功");
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("创建数据表PATENTS失败");
 			return false;
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -216,8 +281,10 @@ public class DatabaseHelper {
 	 * @return Boolean
 	 */
 	private static Boolean createTableTRIZ() {
+		Connection con = null;
+		PreparedStatement ps = null;
 		try {
-			Connection con = getConnection();
+			con = getConnection();
 			String sql_create_table_triz = "CREATE TABLE TRIZ ("
 					+ "TRIZ_NUM INT" + ", TRIZ_TEXT VARCHAR(200) NOT NULL"
 					+ ", PRIMARY KEY(TRIZ_NUM))" + " ENGINE = InnoDB" + ";";
@@ -457,18 +524,28 @@ public class DatabaseHelper {
 					+ "')" + ", " + "('" + "40" + "','" + "复合材料原理" + "');";
 			System.out.println(sql_create_table_triz);
 			System.out.println(sql_insert_into_triz);
-			PreparedStatement ps = con.prepareStatement(sql_create_table_triz);
+			ps = con.prepareStatement(sql_create_table_triz);
 			ps.executeUpdate();
 			ps = con.prepareStatement(sql_insert_into_triz);
 			ps.executeUpdate();
-			ps.close();
-			con.close();
 			System.out.println("创建数据表TRIZ、输入TRIZ数据成功");
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("创建数据表TRIZ、输入TRIZ数据失败");
 			return false;
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -479,8 +556,10 @@ public class DatabaseHelper {
 	 * @return Boolean
 	 */
 	private static Boolean createTableCLASSIFICATION() {
+		Connection con = null;
+		PreparedStatement ps = null;
 		try {
-			Connection con = getConnection();
+			con = getConnection();
 			String sql_create_table_classification = "CREATE TABLE CLASSIFICATION ("
 					+ "PTT_NUM VARCHAR(20)"
 					+ ", TRIZ_NUM INT"
@@ -489,17 +568,26 @@ public class DatabaseHelper {
 					+ ", FOREIGN KEY (TRIZ_NUM) REFERENCES TRIZ(TRIZ_NUM) ON DELETE RESTRICT ON UPDATE RESTRICT)"
 					+ " ENGINE = InnoDB" + ";";
 			System.out.println(sql_create_table_classification);
-			PreparedStatement ps = con
-					.prepareStatement(sql_create_table_classification);
+			ps = con.prepareStatement(sql_create_table_classification);
 			ps.executeUpdate();
-			ps.close();
-			con.close();
 			System.out.println("创建数据表CLASSIFICATION成功");
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("创建数据表CLASSIFICATION失败");
 			return false;
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -512,9 +600,11 @@ public class DatabaseHelper {
 		if (!checkMySQL()) {
 			return null;
 		}
+		Connection con = null;
+		Statement sta = null;
 		try {
-			Connection con = getConnection();
-			Statement sta = con.createStatement();
+			con = getConnection();
+			sta = con.createStatement();
 			String sql = "SELECT * FROM PATENTS;";
 			ResultSet rs = sta.executeQuery(sql);
 			List<PatentDao> listPatent = transferDataToPatentDao(rs);
@@ -527,6 +617,59 @@ public class DatabaseHelper {
 			e.printStackTrace();
 			System.out.println("获取所有专利数据有误 !");
 			return null;
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * 获取具体专利文献的聚类数据，返回该专利的聚类号；如果不存在就返回-1
+	 * 
+	 * @return
+	 */
+	public static int getClusterNumber(String PTT_NUM) {
+		if (!isTableExisted("PATENT_CLUSTER")) {
+			return -1;
+		}
+		Connection con = null;
+		Statement sta = null;
+		try {
+			con = getConnection();
+			sta = con.createStatement();
+			String sql = "SELECT * FROM PATENT_CLUSTER WHERE PTT_NUM='"
+					+ PTT_NUM + "';";
+			ResultSet rs = sta.executeQuery(sql);
+			if (rs.next()) {
+				return rs.getInt("CLUSTER");
+			} else {
+				return -1;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("获取专利文献聚类号有误 !");
+			return -1;
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -573,12 +716,15 @@ public class DatabaseHelper {
 	 * @return
 	 */
 	public static Boolean insertTrizNumber(String PTT_NUM, String[] TRIZ_NUM) {
+		if (TRIZ_NUM.length < 1) {
+			return false;
+		}
+
+		Connection con = null;
+		Statement sta = null;
 		try {
-			if (TRIZ_NUM.length < 1) {
-				return false;
-			}
-			Connection con = getConnection();
-			Statement sta = con.createStatement();
+			con = getConnection();
+			sta = con.createStatement();
 			String sql_insert = "INSERT INTO patentdb.CLASSIFICATION (PTT_NUM, TRIZ_NUM) VALUES ";
 			for (int i = 0; i < TRIZ_NUM.length; i++) {
 				sql_insert += "('" + PTT_NUM + "','" + TRIZ_NUM[i] + "')";
@@ -589,12 +735,22 @@ public class DatabaseHelper {
 			sql_insert += ";";
 			System.out.println(sql_insert);
 			sta.execute(sql_insert);
-			sta.close();
-			con.close();
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -606,15 +762,15 @@ public class DatabaseHelper {
 	 * @return
 	 */
 	public static Boolean updateTrizNumber(String PTT_NUM, String[] TRIZ_NUM) {
+		Connection con = null;
+		Statement sta = null;
 		try {
-			Connection con = getConnection();
-			Statement sta = con.createStatement();
+			con = getConnection();
+			sta = con.createStatement();
 			String sql_delete = "DELETE FROM patentdb.CLASSIFICATION WHERE PTT_NUM = '"
 					+ PTT_NUM + "';";
 			System.out.println(sql_delete);
 			sta.execute(sql_delete);
-			sta.close();
-			con.close();
 			if (insertTrizNumber(PTT_NUM, TRIZ_NUM)) {
 				return true;
 			} else {
@@ -623,6 +779,18 @@ public class DatabaseHelper {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -652,9 +820,11 @@ public class DatabaseHelper {
 		if (!checkMySQL()) {
 			return false;
 		}
+		Connection con = null;
+		Statement sta = null;
 		try {
-			Connection con = getConnection();
-			Statement sta = con.createStatement();
+			con = getConnection();
+			sta = con.createStatement();
 
 			String sql_insert_into_patents = "INSERT INTO patentdb.PATENTS (PTT_NUM,APPLY_NUM,APPLY_DATE,PTT_NAME,PTT_DATE,PTT_MAIN_CLASS_NUM,PTT_CLASS_NUM,PROPOSER,"
 					+ "PROPOSER_ADDRESS,INVENTOR,PTT_AGENCY_ORG,PTT_AGENCY_PERSON,PTT_ABSTRACT,CLASS_NUM_G06Q,INTERNATIONAL_APPLY,INTERNATIONAL_PUBLICATION,INTO_DATE,PTT_TYPE) VALUES ('"
@@ -694,13 +864,23 @@ public class DatabaseHelper {
 
 			System.out.println(sql_insert_into_patents);
 			sta.execute(sql_insert_into_patents);
-			sta.close();
-			con.close();
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println(pttDao.getPttNum());
 			return false;
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -770,9 +950,11 @@ public class DatabaseHelper {
 		if (!checkMySQL()) {
 			return null;
 		}
+		Connection con = null;
+		Statement sta = null;
 		try {
-			Connection con = getConnection();
-			Statement sta = con.createStatement();
+			con = getConnection();
+			sta = con.createStatement();
 			String sql = "SELECT * FROM TRIZ;";
 			ResultSet rs = sta.executeQuery(sql);
 			List<String> listTRIZ = new ArrayList<String>();
@@ -786,6 +968,18 @@ public class DatabaseHelper {
 			e.printStackTrace();
 			System.out.println("获取TRIZ原理有误 !");
 			return null;
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -796,9 +990,11 @@ public class DatabaseHelper {
 		if (!checkMySQL()) {
 			return null;
 		}
+		Connection con = null;
+		Statement sta = null;
 		try {
-			Connection con = getConnection();
-			Statement sta = con.createStatement();
+			con = getConnection();
+			sta = con.createStatement();
 			List<String> listCount = new ArrayList<String>();
 			for (int i = 1; i <= 40; i++) {
 				String sql = "SELECT count(*) FROM `CLASSIFICATION` WHERE `TRIZ_NUM`="
@@ -816,6 +1012,18 @@ public class DatabaseHelper {
 			e.printStackTrace();
 			System.out.println("获取Count有误 !");
 			return null;
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -823,22 +1031,21 @@ public class DatabaseHelper {
 	 * 
 	 */
 	public static void generateTDate() {
-		Connection con;
+		Connection con = null;
+		Statement sta = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			con = getConnection();
-			Statement sta = con.createStatement();
+			sta = con.createStatement();
 			String sql = "SELECT DISTINCT PTT_DATE FROM patents";
 			ResultSet reset = sta.executeQuery(sql);
-
 			while (reset.next()) {
 				Date date = reset.getDate(1);
 				String year = date.toString().substring(0, 4);
 				String month = date.toString().substring(5, 7);
 				String day = date.toString().substring(8, 10);
 
-				Statement sta2 = con.createStatement();
-				sta2.execute("insert into t_date (TIME_KEY,YEAR,MONTH,DATE) VALUES ('"
+				sta.execute("insert into t_date (TIME_KEY,YEAR,MONTH,DATE) VALUES ('"
 						+ date
 						+ "','"
 						+ year
@@ -847,15 +1054,22 @@ public class DatabaseHelper {
 						+ "','"
 						+ day
 						+ "')");
-				sta2.close();
-
 				System.out.println(reset.getDate(1).toString());
 			}
-			reset.close();
-			sta.close();
-			con.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -883,20 +1097,30 @@ public class DatabaseHelper {
 	 */
 	public static int getSize(String dbName) {
 		int size;
-		Connection con;
+		Connection con = null;
+		Statement sta = null;
 		try {
 			con = getConnection();
-			Statement sta = con.createStatement();
+			sta = con.createStatement();
 			ResultSet rs = sta.executeQuery("select count(*) from " + dbName);
 			rs.first();
 			size = rs.getInt(1);
-			rs.close();
-			sta.close();
-			con.close();
 			return size;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return -1;
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 }

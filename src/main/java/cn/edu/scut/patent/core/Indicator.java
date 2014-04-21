@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import cn.edu.scut.patent.model.ClusterValueItem;
 import cn.edu.scut.patent.model.IndicatorData;
 import cn.edu.scut.patent.model.IndicatorParam;
 import cn.edu.scut.patent.model.IndicatorValueItem;
 import cn.edu.scut.patent.model.PatentDao;
+import cn.edu.scut.patent.util.DatabaseHelper;
 import cn.edu.scut.patent.util.StringHelper;
 
 public class Indicator {
@@ -150,6 +152,84 @@ public class Indicator {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
+		}
+	}
+
+	/**
+	 * 聚类查询
+	 * 
+	 * @param param
+	 */
+	public static Map<String, ClusterValueItem> getClusterData(
+			IndicatorParam param) {
+		System.out.println("getClusterData");
+		Map<String, ClusterValueItem> map = new HashMap<String, ClusterValueItem>();
+		try {
+			String keyWord = param.keyWord;
+			System.out.println(keyWord);
+
+			PatentDao patentDao = new PatentDao();
+			patentDao.setPttName(keyWord);
+			List<String> pttTypeList = new ArrayList<String>();
+			pttTypeList.add("11");
+			pttTypeList.add("22");
+			pttTypeList.add("33");
+			List<PatentDao> patentList = IndexAndSearch.doSearch(patentDao,
+					pttTypeList);
+
+			if (patentList == null) {
+				return null;
+			}
+			for (PatentDao patentdao : patentList) {
+				String temp_PTT_NUM = patentdao.getPttNum();
+				int clusterNumber = DatabaseHelper
+						.getClusterNumber(temp_PTT_NUM);
+				if (clusterNumber != -1) {
+					String classNumG06Q = patentdao.getClassNumG06Q()
+							.replaceAll(" ", "").substring(0, 9);
+					String key = classNumG06Q + clusterNumber;
+					if (map.containsKey(key)) {
+						map.get(key).count += 1;
+					} else {
+						ClusterValueItem item = new ClusterValueItem();
+						item.pttClass = getIntByClassNum(classNumG06Q);
+						item.cluster = clusterNumber + 1;
+						item.count = 1;
+						item.keyWord = keyWord;
+						map.put(key, item);
+					}
+				}
+			}
+			return map;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	/**
+	 * 获取ClassNumG06Q的代号
+	 * 
+	 * @param classnum
+	 * @return
+	 */
+	private static int getIntByClassNum(String classnum) {
+		if (classnum.equals("G06Q10/00")) {
+			return 1;
+		} else if (classnum.equals("G06Q20/00")) {
+			return 2;
+		} else if (classnum.equals("G06Q30/00")) {
+			return 3;
+		} else if (classnum.equals("G06Q40/00")) {
+			return 4;
+		} else if (classnum.equals("G06Q50/00")) {
+			return 5;
+		} else if (classnum.equals("G06Q90/00")) {
+			return 6;
+		} else if (classnum.equals("G06Q99/00")) {
+			return 7;
+		} else {
+			return 0;
 		}
 	}
 }

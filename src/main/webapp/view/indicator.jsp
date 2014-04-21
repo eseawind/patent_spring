@@ -34,5 +34,11 @@ String basePath = request.getScheme() + "://"
 <tr><td><input type="text" name="KEY_WORD" value="" class="RowInput"/></td><td><p id="button" class="button1"><input type="submit" value="技术成熟率"></input></p></td></tr>
 </table>
 </form>
+<form name="clusterDataForm" method="post" action="clusterDataChart">
+<input type="hidden" name="INDICATOR_TYPE" value="<%=Constants.CLUSTER_NUMBER%>" />
+<table border=0 cellspacing="20px" cellpadding="20px">
+<tr><td><input type="text" name="KEY_WORD" value="" class="RowInput"/></td><td><p id="button" class="button1"><input type="submit" value="聚类分析"></input></p></td></tr>
+</table>
+</form>
 </body>
 </html>

@@ -68,26 +68,42 @@ public class WordInfoModel {
 	 * @param con
 	 */
 	public void write(Connection con) {
+		Statement sta = null;
 		try {
-
-			Statement sta = con.createStatement();
+			sta = con.createStatement();
 			String sql = "INSERT INTO t_word_info (WORD,MAX_TF,DF) VALUES ("
 					+ "'" + getWord() + "'," + getMaxTf() + "," + getDf() + ")";
 			sta.execute(sql);
-			sta.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-
 	}
 
 	public void write() {
+		Connection con = null;
 		try {
-			Connection con = DatabaseHelper.getConnection();
+			con = DatabaseHelper.getConnection();
 			write(con);
-			con.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
