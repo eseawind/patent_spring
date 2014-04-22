@@ -40,8 +40,12 @@ public class PatentsPreprocess {
 	public static void doPatentsPreprocess() {
 		PatentsPreprocess pp = new PatentsPreprocess();
 
-		// 如果数据表PATENTS_AFTER_WORD_DIVIDE已经存在的话，则跳过下述函数，不再浪费资源重复计算。
+		// 如果数据表PATENT_WORD_TF_DF已经存在的话，则跳过下述函数，不再浪费资源重复计算。
 		if (!DatabaseHelper.isTableExisted("PATENT_WORD_TF_DF")) {
+			DatabaseHelper.dropTable("PATENTS_AFTER_WORD_DIVIDE");
+			DatabaseHelper.dropTable("T_STOPWORD");
+			DatabaseHelper.dropTable("T_WORD_SMARK");
+
 			long startTime = new Date().getTime();// 开始的时间
 			System.out.println("将名称和摘要分词并存入patent_word_after_divide中");
 			// 将名称和摘要分词并存入patent_word_after_divide
@@ -52,6 +56,8 @@ public class PatentsPreprocess {
 
 		// 如果数据表T_WORD_INFO已经存在的话，则跳过下述函数，不再浪费资源重复计算。
 		if (!DatabaseHelper.isTableExisted("T_WORD_INFO")) {
+			DatabaseHelper.dropTable("PATENT_WORD_TF_DF");
+
 			long startTime = new Date().getTime();// 开始的时间
 			// 计算TF，存入Map中
 			pp.countTF();
@@ -64,6 +70,8 @@ public class PatentsPreprocess {
 
 		// 如果数据表PATENT_FEATURE_WORD已经存在的话，则跳过下述函数，不再浪费资源重复计算。
 		if (!DatabaseHelper.isTableExisted("PATENT_FEATURE_WORD")) {
+			DatabaseHelper.dropTable("T_WORD_INFO");
+
 			long startTime = new Date().getTime();// 开始的时间
 			// 保存（word,maxTF,DF）值到t_word_info
 			pp.extractFeatureWord();
@@ -72,15 +80,20 @@ public class PatentsPreprocess {
 
 		// 如果数据表PATENT_CLUSTER已经存在的话，则跳过下述函数，不再浪费资源重复计算。
 		if (!DatabaseHelper.isTableExisted("PATENT_CLUSTER")) {
+			DatabaseHelper.dropTable("PATENT_FEATURE_WORD");
+
 			long startTime = new Date().getTime();// 开始的时间
 			pp.countAndSaveToDb(20);
 			pp.countStandardTFIDF();
 			System.out.println("一共花费了" + StringHelper.timer(startTime) + "完成");
 		}
 
-		long startTime = new Date().getTime();// 开始的时间
-		pp.cluster2(20);
-		System.out.println("一共花费了" + StringHelper.timer(startTime) + "完成");
+		// 如果数据表PATENT_CLUSTER已经存在的话，则跳过下述函数，不再浪费资源重复计算。
+		if (!DatabaseHelper.isTableExisted("PATENT_CLUSTER")) {
+			long startTime = new Date().getTime();// 开始的时间
+			pp.cluster2(20);
+			System.out.println("一共花费了" + StringHelper.timer(startTime) + "完成");
+		}
 	}
 
 	public PatentsPreprocess() {
@@ -143,9 +156,9 @@ public class PatentsPreprocess {
 
 				// 将专利名称和摘要分词
 				pttAWDM.setPtt_name(Nlpir.doNlpirString(
-						rs.getString("PTT_NAME"), 0, null, null));
+						rs.getString("PTT_NAME"), 1, null, null));
 				pttAWDM.setPtt_abstract(Nlpir.doNlpirString(
-						rs.getString("PTT_ABSTRACT"), 0, null, null));
+						rs.getString("PTT_ABSTRACT"), 1, null, null));
 
 				// 存入到patents_after_word_divide数据表
 				sta = con.createStatement();

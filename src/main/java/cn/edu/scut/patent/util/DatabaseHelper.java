@@ -196,6 +196,37 @@ public class DatabaseHelper {
 	}
 
 	/**
+	 * 删除数据表
+	 * 
+	 * @param table
+	 */
+	public static void dropTable(String table) {
+		Connection con = null;
+		PreparedStatement ps = null;
+		try {
+			con = getConnection();
+			String sql_delete_table = "DROP TABLE IF EXISTS " + table + ";";
+			System.out.println(sql_delete_table);
+			ps = con.prepareStatement(sql_delete_table);
+			ps.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
 	 * 创建数据库patentdb
 	 * 
 	 * @param
