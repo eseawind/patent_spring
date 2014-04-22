@@ -38,6 +38,8 @@ public class PatentsPreprocess {
 	 * 供外界调用的接口
 	 */
 	public static void doPatentsPreprocess() {
+		long totalStartTime = new Date().getTime();// 总的开始的时间
+		String result = "";
 		PatentsPreprocess pp = new PatentsPreprocess();
 
 		// 如果数据表PATENT_WORD_TF_DF已经存在的话，则跳过下述函数，不再浪费资源重复计算。
@@ -50,8 +52,10 @@ public class PatentsPreprocess {
 			System.out.println("将名称和摘要分词并存入patent_word_after_divide中");
 			// 将名称和摘要分词并存入patent_word_after_divide
 			pp.divideWordToDb();
-			System.out.println("将名称和摘要分词并存入patent_word_after_divide完成！");
-			System.out.println("一共花费了" + StringHelper.timer(startTime) + "完成");
+			String timeConsume1 = "1.花费了" + StringHelper.timer(startTime)
+					+ "完成专利名称和专利摘要的分词和过滤！";
+			System.out.println(timeConsume1);
+			result += timeConsume1 + "\n";
 		}
 
 		// 如果数据表T_WORD_INFO已经存在的话，则跳过下述函数，不再浪费资源重复计算。
@@ -65,7 +69,10 @@ public class PatentsPreprocess {
 			pp.saveWordDicToDatabase();
 			// 更新patent_word_tf_df中的DF值
 			pp.countDF();
-			System.out.println("一共花费了" + StringHelper.timer(startTime) + "完成");
+			String timeConsume2 = "2.花费了" + StringHelper.timer(startTime)
+					+ "完成统计在名称和摘要中某个词语出现的频率、存入数据库、和计算文档频数DF！";
+			System.out.println(timeConsume2);
+			result += timeConsume2 + "\n";
 		}
 
 		// 如果数据表PATENT_FEATURE_WORD已经存在的话，则跳过下述函数，不再浪费资源重复计算。
@@ -75,7 +82,10 @@ public class PatentsPreprocess {
 			long startTime = new Date().getTime();// 开始的时间
 			// 保存（word,maxTF,DF）值到t_word_info
 			pp.extractFeatureWord();
-			System.out.println("一共花费了" + StringHelper.timer(startTime) + "完成");
+			String timeConsume3 = "3.花费了" + StringHelper.timer(startTime)
+					+ "完成计算所有词权重MaxTf，根据权重提取特证词并保存到数据表 T_WORD_INFO中！";
+			System.out.println(timeConsume3);
+			result += timeConsume3 + "\n";
 		}
 
 		// 如果数据表PATENT_CLUSTER已经存在的话，则跳过下述函数，不再浪费资源重复计算。
@@ -85,15 +95,26 @@ public class PatentsPreprocess {
 			long startTime = new Date().getTime();// 开始的时间
 			pp.countAndSaveToDb(20);
 			pp.countStandardTFIDF();
-			System.out.println("一共花费了" + StringHelper.timer(startTime) + "完成");
+			String timeConsume4 = "4.花费了" + StringHelper.timer(startTime)
+					+ "完成计算并规范化TF-IDF值，提取前20位存入数据表PATENT_FEATURE_WORD中！";
+			System.out.println(timeConsume4);
+			result += timeConsume4 + "\n";
 		}
 
 		// 如果数据表PATENT_CLUSTER已经存在的话，则跳过下述函数，不再浪费资源重复计算。
 		if (!DatabaseHelper.isTableExisted("PATENT_CLUSTER")) {
 			long startTime = new Date().getTime();// 开始的时间
 			pp.cluster2(20);
-			System.out.println("一共花费了" + StringHelper.timer(startTime) + "完成");
+			String timeConsume5 = "5.花费了" + StringHelper.timer(startTime)
+					+ "完成聚类过程！";
+			System.out.println(timeConsume5);
+			result += timeConsume5 + "\n";
 		}
+
+		String timeConsumeTotal = "总共花费了" + StringHelper.timer(totalStartTime)
+				+ "完成整个过程，great！";
+		result += timeConsumeTotal + "\n";
+		System.out.println(result);
 	}
 
 	public PatentsPreprocess() {
