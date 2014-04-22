@@ -69,12 +69,13 @@ public class DatabaseHelper {
 	private static Boolean isDatabaseExisted(String db_name) {
 		Connection con = null;
 		Statement sta = null;
+		ResultSet rs = null;
 		try {
 			con = getConnection();
 			sta = con.createStatement();
 			String sql = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '"
 					+ db_name + "' ;";
-			ResultSet rs = sta.executeQuery(sql);
+			rs = sta.executeQuery(sql);
 			if (rs.next()) {
 				System.out.println("数据库" + db_name + "已经存在");
 				return true;
@@ -88,6 +89,9 @@ public class DatabaseHelper {
 			return false;
 		} finally {
 			try {
+				if (rs != null) {
+					rs.close();
+				}
 				if (sta != null) {
 					sta.close();
 				}
@@ -110,12 +114,13 @@ public class DatabaseHelper {
 	public static Boolean isTableExisted(String table_name) {
 		Connection con = null;
 		Statement sta = null;
+		ResultSet rs = null;
 		try {
 			con = getConnection();
 			sta = con.createStatement();
 			String sql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '"
 					+ table_name + "' ;";
-			ResultSet rs = sta.executeQuery(sql);
+			rs = sta.executeQuery(sql);
 			if (rs.next()) {
 				System.out.println("数据表" + table_name + "已经存在");
 				return true;
@@ -129,6 +134,9 @@ public class DatabaseHelper {
 			return false;
 		} finally {
 			try {
+				if (rs != null) {
+					rs.close();
+				}
 				if (sta != null) {
 					sta.close();
 				}
@@ -151,12 +159,13 @@ public class DatabaseHelper {
 	public static Boolean isPatentNumberExisted(String PTT_NUM) {
 		Connection con = null;
 		Statement sta = null;
+		ResultSet rs = null;
 		try {
 			con = getConnection();
 			sta = con.createStatement();
 			String sql = "SELECT PTT_NUM FROM patentdb.CLASSIFICATION WHERE PTT_NUM = '"
 					+ PTT_NUM + "' ;";
-			ResultSet rs = sta.executeQuery(sql);
+			rs = sta.executeQuery(sql);
 			if (rs.next()) {
 				System.out.println("专利" + PTT_NUM + "已经分类！");
 				return true;
@@ -170,6 +179,9 @@ public class DatabaseHelper {
 			return false;
 		} finally {
 			try {
+				if (rs != null) {
+					rs.close();
+				}
 				if (sta != null) {
 					sta.close();
 				}
@@ -602,11 +614,12 @@ public class DatabaseHelper {
 		}
 		Connection con = null;
 		Statement sta = null;
+		ResultSet rs = null;
 		try {
 			con = getConnection();
 			sta = con.createStatement();
 			String sql = "SELECT * FROM PATENTS;";
-			ResultSet rs = sta.executeQuery(sql);
+			rs = sta.executeQuery(sql);
 			List<PatentDao> listPatent = transferDataToPatentDao(rs);
 			if (listPatent.size() == 0) {
 				return null;
@@ -619,6 +632,9 @@ public class DatabaseHelper {
 			return null;
 		} finally {
 			try {
+				if (rs != null) {
+					rs.close();
+				}
 				if (sta != null) {
 					sta.close();
 				}
@@ -643,12 +659,13 @@ public class DatabaseHelper {
 		}
 		Connection con = null;
 		Statement sta = null;
+		ResultSet rs = null;
 		try {
 			con = getConnection();
 			sta = con.createStatement();
 			String sql = "SELECT * FROM PATENT_CLUSTER WHERE PTT_NUM='"
 					+ PTT_NUM + "';";
-			ResultSet rs = sta.executeQuery(sql);
+			rs = sta.executeQuery(sql);
 			if (rs.next()) {
 				return rs.getInt("CLUSTER");
 			} else {
@@ -660,6 +677,9 @@ public class DatabaseHelper {
 			return -1;
 		} finally {
 			try {
+				if (rs != null) {
+					rs.close();
+				}
 				if (sta != null) {
 					sta.close();
 				}
@@ -952,11 +972,12 @@ public class DatabaseHelper {
 		}
 		Connection con = null;
 		Statement sta = null;
+		ResultSet rs = null;
 		try {
 			con = getConnection();
 			sta = con.createStatement();
 			String sql = "SELECT * FROM TRIZ;";
-			ResultSet rs = sta.executeQuery(sql);
+			rs = sta.executeQuery(sql);
 			List<String> listTRIZ = new ArrayList<String>();
 			while (rs.next()) {
 				String temp = rs.getString("TRIZ_NUM")
@@ -970,6 +991,9 @@ public class DatabaseHelper {
 			return null;
 		} finally {
 			try {
+				if (rs != null) {
+					rs.close();
+				}
 				if (sta != null) {
 					sta.close();
 				}
@@ -992,6 +1016,7 @@ public class DatabaseHelper {
 		}
 		Connection con = null;
 		Statement sta = null;
+		ResultSet rs = null;
 		try {
 			con = getConnection();
 			sta = con.createStatement();
@@ -999,7 +1024,7 @@ public class DatabaseHelper {
 			for (int i = 1; i <= 40; i++) {
 				String sql = "SELECT count(*) FROM `CLASSIFICATION` WHERE `TRIZ_NUM`="
 						+ i + " group by `TRIZ_NUM`";
-				ResultSet rs = sta.executeQuery(sql);
+				rs = sta.executeQuery(sql);
 				if (rs.next()) {
 					String temp = rs.getString("count(*)");
 					listCount.add(temp);
@@ -1014,6 +1039,9 @@ public class DatabaseHelper {
 			return null;
 		} finally {
 			try {
+				if (rs != null) {
+					rs.close();
+				}
 				if (sta != null) {
 					sta.close();
 				}
@@ -1033,14 +1061,15 @@ public class DatabaseHelper {
 	public static void generateTDate() {
 		Connection con = null;
 		Statement sta = null;
+		ResultSet rs = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			con = getConnection();
 			sta = con.createStatement();
 			String sql = "SELECT DISTINCT PTT_DATE FROM patents";
-			ResultSet reset = sta.executeQuery(sql);
-			while (reset.next()) {
-				Date date = reset.getDate(1);
+			rs = sta.executeQuery(sql);
+			while (rs.next()) {
+				Date date = rs.getDate(1);
 				String year = date.toString().substring(0, 4);
 				String month = date.toString().substring(5, 7);
 				String day = date.toString().substring(8, 10);
@@ -1054,12 +1083,15 @@ public class DatabaseHelper {
 						+ "','"
 						+ day
 						+ "')");
-				System.out.println(reset.getDate(1).toString());
+				System.out.println(rs.getDate(1).toString());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			try {
+				if (rs != null) {
+					rs.close();
+				}
 				if (sta != null) {
 					sta.close();
 				}
@@ -1099,10 +1131,11 @@ public class DatabaseHelper {
 		int size;
 		Connection con = null;
 		Statement sta = null;
+		ResultSet rs = null;
 		try {
 			con = getConnection();
 			sta = con.createStatement();
-			ResultSet rs = sta.executeQuery("select count(*) from " + dbName);
+			rs = sta.executeQuery("select count(*) from " + dbName);
 			rs.first();
 			size = rs.getInt(1);
 			return size;
@@ -1111,6 +1144,9 @@ public class DatabaseHelper {
 			return -1;
 		} finally {
 			try {
+				if (rs != null) {
+					rs.close();
+				}
 				if (sta != null) {
 					sta.close();
 				}

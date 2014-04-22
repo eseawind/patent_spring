@@ -98,9 +98,9 @@ public class PatentFeatureWordModel {
 	 * @param con
 	 */
 	public void write(Connection con) {
+		Statement sta = null;
 		try {
-
-			Statement sta = con.createStatement();
+			sta = con.createStatement();
 			String sql = "INSERT INTO patent_feature_word (PTT_NUM,FEATURE_WORD,TFIDF_VALUE,TFIDF_VALUE_STANDARD) VALUES ("
 					+ "'"
 					+ getPttnum()
@@ -110,13 +110,20 @@ public class PatentFeatureWordModel {
 					+ getTfidfValue() + "," + getTfidfValueStandard() + ")";
 			System.out.println(sql);
 			sta.execute(sql);
-			sta.close();
 		} catch (Exception e) {
 			// System.out.println(getPttnum() + getFeatureWord() +
 			// getTfidfValue());
 			e.printStackTrace();
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-
 	}
 
 	public void write() {

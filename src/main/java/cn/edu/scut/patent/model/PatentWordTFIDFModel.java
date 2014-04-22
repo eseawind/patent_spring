@@ -95,8 +95,9 @@ public class PatentWordTFIDFModel {
 	 * @param con
 	 */
 	public void write(Connection con) {
+		Statement sta = null;
 		try {
-			Statement sta = con.createStatement();
+			sta = con.createStatement();
 			String sql = "INSERT INTO patent_word_tf_df (PTT_NUM,WORD,TF,DF,FLAG) VALUES ("
 					+ "'"
 					+ getPttNum()
@@ -106,9 +107,17 @@ public class PatentWordTFIDFModel {
 					+ getTf()
 					+ "," + getDf() + "," + getFlag() + ")";
 			sta.execute(sql);
-			sta.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 }

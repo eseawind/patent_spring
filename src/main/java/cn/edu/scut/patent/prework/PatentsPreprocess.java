@@ -98,10 +98,11 @@ public class PatentsPreprocess {
 	 * 在数据表PATENTS_AFTER_WORD_DIVIDE中输入所有的分词内容
 	 */
 	public void divideWordToDb() {
+		Statement sta = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 		try {
-
-			Statement sta = con.createStatement();
-
+			sta = con.createStatement();
 			if (!DatabaseHelper.isTableExisted("PATENTS_AFTER_WORD_DIVIDE")) {
 				String sql_create_table_PATENTS_AFTER_WORD_DIVIDE = "CREATE TABLE PATENTS_AFTER_WORD_DIVIDE ("
 						+ "PTT_NUM VARCHAR(20) NOT NULL PRIMARY KEY"
@@ -111,33 +112,27 @@ public class PatentsPreprocess {
 						+ ", PTT_ABSTRACT_DIVIDED VARCHAR(10000) NOT NULL"
 						+ ", PTT_CONTENT_DIVIDED VARCHAR(10000) NOT NULL)"
 						+ " ENGINE = InnoDB" + ";";
-				PreparedStatement ps = con
-						.prepareStatement(sql_create_table_PATENTS_AFTER_WORD_DIVIDE);
+				ps = con.prepareStatement(sql_create_table_PATENTS_AFTER_WORD_DIVIDE);
 				ps.executeUpdate();
-				ps.close();
 			}
 			if (!DatabaseHelper.isTableExisted("T_STOPWORD")) {
 				String sql_create_table_T_STOPWORD = "CREATE TABLE T_STOPWORD ("
 						+ "WORD VARCHAR(20) NOT NULL PRIMARY KEY"
 						+ ", FLAG INT NOT NULL)" + " ENGINE = InnoDB" + ";";
-				PreparedStatement ps = con
-						.prepareStatement(sql_create_table_T_STOPWORD);
+				ps = con.prepareStatement(sql_create_table_T_STOPWORD);
 				ps.executeUpdate();
-				ps.close();
 			}
 			if (!DatabaseHelper.isTableExisted("T_WORD_SMARK")) {
 				String sql_create_table_T_WORD_SMARK = "CREATE TABLE T_WORD_SMARK ("
 						+ "WORD_SMARK VARCHAR(10) NOT NULL PRIMARY KEY"
 						+ ", REMARK VARCHAR(50) NOT NULL"
 						+ ", FLAG INT NOT NULL)" + " ENGINE = InnoDB" + ";";
-				PreparedStatement ps = con
-						.prepareStatement(sql_create_table_T_WORD_SMARK);
+				ps = con.prepareStatement(sql_create_table_T_WORD_SMARK);
 				ps.executeUpdate();
-				ps.close();
 			}
 
 			String sql = "SELECT PTT_NUM,PTT_NAME,PTT_DATE,CLASS_NUM_G06Q,PTT_ABSTRACT FROM patents";
-			ResultSet rs = sta.executeQuery(sql);
+			rs = sta.executeQuery(sql);
 
 			PatentsAfterWordDivideModel pttAWDM;
 			while (rs.next()) {
@@ -153,7 +148,7 @@ public class PatentsPreprocess {
 						rs.getString("PTT_ABSTRACT"), 0, null, null));
 
 				// 存入到patents_after_word_divide数据表
-				Statement sta2 = con.createStatement();
+				sta = con.createStatement();
 				String sql2 = "INSERT INTO patents_after_word_divide (PTT_NUM,PTT_NAME_DIVIDED,PTT_DATE,CLASS_NUM_G06Q,PTT_ABSTRACT_DIVIDED,PTT_CONTENT_DIVIDED) VALUES ('"
 						+ pttAWDM.getPtt_num()
 						+ "','"
@@ -166,20 +161,32 @@ public class PatentsPreprocess {
 						+ pttAWDM.getPtt_abstract()
 						+ "','"
 						+ pttAWDM.getPtt_content() + "');";
-				sta2.execute(sql2);
+				sta.execute(sql2);
 				// 8624
 				System.out.println("Number : " + rs.getRow() + "\n" + sql2);
-				sta2.close();
 				// *************************************
 				if (rs.getRow() >= 100) {
 					break;
 				}
 				// *************************************
 			}
-			rs.close();
-			sta.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (sta != null) {
+					sta.close();
+				}
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -190,10 +197,12 @@ public class PatentsPreprocess {
 	 * 统计词语在某个文档中出现的频率TF，并保存到HashMap中
 	 */
 	public void countTF() {
+		Statement sta = null;
+		ResultSet rs = null;
 		try {
-			Statement sta = con.createStatement();
+			sta = con.createStatement();
 			String sql = "SELECT * FROM patents_after_word_divide";
-			ResultSet rs = sta.executeQuery(sql);
+			rs = sta.executeQuery(sql);
 
 			PatentsAfterWordDivideModel pawd;
 			String[] titleArr;
@@ -288,10 +297,20 @@ public class PatentsPreprocess {
 				System.out.println(rs.getRow() + "\t" + "ok!\t"
 						+ pawd.getPtt_num() + "\t" + pawd.getPtt_name());
 			}
-			rs.close();
-			sta.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (sta != null) {
+					sta.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -301,6 +320,7 @@ public class PatentsPreprocess {
 	 * 把HashMap中统计词语在某个文档中出现的频率TF并保存到数据表PATENT_WORD_TF_DF中
 	 */
 	public void saveWordDicToDatabase() {
+		PreparedStatement ps = null;
 		try {
 			if (!DatabaseHelper.isTableExisted("PATENT_WORD_TF_DF")) {
 				String sql_create_table_PATENT_WORD_TF_DF = "CREATE TABLE PATENT_WORD_TF_DF ("
@@ -311,14 +331,21 @@ public class PatentsPreprocess {
 						+ ", DF INT NOT NULL"
 						+ ", FLAG INT NOT NULL)"
 						+ " ENGINE = InnoDB AUTO_INCREMENT = 1" + ";";
-				PreparedStatement ps;
 				ps = con.prepareStatement(sql_create_table_PATENT_WORD_TF_DF);
 				ps.executeUpdate();
-				ps.close();
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		Iterator<Map.Entry<String, PatentWordTFIDFModel>> iterator1 = titleWordDic
 				.entrySet().iterator();
@@ -348,13 +375,16 @@ public class PatentsPreprocess {
 	 * 计算所有词的文档频数DF，并保存到数据表PATENT_WORD_TF_DF中
 	 */
 	public void countDF() {
+		Statement sta = null;
+		ResultSet rs = null;
+		Statement tempSta1 = null;
+		Statement tempSta2 = null;
+		ResultSet tempRs1 = null;
+		ResultSet tempRs2 = null;
 		try {
-			Statement sta = con.createStatement();
-			ResultSet rs = sta
-					.executeQuery("SELECT DISTINCT WORD FROM patent_word_tf_df");
+			sta = con.createStatement();
+			rs = sta.executeQuery("SELECT DISTINCT WORD FROM patent_word_tf_df");
 
-			Statement tempSta1, tempSta2;
-			ResultSet tempRs1, tempRs2;
 			// int count = 0;
 			while (rs.next()) {
 				System.out.println(rs.getRow() + "\t" + rs.getString("WORD"));
@@ -377,18 +407,33 @@ public class PatentsPreprocess {
 					tempRs1.updateInt(5, f);
 					tempRs1.updateRow();
 				}
-
-				tempRs2.close();
-				tempSta2.close();
-
-				tempRs1.close();
-				tempSta1.close();
-				// System.out.println(count++);
 			}
-			rs.close();
-			sta.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (tempRs1 != null) {
+					tempRs1.close();
+				}
+				if (tempRs2 != null) {
+					tempRs2.close();
+				}
+				if (sta != null) {
+					sta.close();
+				}
+				if (tempSta1 != null) {
+					tempSta1.close();
+				}
+				if (tempSta2 != null) {
+					tempSta2.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -397,26 +442,28 @@ public class PatentsPreprocess {
 	 */
 	public void extractFeatureWord() {
 		Map<String, Number> wordMaxTFmap = new HashMap<String, Number>();
+		Statement sta = null;
+		ResultSet rs1 = null;
+		ResultSet rs2 = null;
 		try {
 			int count = 0;
-			Connection connection = DatabaseHelper.getConnection();
-			Statement statement = connection.createStatement();
-			ResultSet resultSet = statement
+			sta = con.createStatement();
+			rs1 = sta
 					.executeQuery("SELECT DISTINCT WORD FROM patent_word_tf_df");
 			int tempNum;
 			String word;
 			WordInfoModel tempWim;
-			while (resultSet.next()) {
+			while (rs1.next()) {
 				tempNum = 0;
-				Statement wordSta = connection.createStatement();
-				word = resultSet.getString(1);
-				ResultSet wordRs = wordSta
+				sta = con.createStatement();
+				word = rs1.getString(1);
+				rs2 = sta
 						.executeQuery("select * from patent_word_tf_df where WORD='"
 								+ word + "'");
 				int df = 1;
-				while (wordRs.next()) {
-					df = wordRs.getInt(5);
-					tempNum = Math.max(tempNum, wordRs.getInt(4));
+				while (rs2.next()) {
+					df = rs2.getInt(5);
+					tempNum = Math.max(tempNum, rs2.getInt(4));
 				}
 				wordMaxTFmap.put(word, tempNum);
 
@@ -425,6 +472,8 @@ public class PatentsPreprocess {
 				tempWim.setWord(word);
 				tempWim.setMaxTf(tempNum);
 				tempWim.setDf(df);
+
+				PreparedStatement ps = null;
 				try {
 					if (!DatabaseHelper.isTableExisted("T_WORD_INFO")) {
 						String sql_create_table_T_WORD_INFO = "CREATE TABLE T_WORD_INFO ("
@@ -433,28 +482,40 @@ public class PatentsPreprocess {
 								+ ", DF INT NOT NULL)"
 								+ " ENGINE = InnoDB"
 								+ ";";
-						PreparedStatement ps;
 						ps = con.prepareStatement(sql_create_table_T_WORD_INFO);
 						ps.executeUpdate();
-						ps.close();
 					}
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				} finally {
+					if (ps != null) {
+						ps.close();
+					}
 				}
 				tempWim.write();
-				wordRs.close();
-				wordSta.close();
 				count++;
 				System.out.println("map count:" + count + "\tkey:" + word
 						+ "\tvalue:" + tempNum);
 			}
 			System.out.println("map保存成功！");
-			resultSet.close();
-			statement.close();
-			connection.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (rs1 != null) {
+					rs1.close();
+				}
+				if (rs2 != null) {
+					rs2.close();
+				}
+				if (sta != null) {
+					sta.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -465,6 +526,7 @@ public class PatentsPreprocess {
 	 *            为前多少位词语作为特征词。
 	 */
 	public void countAndSaveToDb(int size) {
+		PreparedStatement ps = null;
 		try {
 			if (!DatabaseHelper.isTableExisted("PATENT_FEATURE_WORD")) {
 				String sql_create_table_PATENT_FEATURE_WORD = "CREATE TABLE PATENT_FEATURE_WORD ("
@@ -474,47 +536,52 @@ public class PatentsPreprocess {
 						+ ", TFIDF_VALUE DOUBLE NOT NULL"
 						+ ", TFIDF_VALUE_STANDARD DOUBLE NOT NULL)"
 						+ " ENGINE = InnoDB AUTO_INCREMENT = 1" + ";";
-				PreparedStatement ps;
 				ps = con.prepareStatement(sql_create_table_PATENT_FEATURE_WORD);
 				ps.executeUpdate();
-				ps.close();
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+
+		Statement sta = null;
+		ResultSet rs = null;
+		ResultSet pttnumRs = null;
 		try {
 			int n = DatabaseHelper.getSize("patents_after_word_divide");
 			int count = 0;
 			Map<String, Number> wordMaxTFmap = new HashMap<String, Number>();
-			Connection connection = DatabaseHelper.getConnection();
-			Statement mapSta = connection.createStatement();
-			ResultSet mapRs = mapSta.executeQuery("select * from t_word_info");
-			while (mapRs.next()) {
-				wordMaxTFmap.put(mapRs.getString("WORD"),
-						mapRs.getInt("MAX_TF"));
+			sta = con.createStatement();
+			rs = sta.executeQuery("select * from t_word_info");
+			while (rs.next()) {
+				wordMaxTFmap.put(rs.getString("WORD"), rs.getInt("MAX_TF"));
 			}
-			mapRs.close();
-			mapSta.close();
 			System.out.println(wordMaxTFmap.get("web"));
 			System.out.println(wordMaxTFmap.size());
 
-			Statement statement = connection.createStatement();
-			ResultSet resultSet = statement
-					.executeQuery("SELECT DISTINCT PTT_NUM FROM patent_word_tf_df");
+			sta = con.createStatement();
+			rs = sta.executeQuery("SELECT DISTINCT PTT_NUM FROM patent_word_tf_df");
 			String pttnum;
 			ArrayList<PatentFeatureWordModel> tempArr;
-			while (resultSet.next()) {
+			while (rs.next()) {
 				tempArr = new ArrayList<PatentFeatureWordModel>();
-				Statement pttnumSta = connection.createStatement();
-				pttnum = resultSet.getString(1);
-				ResultSet pttnumRs = pttnumSta
+				sta = con.createStatement();
+				pttnum = rs.getString(1);
+				pttnumRs = sta
 						.executeQuery("select * from patent_word_tf_df where PTT_NUM='"
 								+ pttnum + "'");
 
 				while (pttnumRs.next()) {
 					int tf = pttnumRs.getInt(4);
-
 					int maxTf = 0;
 					if (wordMaxTFmap.get(pttnumRs.getString(3)) == null) {
 						System.out.println(pttnumRs.getString(3)
@@ -524,7 +591,6 @@ public class PatentsPreprocess {
 						maxTf = wordMaxTFmap.get(pttnumRs.getString(3))
 								.intValue();
 					}
-
 					int df = pttnumRs.getInt(5);
 					Number tempValue = (0.5 + 0.5 * tf / maxTf)
 							* (Math.log(n / df));
@@ -550,16 +616,27 @@ public class PatentsPreprocess {
 					// 写入数据库
 					tempArr.get(m).write();
 				}
-
-				pttnumRs.close();
-				pttnumSta.close();
-
 				count++;
 				System.out.println("第" + count + "个专利" + pttnum + "的特征词数量为"
 						+ len);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+				if (rs != null) {
+					rs.close();
+				}
+				if (pttnumRs != null) {
+					pttnumRs.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -569,17 +646,19 @@ public class PatentsPreprocess {
 	 * 更新数据表PATENT_FEATURE_WORD中的TFIDF_VALUE_STANDARD
 	 */
 	public void countStandardTFIDF() {
+		Statement sta = null;
+		ResultSet rs = null;
+		Statement sta2 = null;
+		ResultSet rs2 = null;
 		try {
-			Statement sta = con.createStatement();
-			ResultSet rs = sta.executeQuery("select PTT_NUM from patents");
-
+			sta = con.createStatement();
+			rs = sta.executeQuery("select PTT_NUM from patents");
 			while (rs.next()) {
 				String pttNum = rs.getString(1);
-				Statement sta2 = con.createStatement();
-				ResultSet rs2 = sta2
+				sta2 = con.createStatement();
+				rs2 = sta2
 						.executeQuery("select * from patent_feature_word where PTT_NUM='"
 								+ pttNum + "'");
-
 				List<PatentFeatureWordModel> pfwnList = new ArrayList<PatentFeatureWordModel>();
 				while (rs2.next()) {
 					PatentFeatureWordModel pfwm = new PatentFeatureWordModel();
@@ -596,14 +675,28 @@ public class PatentsPreprocess {
 					p.setTfidfValueStandard(p.getTfidfValue() / sum);
 					p.updateTfidfValueStandard();
 				}
-				rs2.close();
-				sta2.close();
 				System.out.println(pttNum);
 			}
-			rs.close();
-			sta.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (rs2 != null) {
+					rs2.close();
+				}
+				if (rs != null) {
+					rs.close();
+				}
+				if (sta2 != null) {
+					sta2.close();
+				}
+				if (sta != null) {
+					sta.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -615,33 +708,46 @@ public class PatentsPreprocess {
 	 */
 	@SuppressWarnings("unchecked")
 	public void cluster(int k) {
+		PreparedStatement ps = null;
 		try {
 			if (!DatabaseHelper.isTableExisted("PATENT_CLUSTER")) {
 				String sql_create_table_PATENT_CLUSTER = "CREATE TABLE PATENT_CLUSTER ("
 						+ "PTT_NUM VARCHAR(20) NOT NULL PRIMARY KEY"
 						+ ", CLUSTER INT NOT NULL)" + " ENGINE = InnoDB" + ";";
-				PreparedStatement ps;
+
 				ps = con.prepareStatement(sql_create_table_PATENT_CLUSTER);
 				ps.executeUpdate();
-				ps.close();
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+
 		List<PatentMatrix> pttMatrix = new ArrayList<PatentMatrix>();
 		int n = 0;
+		Statement sta = null;
+		ResultSet rs = null;
+		Statement sta2 = null;
+		ResultSet rs2 = null;
 		try {
-			Statement sta = con.createStatement();
-			ResultSet rs = sta.executeQuery("select PTT_NUM from patents");
+			sta = con.createStatement();
+			rs = sta.executeQuery("select PTT_NUM from patents");
 			while (rs.next()) {
 				String pttNum = rs.getString(1);
-
 				PatentMatrix pm = new PatentMatrix();
 				pm.pttNum = pttNum;
 
-				Statement sta2 = con.createStatement();
-				ResultSet rs2 = sta2
+				sta2 = con.createStatement();
+				rs2 = sta2
 						.executeQuery("select * from patent_feature_word where PTT_NUM='"
 								+ pttNum + "'");
 				int index = 0;
@@ -649,18 +755,13 @@ public class PatentsPreprocess {
 				while (rs2.next()) {
 					PatentFeatureWordModel pfwm = new PatentFeatureWordModel();
 					pfwm.read(rs2);
-
 					pm.value[index] = pfwm.getTfidfValueStandard();
 					sum += pm.value[index] * pm.value[index];
-
 					index += 1;
 				}
 				for (int t = index; t < 20; t++) {
 					pm.value[t] = 0;
 				}
-				rs2.close();
-				sta2.close();
-
 				pttMatrix.add(pm);
 
 				System.out.println(":" + n);
@@ -671,10 +772,26 @@ public class PatentsPreprocess {
 				// }
 				n++;
 			}
-			rs.close();
-			sta.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (rs2 != null) {
+					rs2.close();
+				}
+				if (rs != null) {
+					rs.close();
+				}
+				if (sta2 != null) {
+					sta2.close();
+				}
+				if (sta != null) {
+					sta.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		// 变量定义
@@ -748,21 +865,27 @@ public class PatentsPreprocess {
 			count++;
 		}
 
+		Statement sta3 = null;
 		for (int ii = 0; ii < n; ii++) {
-			Statement statement;
 			try {
-				statement = con.createStatement();
-				statement
-						.execute("INSERT INTO patent_cluster (PTT_NUM,CLUSTER) VALUES ('"
-								+ pttMatrix.get(ii).pttNum
-								+ "',"
-								+ clusterAssignments[ii] + ")");
-				statement.close();
+				sta3 = con.createStatement();
+				sta3.execute("INSERT INTO patent_cluster (PTT_NUM,CLUSTER) VALUES ('"
+						+ pttMatrix.get(ii).pttNum
+						+ "',"
+						+ clusterAssignments[ii] + ")");
 			} catch (SQLException e) {
 				e.printStackTrace();
+			} finally {
+				try {
+					if (sta3 != null) {
+						sta3.close();
+					}
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
-
 		System.out.println("聚类成功！");
 	}
 
@@ -774,34 +897,45 @@ public class PatentsPreprocess {
 	 */
 	@SuppressWarnings("unchecked")
 	public void cluster2(int k) {
+		PreparedStatement ps = null;
 		try {
 			if (!DatabaseHelper.isTableExisted("PATENT_CLUSTER")) {
 				String sql_create_table_PATENT_CLUSTER = "CREATE TABLE PATENT_CLUSTER ("
 						+ "PTT_NUM VARCHAR(20) NOT NULL PRIMARY KEY"
 						+ ", CLUSTER INT NOT NULL)" + " ENGINE = InnoDB" + ";";
-				PreparedStatement ps;
 				ps = con.prepareStatement(sql_create_table_PATENT_CLUSTER);
 				ps.executeUpdate();
-				ps.close();
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		// 以专利为单位，存储所有专利所有特征词的权重
 		System.out.println("以专利为单位，存储所有专利所有特征词的权重");
 		List<PatentMatrix> pttMatrix = new ArrayList<PatentMatrix>();
 		int n = 0;
+		Statement sta = null;
+		ResultSet rs = null;
+		Statement sta2 = null;
+		ResultSet rs2 = null;
 		try {
-			Statement sta = con.createStatement();
-			ResultSet rs = sta
-					.executeQuery("SELECT DISTINCT PTT_NUM FROM PATENT_FEATURE_WORD");
+			sta = con.createStatement();
+			rs = sta.executeQuery("SELECT DISTINCT PTT_NUM FROM PATENT_FEATURE_WORD");
 			while (rs.next()) {
 				String pttNum = rs.getString(1);
 				PatentMatrix pm = new PatentMatrix();
 				pm.pttNum = pttNum;
-				Statement sta2 = con.createStatement();
-				ResultSet rs2 = sta2
+				sta2 = con.createStatement();
+				rs2 = sta2
 						.executeQuery("select * from patent_feature_word where PTT_NUM='"
 								+ pttNum + "'");
 				int index = 0;
@@ -816,18 +950,31 @@ public class PatentsPreprocess {
 				for (int t = index; t < 20; t++) {
 					pm.value[t] = 0;
 				}
-				rs2.close();
-				sta2.close();
-
 				pttMatrix.add(pm);
 				System.out.println("第" + n + "个专利");
 				System.out.println("权重平方和为:" + sum);
 				n++;
 			}
-			rs.close();
-			sta.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (rs2 != null) {
+					rs2.close();
+				}
+				if (rs != null) {
+					rs.close();
+				}
+				if (sta2 != null) {
+					sta2.close();
+				}
+				if (sta != null) {
+					sta.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		// 变量定义
@@ -908,17 +1055,24 @@ public class PatentsPreprocess {
 		}
 
 		for (int ii = 0; ii < n; ii++) {
-			Statement statement;
+			Statement sta3 = null;
 			try {
-				statement = con.createStatement();
-				statement
-						.execute("INSERT INTO patent_cluster (PTT_NUM,CLUSTER) VALUES ('"
-								+ pttMatrix.get(ii).pttNum
-								+ "',"
-								+ clusterAssignments[ii] + ")");
-				statement.close();
+				sta3 = con.createStatement();
+				sta3.execute("INSERT INTO patent_cluster (PTT_NUM,CLUSTER) VALUES ('"
+						+ pttMatrix.get(ii).pttNum
+						+ "',"
+						+ clusterAssignments[ii] + ")");
 			} catch (SQLException e) {
 				e.printStackTrace();
+			} finally {
+				try {
+					if (sta3 != null) {
+						sta3.close();
+					}
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 		System.out.println("聚类成功！");
@@ -946,18 +1100,18 @@ public class PatentsPreprocess {
 		// }
 
 		// *********************************
-		Statement statement;
+		Statement sta = null;
 		try {
-			statement = con.createStatement();
+			sta = con.createStatement();
 			if (!DatabaseHelper.isTableExisted("DATA")) {
 				String sql_create_table_DATA = "CREATE TABLE DATA ("
 						+ "I INT NOT NULL" + ", J INT NOT NULL"
 						+ ", DISTANCE DOUBLE NOT NULL" + ", PRIMARY KEY(I, J))"
 						+ " ENGINE = InnoDB" + ";";
-				statement.execute(sql_create_table_DATA);
+				sta.execute(sql_create_table_DATA);
 			}
 			String sql_drop_table_DATA = "TRUNCATE TABLE DATA;";
-			statement.execute(sql_drop_table_DATA);
+			sta.execute(sql_drop_table_DATA);
 
 			for (int j = 0; j < len; j++) {
 				for (int i = j; i < len; i++) {
@@ -965,21 +1119,29 @@ public class PatentsPreprocess {
 					if (i == j) {
 						sql_insert_table_DATA = "INSERT INTO DATA (I, J, DISTANCE) VALUES ("
 								+ i + ", " + j + ", " + 0 + ");";
-						statement.execute(sql_insert_table_DATA);
+						sta.execute(sql_insert_table_DATA);
 					} else {
 						double dis = getDistance(cluster.get(i), cluster.get(j));
 						sql_insert_table_DATA = "INSERT INTO DATA (I, J, DISTANCE) VALUES ("
 								+ i + ", " + j + ", " + dis + ");";
-						statement.execute(sql_insert_table_DATA);
+						sta.execute(sql_insert_table_DATA);
 						sql_insert_table_DATA = "INSERT INTO DATA (I, J, DISTANCE) VALUES ("
 								+ j + ", " + i + ", " + dis + ");";
-						statement.execute(sql_insert_table_DATA);
+						sta.execute(sql_insert_table_DATA);
 					}
 				}
 			}
-			statement.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		// *********************************
@@ -1066,28 +1228,40 @@ public class PatentsPreprocess {
 	 */
 	private double countStandardDiviation2(int n) {
 		List<Double> distance = new ArrayList<Double>();
-		Statement statement;
+		Statement sta = null;
+		ResultSet rs = null;
 		try {
-			statement = con.createStatement();
+			sta = con.createStatement();
 			if (!DatabaseHelper.isTableExisted("DATA")) {
 				String sql_create_table_DATA = "CREATE TABLE DATA ("
 						+ "I INT NOT NULL" + ", J INT NOT NULL"
 						+ ", DISTANCE DOUBLE NOT NULL" + ", PRIMARY KEY(I, J))"
 						+ " ENGINE = InnoDB" + ";";
-				statement.execute(sql_create_table_DATA);
+				sta.execute(sql_create_table_DATA);
 			}
 			String sql_select_from_DATA = "SELECT DISTANCE FROM DATA WHERE I="
 					+ n;
-			ResultSet resultSet = statement.executeQuery(sql_select_from_DATA);
-			while (resultSet.next()) {
-				distance.add(resultSet.getDouble(1));
+			rs = sta.executeQuery(sql_select_from_DATA);
+			while (rs.next()) {
+				distance.add(rs.getDouble(1));
 			}
-			statement.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (sta != null) {
+					sta.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		int len = distance.size();
 
+		int len = distance.size();
 		double sum = 0;
 		for (int i = 0; i < len; i++) {
 			sum += distance.get(i);
