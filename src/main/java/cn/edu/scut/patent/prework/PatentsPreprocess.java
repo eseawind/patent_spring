@@ -17,6 +17,7 @@ import cn.edu.scut.patent.model.PatentMatrix;
 import cn.edu.scut.patent.model.PatentWordTFIDFModel;
 import cn.edu.scut.patent.model.PatentsAfterWordDivideModel;
 import cn.edu.scut.patent.model.WordInfoModel;
+import cn.edu.scut.patent.util.Constants;
 import cn.edu.scut.patent.util.DatabaseHelper;
 import cn.edu.scut.patent.util.StringHelper;
 
@@ -177,9 +178,9 @@ public class PatentsPreprocess {
 
 				// 将专利名称和摘要分词
 				pttAWDM.setPtt_name(Nlpir.doNlpirString(
-						rs.getString("PTT_NAME"), 1, null, null));
+						rs.getString("PTT_NAME"), 0, null, null));
 				pttAWDM.setPtt_abstract(Nlpir.doNlpirString(
-						rs.getString("PTT_ABSTRACT"), 1, null, null));
+						rs.getString("PTT_ABSTRACT"), 0, null, null));
 
 				// 存入到patents_after_word_divide数据表
 				sta = con.createStatement();
@@ -199,7 +200,7 @@ public class PatentsPreprocess {
 				// 8624
 				System.out.println("Number : " + rs.getRow() + "\n" + sql2);
 				// *************************************
-				if (rs.getRow() >= 100) {
+				if (rs.getRow() >= 1000) {
 					break;
 				}
 				// *************************************
@@ -1055,7 +1056,7 @@ public class PatentsPreprocess {
 			System.out.println("第三步完成");
 
 			// 4.比较每个数据最近的聚类是否就是它所属的聚类
-			// 如果全相等表示所有的点已经是最佳距离了，直接返回；
+			// 如果全相等表示所有的点已经是最佳距离或达到了聚类的最大次数，直接返回；
 			System.out.println("第四步：比较每个数据最近的聚类是否就是它原本所属的聚类");
 			int r = 0;
 			for (int w = 0; w < n; w++) {
@@ -1070,7 +1071,7 @@ public class PatentsPreprocess {
 				}
 			}
 			System.out.println();
-			if (r == n) {
+			if (r == n || count >= Constants.CLUSTER_MAX_NUMBER) {
 				break;
 			}
 			System.out.println("第四步完成");

@@ -40,6 +40,8 @@ public class Constants {
 	// 存放专利网页的地址
 	public static String WEBSITE_PATH = DIRECTORY_ROOT
 			+ "/patents/patentPages/";
+	// 聚类最大次数
+	public static int CLUSTER_MAX_NUMBER = 5;
 	// 技术生长率的指标号码
 	public static int TECHNICAL_GROWTH_RATE_NUMBER = 101;
 	// 技术成熟率的指标号码
