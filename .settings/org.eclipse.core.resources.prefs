@@ -1,0 +1,17 @@
+eclipse.preferences.version=1
+encoding//src/main/java/cn/edu/scut/patent/core/IndexAndSearch.java=UTF-8
+encoding//src/main/java/cn/edu/scut/patent/model/ClusterValueItem.java=UTF-8
+encoding//src/main/java/cn/edu/scut/patent/model/IndicatorData.java=UTF-8
+encoding//src/main/java/cn/edu/scut/patent/model/IndicatorParam.java=UTF-8
+encoding//src/main/java/cn/edu/scut/patent/model/IndicatorValueItem.java=UTF-8
+encoding//src/main/java/cn/edu/scut/patent/model/PatentDao.java=UTF-8
+encoding//src/main/java/cn/edu/scut/patent/model/PatentFeatureWordModel.java=UTF-8
+encoding//src/main/java/cn/edu/scut/patent/model/PatentMatrix.java=UTF-8
+encoding//src/main/java/cn/edu/scut/patent/model/PatentWordTFIDFModel.java=UTF-8
+encoding//src/main/java/cn/edu/scut/patent/model/PatentsAfterWordDivideModel.java=UTF-8
+encoding//src/main/java/cn/edu/scut/patent/model/WordInfoModel.java=UTF-8
+encoding//src/main/java/cn/edu/scut/patent/prework/GetPatents.java=UTF-8
+encoding//src/main/java/cn/edu/scut/patent/prework/PatentsPreprocess.java=UTF-8
+encoding//src/main/java/cn/edu/scut/patent/prework/SaveToMysql.java=UTF-8
+encoding//src/main/java/cn/edu/scut/patent/util/DatabaseHelper.java=UTF-8
+encoding/<project>=UTF-8
