@@ -196,9 +196,9 @@ public class IndexAndSearch {
 			System.out.println("size:" + map.size());
 			BooleanQuery booleanQuery = new BooleanQuery();
 			Set<String> keySet = map.keySet();
-			Iterator it = keySet.iterator();
+			Iterator<String> it = keySet.iterator();
 			while (it.hasNext()) {
-				String key = (String) it.next();
+				String key = it.next();
 				String value = map.get(key);
 				if (key == "APPLY_NUM") {
 					Query tempQuery = new TermQuery(new Term(key, value));

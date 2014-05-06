@@ -122,9 +122,9 @@ public class TechnicalDataChartController {
 				Data += "{data: [";
 				if (map.size() > 0) {
 					Set<String> keySet = map.keySet();
-					Iterator it = keySet.iterator();
+					Iterator<String> it = keySet.iterator();
 					while (it.hasNext()) {
-						String key = (String) it.next();
+						String key = it.next();
 						ClusterValueItem value = map.get(key);
 						Data += "[" + value.cluster + "," + value.pttClass
 								+ "," + value.count + "]";

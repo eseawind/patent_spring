@@ -23,9 +23,9 @@ public class CheckHelper {
 		System.out.println("当前使用的分词器：" + analyzer.getClass().getSimpleName());
 		if (map != null) {
 			Set<String> keySet = map.keySet();
-			Iterator it = keySet.iterator();
+			Iterator<String> it = keySet.iterator();
 			while (it.hasNext()) {
-				String key = (String) it.next();
+				String key = it.next();
 				String value = map.get(key);
 				System.out
 						.println("打印分词field=" + key + "\n" + "value=" + value);

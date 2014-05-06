@@ -89,9 +89,9 @@ public class PDFHelper {
 		// 遍历map把各项专利的属性加入到document当中
 		if (map != null) {
 			Set<String> keySet = map.keySet();
-			Iterator it = keySet.iterator();
+			Iterator<String> it = keySet.iterator();
 			while (it.hasNext()) {
-				String key = (String) it.next();
+				String key = it.next();
 				String value = Nlpir.doNlpirString(map.get(key), 0, null, null);
 				document.add(new TextField(key, value, Field.Store.YES));
 			}
