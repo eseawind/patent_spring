@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import cn.edu.scut.patent.util.DatabaseHelper;
+import cn.edu.scut.patent.dao.DatabaseHelper;
 
 /**
  * 经过特征提取之后的专利特征词及其权重

@@ -1,4 +1,4 @@
-package cn.edu.scut.patent.core;
+package cn.edu.scut.patent.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import cn.edu.scut.patent.model.IndicatorData;
 import cn.edu.scut.patent.model.IndicatorParam;
 import cn.edu.scut.patent.model.IndicatorValueItem;
 import cn.edu.scut.patent.model.PatentDao;
-import cn.edu.scut.patent.util.DatabaseHelper;
+import cn.edu.scut.patent.dao.DatabaseHelper;
 import cn.edu.scut.patent.util.StringHelper;
 
 public class Indicator {
@@ -33,7 +33,7 @@ public class Indicator {
 			pttTypeList.add("11");
 			pttTypeList.add("22");
 			pttTypeList.add("33");
-			List<PatentDao> patentList = IndexAndSearch.doSearch(patentdao,
+			List<PatentDao> patentList = new Search().doSearch(patentdao,
 					pttTypeList);
 			Map<String, Integer> map = new HashMap<String, Integer>();
 			double sum = 0;
@@ -99,7 +99,7 @@ public class Indicator {
 			pttTypeList.add("11");
 			pttTypeList.add("22");
 			pttTypeList.add("33");
-			List<PatentDao> patentList = IndexAndSearch.doSearch(patentdao,
+			List<PatentDao> patentList = new Search().doSearch(patentdao,
 					pttTypeList);
 			Map<String, Integer> map11 = new HashMap<String, Integer>();
 			Map<String, Integer> yearSum = new HashMap<String, Integer>();
@@ -174,7 +174,7 @@ public class Indicator {
 			pttTypeList.add("11");
 			pttTypeList.add("22");
 			pttTypeList.add("33");
-			List<PatentDao> patentList = IndexAndSearch.doSearch(patentDao,
+			List<PatentDao> patentList = new Search().doSearch(patentDao,
 					pttTypeList);
 
 			if (patentList == null) {

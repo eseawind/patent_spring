@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import cn.edu.scut.patent.core.IndexAndSearch;
 import cn.edu.scut.patent.model.PatentDao;
+import cn.edu.scut.patent.service.Search;
 import cn.edu.scut.patent.util.StringHelper;
 
 @Controller
@@ -96,7 +96,7 @@ public class SearchController {
 			patentdao.setPttAbstract(request.getParameter("PTT_ABSTRACT"));
 		}
 		System.out.println("进入search啦！");
-		List<PatentDao> patentList = IndexAndSearch.doSearch(patentdao,
+		List<PatentDao> patentList = new Search().doSearch(patentdao,
 				pttTypeList);
 
 		String timeConsume = StringHelper.timer(startTime);

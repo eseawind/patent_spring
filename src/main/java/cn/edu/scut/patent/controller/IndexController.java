@@ -4,7 +4,7 @@ import java.util.Date;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-import cn.edu.scut.patent.core.IndexAndSearch;
+import cn.edu.scut.patent.service.Index;
 import cn.edu.scut.patent.util.StringHelper;
 
 @Controller
@@ -20,8 +20,7 @@ public class IndexController {
 		// 索引开始的时间
 		long startTime = new Date().getTime();
 		System.out.println("进入index啦！");
-		// IndexAndSearch.doIndexFromPDF(entry.getValue());
-		IndexAndSearch.doIndexFromDatabase();
+		new Index().doIndexFromDatabase();
 		String timeConsume = StringHelper.timer(startTime);
 
 		ModelAndView mv = new ModelAndView("alert", "command", "索引建立成功！耗时" + timeConsume);

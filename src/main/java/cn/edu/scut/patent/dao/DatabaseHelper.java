@@ -1,4 +1,4 @@
-package cn.edu.scut.patent.util;
+package cn.edu.scut.patent.dao;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -16,6 +16,9 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
 import ICTCLAS2014.Nlpir;
 import cn.edu.scut.patent.model.PatentDao;
+import cn.edu.scut.patent.model.PatentsAfterWordDivideModel;
+import cn.edu.scut.patent.util.Constants;
+import cn.edu.scut.patent.util.StringHelper;
 
 public class DatabaseHelper {
 
@@ -36,7 +39,7 @@ public class DatabaseHelper {
 	 * 
 	 * @return
 	 */
-	private static Boolean checkMySQL() {
+	public static Boolean checkMySQL() {
 		if (!isDatabaseExisted("patentdb")) {
 			if (!createDatabase()) {
 				return false;
@@ -66,7 +69,7 @@ public class DatabaseHelper {
 	 * @param db_name
 	 * @return
 	 */
-	private static Boolean isDatabaseExisted(String db_name) {
+	public static Boolean isDatabaseExisted(String db_name) {
 		Connection con = null;
 		Statement sta = null;
 		ResultSet rs = null;
@@ -232,7 +235,7 @@ public class DatabaseHelper {
 	 * @param
 	 * @return Boolean
 	 */
-	private static Boolean createDatabase() {
+	public static Boolean createDatabase() {
 		Connection con = null;
 		PreparedStatement ps = null;
 		try {
@@ -268,7 +271,7 @@ public class DatabaseHelper {
 	 * @param
 	 * @return Boolean
 	 */
-	private static Boolean createTablePATENTS() {
+	public static Boolean createTablePATENTS() {
 		Connection con = null;
 		PreparedStatement ps = null;
 		try {
@@ -323,7 +326,7 @@ public class DatabaseHelper {
 	 * @param
 	 * @return Boolean
 	 */
-	private static Boolean createTableTRIZ() {
+	public static Boolean createTableTRIZ() {
 		Connection con = null;
 		PreparedStatement ps = null;
 		try {
@@ -598,7 +601,7 @@ public class DatabaseHelper {
 	 * @param
 	 * @return Boolean
 	 */
-	private static Boolean createTableCLASSIFICATION() {
+	public static Boolean createTableCLASSIFICATION() {
 		Connection con = null;
 		PreparedStatement ps = null;
 		try {
@@ -635,11 +638,294 @@ public class DatabaseHelper {
 	}
 
 	/**
+	 * 创建PATENTS_AFTER_WORD_DIVIDE数据表
+	 * 
+	 * @param
+	 * @return Boolean
+	 */
+	public static Boolean createTablePATENTS_AFTER_WORD_DIVIDE() {
+		Connection con = null;
+		PreparedStatement ps = null;
+		try {
+			con = getConnection();
+			String sql_create_table_patents_after_word_divide = "CREATE TABLE PATENTS_AFTER_WORD_DIVIDE ("
+					+ "PTT_NUM VARCHAR(20) NOT NULL PRIMARY KEY"
+					+ ", PTT_NAME_DIVIDED VARCHAR(200) NOT NULL"
+					+ ", PTT_DATE DATE NOT NULL"
+					+ ", CLASS_NUM_G06Q VARCHAR(20) NOT NULL"
+					+ ", PTT_ABSTRACT_DIVIDED VARCHAR(10000) NOT NULL"
+					+ ", PTT_CONTENT_DIVIDED VARCHAR(10000) NOT NULL)"
+					+ " ENGINE = InnoDB" + ";";
+			System.out.println(sql_create_table_patents_after_word_divide);
+			ps = con.prepareStatement(sql_create_table_patents_after_word_divide);
+			ps.executeUpdate();
+			System.out.println("创建数据表PATENTS_AFTER_WORD_DIVIDE成功");
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("创建数据表PATENTS_AFTER_WORD_DIVIDE失败");
+			return false;
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * 创建T_STOPWORD数据表
+	 * 
+	 * @param
+	 * @return Boolean
+	 */
+	public static Boolean createTableT_STOPWORD() {
+		Connection con = null;
+		PreparedStatement ps = null;
+		try {
+			con = getConnection();
+			String sql_create_table_t_stopword = "CREATE TABLE T_STOPWORD ("
+					+ "WORD VARCHAR(20) NOT NULL PRIMARY KEY"
+					+ ", FLAG INT NOT NULL)" + " ENGINE = InnoDB" + ";";
+			System.out.println(sql_create_table_t_stopword);
+			ps = con.prepareStatement(sql_create_table_t_stopword);
+			ps.executeUpdate();
+			System.out.println("创建数据表T_STOPWORD成功");
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("创建数据表T_STOPWORD失败");
+			return false;
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * 创建T_WORD_SMARK数据表
+	 * 
+	 * @param
+	 * @return Boolean
+	 */
+	public static Boolean createTableT_WORD_SMARK() {
+		Connection con = null;
+		PreparedStatement ps = null;
+		try {
+			con = getConnection();
+			String sql_create_table_t_word_smark = "CREATE TABLE T_WORD_SMARK ("
+					+ "WORD_SMARK VARCHAR(10) NOT NULL PRIMARY KEY"
+					+ ", REMARK VARCHAR(50) NOT NULL"
+					+ ", FLAG INT NOT NULL)"
+					+ " ENGINE = InnoDB" + ";";
+			System.out.println(sql_create_table_t_word_smark);
+			ps = con.prepareStatement(sql_create_table_t_word_smark);
+			ps.executeUpdate();
+			System.out.println("创建数据表T_WORD_SMARK成功");
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("创建数据表T_WORD_SMARK失败");
+			return false;
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * 创建PATENT_WORD_TF_DF数据表
+	 * 
+	 * @param
+	 * @return Boolean
+	 */
+	public static Boolean createTablePATENT_WORD_TF_DF() {
+		Connection con = null;
+		PreparedStatement ps = null;
+		try {
+			con = getConnection();
+			String sql_create_table_patent_word_tf_nf = "CREATE TABLE PATENT_WORD_TF_DF ("
+					+ "ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT"
+					+ ", PTT_NUM VARCHAR(20) NOT NULL"
+					+ ", WORD VARCHAR(100) NOT NULL"
+					+ ", TF INT NOT NULL"
+					+ ", DF INT NOT NULL"
+					+ ", FLAG INT NOT NULL)"
+					+ " ENGINE = InnoDB AUTO_INCREMENT = 1" + ";";
+			System.out.println(sql_create_table_patent_word_tf_nf);
+			ps = con.prepareStatement(sql_create_table_patent_word_tf_nf);
+			ps.executeUpdate();
+			System.out.println("创建数据表PATENT_WORD_TF_DF成功");
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("创建数据表PATENT_WORD_TF_DF失败");
+			return false;
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * 创建T_WORD_INFO数据表
+	 * 
+	 * @param
+	 * @return Boolean
+	 */
+	public static Boolean createTableT_WORD_INFO() {
+		Connection con = null;
+		PreparedStatement ps = null;
+		try {
+			con = getConnection();
+			String sql_create_table_t_word_info = "CREATE TABLE T_WORD_INFO ("
+					+ "WORD VARCHAR(100) NOT NULL PRIMARY KEY"
+					+ ", MAX_TF INT NOT NULL" + ", DF INT NOT NULL)"
+					+ " ENGINE = InnoDB" + ";";
+			System.out.println(sql_create_table_t_word_info);
+			ps = con.prepareStatement(sql_create_table_t_word_info);
+			ps.executeUpdate();
+			System.out.println("创建数据表T_WORD_INFO成功");
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("创建数据表T_WORD_INFO失败");
+			return false;
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * 创建PATENT_FEATURE_WORD数据表
+	 * 
+	 * @param
+	 * @return Boolean
+	 */
+	public static Boolean createTablePATENT_FEATURE_WORD() {
+		Connection con = null;
+		PreparedStatement ps = null;
+		try {
+			con = getConnection();
+			String sql_create_table_patent_feature_word = "CREATE TABLE PATENT_FEATURE_WORD ("
+					+ "ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT"
+					+ ", PTT_NUM VARCHAR(20) NOT NULL"
+					+ ", FEATURE_WORD VARCHAR(100) NOT NULL"
+					+ ", TFIDF_VALUE DOUBLE NOT NULL"
+					+ ", TFIDF_VALUE_STANDARD DOUBLE NOT NULL)"
+					+ " ENGINE = InnoDB AUTO_INCREMENT = 1" + ";";
+			System.out.println(sql_create_table_patent_feature_word);
+			ps = con.prepareStatement(sql_create_table_patent_feature_word);
+			ps.executeUpdate();
+			System.out.println("创建数据表PATENT_FEATURE_WORD成功");
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("创建数据表PATENT_FEATURE_WORD失败");
+			return false;
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * 创建PATENT_CLUSTER数据表
+	 * 
+	 * @param
+	 * @return Boolean
+	 */
+	public static Boolean createTablePATENT_CLUSTER() {
+		Connection con = null;
+		PreparedStatement ps = null;
+		try {
+			con = getConnection();
+			String sql_create_table_patent_cluster = "CREATE TABLE PATENT_CLUSTER ("
+					+ "PTT_NUM VARCHAR(20) NOT NULL PRIMARY KEY"
+					+ ", CLUSTER INT NOT NULL)" + " ENGINE = InnoDB" + ";";
+			System.out.println(sql_create_table_patent_cluster);
+			ps = con.prepareStatement(sql_create_table_patent_cluster);
+			ps.executeUpdate();
+			System.out.println("创建数据表PATENT_CLUSTER成功");
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("创建数据表PATENT_CLUSTER失败");
+			return false;
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
 	 * 获取所有的专利数据
 	 * 
 	 * @return
 	 */
-	private static List<PatentDao> getAllPatents() {
+	public static List<PatentDao> getAllPatents() {
 		if (!checkMySQL()) {
 			return null;
 		}
@@ -660,6 +946,86 @@ public class DatabaseHelper {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("获取所有专利数据有误 !");
+			return null;
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (sta != null) {
+					sta.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * 获取PATENTS所有专利关键属性的数据
+	 * 
+	 * @return
+	 */
+	public static ResultSet getPatentsKeys() {
+		if (!checkMySQL()) {
+			return null;
+		}
+		Connection con = null;
+		Statement sta = null;
+		ResultSet rs = null;
+		try {
+			con = getConnection();
+			sta = con.createStatement();
+			String sql = "SELECT PTT_NUM,PTT_NAME,PTT_DATE,CLASS_NUM_G06Q,PTT_ABSTRACT FROM patents";
+			rs = sta.executeQuery(sql);
+			return rs;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("获取PATENTS所有专利关键属性的数据有误 !");
+			return null;
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (sta != null) {
+					sta.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * 从PATENTS_AFTER_WORD_DIVIDE获取专利属性的数据
+	 * 
+	 * @return
+	 */
+	public static ResultSet getPatentsFromPATENTS_AFTER_WORD_DIVIDE() {
+		if (!checkMySQL()) {
+			return null;
+		}
+		Connection con = null;
+		Statement sta = null;
+		ResultSet rs = null;
+		try {
+			con = getConnection();
+			sta = con.createStatement();
+			String sql = "SELECT * FROM PATENTS_AFTER_WORD_DIVIDE";
+			rs = sta.executeQuery(sql);
+			return rs;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("从PATENTS_AFTER_WORD_DIVIDE获取专利属性的数据失败 !");
 			return null;
 		} finally {
 			try {
@@ -846,12 +1212,60 @@ public class DatabaseHelper {
 	}
 
 	/**
-	 * 按照专利的格式写入数据库的外部接口
+	 * 插入数据到表PATENTS_AFTER_WORD_DIVIDE中
+	 * 
+	 * @param pttAWDM
+	 * @return
+	 */
+	public static Boolean insertPATENTS_AFTER_WORD_DIVIDE(
+			PatentsAfterWordDivideModel pttAWDM) {
+
+		Connection con = null;
+		Statement sta = null;
+		try {
+			con = getConnection();
+			sta = con.createStatement();
+			String sql_insert = "INSERT INTO patents_after_word_divide (PTT_NUM,PTT_NAME_DIVIDED,PTT_DATE,CLASS_NUM_G06Q,PTT_ABSTRACT_DIVIDED,PTT_CONTENT_DIVIDED) VALUES ('"
+					+ pttAWDM.getPtt_num()
+					+ "','"
+					+ pttAWDM.getPtt_name()
+					+ "','"
+					+ pttAWDM.getPtt_date()
+					+ "','"
+					+ pttAWDM.getClass_num_g06q()
+					+ "','"
+					+ pttAWDM.getPtt_abstract()
+					+ "','"
+					+ pttAWDM.getPtt_content() + "');";
+			System.out.println(sql_insert);
+			sta.execute(sql_insert);
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			try {
+				if (sta != null) {
+					sta.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * 按照专利的格式写入数据库
 	 * 
 	 * @param patentdao
 	 * @throws IOException
 	 */
-	public static void saveToDatabase(PatentDao patentdao) throws IOException {
+	public static void savePatentsToDatabase(PatentDao patentdao)
+			throws IOException {
 		if (patentdao != null) {
 			if (writeToDb(patentdao)) {
 				System.out.println("写入数据库成功");
@@ -867,7 +1281,7 @@ public class DatabaseHelper {
 	 * @param pttDao
 	 * @return
 	 */
-	private static Boolean writeToDb(PatentDao pttDao) {
+	public static Boolean writeToDb(PatentDao pttDao) {
 		if (!checkMySQL()) {
 			return false;
 		}
@@ -938,6 +1352,8 @@ public class DatabaseHelper {
 	/**
 	 * 从数据库获取索引数据
 	 * 
+	 * @param analyzer
+	 * @return
 	 * @throws Exception
 	 */
 	public static List<Document> getDocumentFromDatabase(Analyzer analyzer)
@@ -956,6 +1372,7 @@ public class DatabaseHelper {
 					Field.Store.YES));
 			document.add(new TextField("APPLY_DATE", pttDao.getApplyDate()
 					.toString(), Field.Store.YES));
+			System.out.println(pttDao.getPttName());
 			document.add(new TextField("PTT_NAME", Nlpir.doNlpirString(
 					pttDao.getPttName(), 0, null, null), Field.Store.YES));
 			document.add(new TextField("PTT_NUM", pttDao.getPttNum(),
@@ -996,6 +1413,8 @@ public class DatabaseHelper {
 
 	/**
 	 * 获取所有的TRIZ
+	 * 
+	 * @return
 	 */
 	public static List<String> getAllTRIZ() {
 		if (!checkMySQL()) {
@@ -1040,6 +1459,8 @@ public class DatabaseHelper {
 
 	/**
 	 * CLASSIFICATION统计TRIZ的个数
+	 * 
+	 * @return
 	 */
 	public static List<String> getCount() {
 		if (!checkMySQL()) {

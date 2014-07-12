@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -27,6 +26,8 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+
+import cn.edu.scut.patent.prework.impl.GetPatentsFromNetworkImpl;
 import cn.edu.scut.patent.util.Constants;
 
 /**
@@ -34,46 +35,32 @@ import cn.edu.scut.patent.util.Constants;
  * 
  * 根据国家知识产权局专利检索，将检索到的专利页面保存在本地
  */
-public class GetPatents {
+public class GetPatentsFromNetwork implements GetPatentsFromNetworkImpl {
 
-	public static void main(String[] args) {
-		doGetPatents();
-	}
+	private String currentFileName;
 
-	/**
-	 * 开放给索引调用的接口
-	 */
-	public static void doGetPatents() {
-		GetPatents getPatents = new GetPatents();
+	public void doGetPatents() {
 		// 获取商业专利方法专利列表页面，已知商业方法专利中发明型专利11525/27048个，实用新型专利888/3311个
 		// 在这里用了最笨的方法，一个页面专利数100/20，总共有发明型专利页面116/1353页，实用新型专利9/166页，所以用了两个for循环抓取专利列表页面
 		for (int i = 1; i <= 2; i++) {
-			getPatents.getPatentListPage("11", i);
+			getPatentsListPage("11", i);
 		}
 		for (int j = 1; j <= 2; j++) {
-			getPatents.getPatentListPage("22", j);
+			getPatentsListPage("22", j);
 		}
 		// 提取抓取下来的专利列表页面中每个专利的专利基本信息网页的URL
 		try {
-			getPatents.getAllUrls("11");
-			getPatents.getAllUrls("22");
+			saveAllUrlsToTxt("11");
+			saveAllUrlsToTxt("22");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		// 根据提取出来的专利基本信息页面的URL，抓取各专利基本信息网页
-		getPatents.downloadHtmls("11");
-		getPatents.downloadHtmls("22");
+		downloadHtmls("11");
+		downloadHtmls("22");
 	}
 
-	/**
-	 * 取得专利列表
-	 * 
-	 * @param type
-	 *            (专利类型)
-	 * @param page
-	 *            (页码)
-	 */
-	private void getPatentListPage(String type, int page) {
+	public void getPatentsListPage(String type, int page) {
 
 		// 中国知识局的查询接口
 		String url = Constants.CHINA_SIPO_URL;
@@ -136,90 +123,17 @@ public class GetPatents {
 			System.err.println("页面无法访问,重试！  错误信息1：" + e.getMessage()
 					+ "    type:" + type + "    page:" + page);
 			postMethod.releaseConnection();
-			getPatentListPage(type, page);
+			getPatentsListPage(type, page);
 		} catch (Exception e) {
 			System.err.println("页面无法访问,重试！  错误信息2：" + e.getMessage()
 					+ "    type:" + type + "    page:" + page);
 			postMethod.releaseConnection();
-			getPatentListPage(type, page);
+			getPatentsListPage(type, page);
 		}
 		postMethod.releaseConnection();
 	}
 
-	/**
-	 * 获取HTML字节流
-	 * 
-	 * @param pageURL
-	 * @param encoding
-	 * @return
-	 */
-	private StringBuilder getHTML(String pageURL, String encoding) {
-		StringBuilder pageHTML = new StringBuilder();
-		try {
-			URL url = new URL(pageURL);
-			HttpURLConnection connection = (HttpURLConnection) url
-					.openConnection();
-			connection.setRequestProperty("User-Agent", "MSIE 7.0");
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					connection.getInputStream(), encoding));
-			String line = null;
-			while ((line = br.readLine()) != null) {
-				pageHTML.append(line);
-				pageHTML.append("\r\n");
-			}
-			connection.disconnect();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return pageHTML;
-	}
-
-	/**
-	 * 从soopat取得专利列表
-	 * 
-	 * @param type
-	 * @param page
-	 */
-	private void getPatentListPage2(String type, int page) {
-
-		// soopat的查询接口
-		String url = "http://www2.soopat.com/Home/Result?SearchWord=FLH%3A(G06Q)%20&FMZL=Y&SYXX=Y&WGZL=Y&PatentIndex=10";
-		try {
-			StringBuilder html = getHTML(url, "utf-8");
-			if (html.length() < 100) {
-				throw new Exception("页面错误！" + html.length());
-			}
-			String filepath = "E:/dir/patents/patentlist/patentListPage/"
-					+ type + "/patentListPage" + page + ".html";
-			File f = new File(filepath);
-			if (!f.exists()) {
-				f.createNewFile();
-			}
-			FileWriter wt = new FileWriter(f);
-			BufferedWriter bw = new BufferedWriter(wt);
-			bw.write(html.toString());
-			bw.flush();
-			bw.close();
-			System.out.println("专利列表页面保存成功！---" + type + "  " + page);
-
-		} catch (SocketTimeoutException e) {
-			System.err.println("页面无法访问,重试！  错误信息1：" + e.getMessage()
-					+ "    type:" + type + "    page:" + page);
-			getPatentListPage(type, page);
-		} catch (Exception e) {
-			System.err.println("页面无法访问,重试！  错误信息2：" + e.getMessage()
-					+ "    type:" + type + "    page:" + page);
-			getPatentListPage(type, page);
-		}
-	}
-
-	/**
-	 * 把获取专利检索结果页面的URL存入TXT文件
-	 * 
-	 * @param type
-	 * @throws IOException
-	 */
-	private void getAllUrls(String type) throws IOException {
+	public void saveAllUrlsToTxt(String type) throws IOException {
 		File urlsfile = new File(Constants.URL_TXT_PATH + "patentList" + type
 				+ "Url.txt");
 		if (urlsfile.exists()) {
@@ -239,15 +153,7 @@ public class GetPatents {
 		bw.close();
 	}
 
-	private String currentFileName;
-
-	/**
-	 * 从网页目录中获取URL
-	 * 
-	 * @param filePath
-	 * @param bw
-	 */
-	private void getUrls(String filePath, BufferedWriter bw) {
+	public void getUrls(String filePath, BufferedWriter bw) {
 		List<URL> results = new ArrayList<URL>();
 		try {
 			FileInputStream content = new FileInputStream(new File(filePath));
@@ -259,7 +165,7 @@ public class GetPatents {
 				html.append(tempbf + "\n");
 			}
 			URL u = new URL(Constants.CHINA_SIPO_SHOW_URL);
-			results = parseLinksInDocument(u, html.toString());
+			results = parseAsHTML(u, html.toString());
 			for (Iterator<URL> i = results.iterator(); i.hasNext();) {
 				URL url = (URL) i.next();
 				String s = url.toExternalForm();
@@ -279,13 +185,7 @@ public class GetPatents {
 		}
 	}
 
-	/**
-	 * 根据TXT下载网页页面
-	 * 
-	 * @param type
-	 */
-	private void downloadHtmls(String type) {
-
+	public void downloadHtmls(String type) {
 		try {
 			File f = new File(Constants.WEBSITE_PATH);
 			if (!f.exists()) {
@@ -313,7 +213,7 @@ public class GetPatents {
 					if (urlsfile.exists()) {
 						continue;
 					} else {
-						down(url, s, type);
+						downloadHtml(url, s, type);
 					}
 				}
 			} catch (MalformedURLException e) {
@@ -326,17 +226,9 @@ public class GetPatents {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-
 	}
 
-	/**
-	 * 单个下载URL页面
-	 * 
-	 * @param url
-	 * @param filename
-	 * @param type
-	 */
-	private void down(URL url, String filename, String type) {
+	public void downloadHtml(URL url, String filename, String type) {
 		try {
 			URLConnection uc = url.openConnection();
 
@@ -377,12 +269,11 @@ public class GetPatents {
 			// down(url, filename, type);
 		} catch (IOException e) {
 			System.err.println(e.getMessage() + "    url:" + url.toString());
-			down(repalceUrl(url), filename, type);
+			downloadHtml(replaceUrl(url), filename, type);
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			down(url, filename, type);
+			downloadHtml(url, filename, type);
 		}
-
 	}
 
 	/**
@@ -391,7 +282,7 @@ public class GetPatents {
 	 * @param url
 	 * @return
 	 */
-	private URL repalceUrl(URL url) {
+	private URL replaceUrl(URL url) {
 		String s = url.toExternalForm();
 		s = s.replaceAll(" ", "%20");
 		URL temp = null;
@@ -401,14 +292,9 @@ public class GetPatents {
 			e.printStackTrace();
 		}
 		return temp;
-
 	}
 
-	private List<URL> parseLinksInDocument(URL sourceURL, String textContent) {
-		return parseAsHTML(sourceURL, textContent);
-	}
-
-	private List<URL> parseAsHTML(URL sourceURL, String textContent) {
+	public List<URL> parseAsHTML(URL sourceURL, String textContent) {
 		ArrayList<URL> newURLs = new ArrayList<URL>();
 		HashSet<URL> newURLSet = new HashSet<URL>();
 
@@ -434,9 +320,18 @@ public class GetPatents {
 		return newURLs;
 	}
 
+	/**
+	 * 从网页代码的标签中提取属性
+	 * 
+	 * @param tag
+	 * @param attr
+	 * @param sourceURL
+	 * @param newURLs
+	 * @param newURLSet
+	 * @param input
+	 */
 	private void extractAttributesFromTags(String tag, String attr,
 			URL sourceURL, List<URL> newURLs, Set<URL> newURLSet, String input) {
-
 		int startPos = 0;
 		String startTag = "<" + tag + " ";
 		String attrStr = attr + "=\"";
@@ -490,8 +385,12 @@ public class GetPatents {
 		}
 	}
 
+	/**
+	 * 记录邮件的URL
+	 * 
+	 * @param url
+	 */
 	private void logMailURL(String url) {
-
 		try {
 			FileWriter appendedFile = new FileWriter("d:/logmail.txt", true);
 			PrintWriter pW = new PrintWriter(appendedFile);
@@ -505,7 +404,7 @@ public class GetPatents {
 	}
 
 	/**
-	 * Check if a particular URL looks like it's a mailto: style link.
+	 * 检查该URL是否为发送邮件的地址
 	 * 
 	 * @param url
 	 * @return
@@ -514,13 +413,12 @@ public class GetPatents {
 		if (url == null) {
 			return false;
 		}
-
 		url = url.toUpperCase();
 		return (url.indexOf("MAILTO:") != -1);
 	}
 
 	/**
-	 * Inner class for UTF-8 support
+	 * 拓展PostMethod以支持UTF-8的代码格式
 	 * 
 	 * @author Vincent_Melancholy
 	 * 
@@ -538,7 +436,7 @@ public class GetPatents {
 	}
 
 	/**
-	 * Inner class for UTF-8 support
+	 * 拓展GetMethod以支持UTF-8的代码格式
 	 * 
 	 * @author Vincent_Melancholy
 	 * 
@@ -554,5 +452,4 @@ public class GetPatents {
 			return "utf-8";
 		}
 	}
-
 }

@@ -14,38 +14,24 @@ import org.htmlparser.tags.TableTag;
 import org.htmlparser.util.NodeList;
 import org.htmlparser.util.ParserException;
 import cn.edu.scut.patent.model.PatentDao;
+import cn.edu.scut.patent.prework.impl.SaveHtmlPatentsDataToMysqlImpl;
 import cn.edu.scut.patent.util.Constants;
-import cn.edu.scut.patent.util.DatabaseHelper;
+import cn.edu.scut.patent.dao.DatabaseHelper;
 
 /**
  * 将保存下来的专利网页的专利信息保存到数据库
  * 
  * @author cjx
  */
-public class SaveToMysql {
+public class SaveHtmlPatentsDataToMysql implements
+		SaveHtmlPatentsDataToMysqlImpl {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		doSaveToMysql();
+	public void doSaveToMysql() {
+		save("11");
+		save("22");
 	}
 
-	/**
-	 * 开放给索引调用的接口
-	 */
-	public static void doSaveToMysql() {
-		SaveToMysql save = new SaveToMysql();
-		save.save("11");
-		save.save("22");
-	}
-
-	/**
-	 * 按照专利的类型执行保存工作
-	 * 
-	 * @param type
-	 */
-	private void save(String type) {
+	public void save(String type) {
 		File file = new File(Constants.WEBSITE_PATH + type);
 		File[] fileList = file.listFiles();
 		// 遍历专利页面文件夹下所有专利页面，并将页面信息保存到数据库
@@ -54,21 +40,14 @@ public class SaveToMysql {
 		for (int i = 0; i < len; i++) {
 			tempFile = fileList[i];
 			try {
-				saveToDatabase(tempFile, type);
+				savePatentToDatabase(tempFile, type);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
-	/**
-	 * 把单个网页的数据保存到数据库中
-	 * 
-	 * @param file
-	 * @param type
-	 * @throws IOException
-	 */
-	private void saveToDatabase(File file, String type) throws IOException {
+	public void savePatentToDatabase(File file, String type) throws IOException {
 		FileInputStream content = new FileInputStream(file);
 		BufferedReader br = new BufferedReader(new InputStreamReader(content,
 				"utf-8"));
@@ -82,21 +61,13 @@ public class SaveToMysql {
 			// 从html中读取数据，以PattentDao保存
 			pttDao = parseHtmlToPatentDao(html.toString(), type);
 			// 保存patents数据表
-			DatabaseHelper.saveToDatabase(pttDao);
+			DatabaseHelper.savePatentsToDatabase(pttDao);
 		} catch (ParserException e) {
 			e.printStackTrace();
 		}
 	}
 
-	/**
-	 * 把HTML中的数据格式化为PatentDao类型
-	 * 
-	 * @param html
-	 * @param type
-	 * @return
-	 * @throws ParserException
-	 */
-	private PatentDao parseHtmlToPatentDao(String html, String type)
+	public PatentDao parseHtmlToPatentDao(String html, String type)
 			throws ParserException {
 		PatentDao pttDao = new PatentDao();
 		pttDao.setPttType(type);

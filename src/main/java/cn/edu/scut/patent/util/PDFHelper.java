@@ -1,14 +1,11 @@
 package cn.edu.scut.patent.util;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.imageio.ImageIO;
 import net.paoding.analysis.analyzer.PaodingAnalyzer;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.cjk.CJKAnalyzer;
@@ -22,12 +19,10 @@ import org.apache.lucene.document.TextField;
 import org.apache.lucene.util.Version;
 import org.apache.pdfbox.pdfparser.PDFParser;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDResources;
-import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
 import org.apache.pdfbox.util.PDFTextStripper;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 import ICTCLAS2014.Nlpir;
+import cn.edu.scut.patent.dao.DatabaseHelper;
 import cn.edu.scut.patent.model.PatentDao;
 
 public class PDFHelper {
@@ -60,7 +55,7 @@ public class PDFHelper {
 			// transferPDFToImages(doc, title, Constants.TYPE);
 			// 获取专利的各项属性
 			patentdao = getPatentDetails(result);
-			DatabaseHelper.saveToDatabase(patentdao);
+			DatabaseHelper.savePatentsToDatabase(patentdao);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -101,62 +96,6 @@ public class PDFHelper {
 		// 测试所有Analyzer的分词结果
 		// testAllAnalyzer(patentdao);
 		return document;
-	}
-
-	/**
-	 * 获取PDF文档当中的图片
-	 * 
-	 * @throws IOException
-	 */
-	@SuppressWarnings({ "unchecked", "deprecation", "unused" })
-	private static void getImagesInPDF(PDDocument doc, String prefix)
-			throws IOException {
-		List<PDPage> pages = doc.getDocumentCatalog().getAllPages();
-		Iterator<PDPage> iter = pages.iterator();
-		while (iter.hasNext()) {
-			System.out.println("@@@@@@@@@@");
-			PDPage page = (PDPage) iter.next();
-			PDResources resources = page.getResources();
-			Map<String, PDXObjectImage> images = resources.getImages();
-			if (images != null) {
-				System.out.println("#########");
-				Iterator<String> imageIter = images.keySet().iterator();
-				while (imageIter.hasNext()) {
-					System.out.println("%%%%%%%%%%");
-					String key = (String) imageIter.next();
-					PDXObjectImage image = (PDXObjectImage) images.get(key);
-					// String name = getUniqueFileName( key,
-					// image.getSuffix() );
-					// System.out.println( "Writing image:" + name );
-					// PDStream pdfstream=image.getPDStream();
-					String name = prefix + "_" + key;
-					image.write2file(Constants.GET_IMAGES_FROM_PDF_DIR_STRING
-							+ "\\" + name);
-				}
-			}
-		}
-	}
-
-	/**
-	 * 把PDF文档转化为图片
-	 * 
-	 * @throws IOException
-	 */
-	@SuppressWarnings("unchecked")
-	private static void transferPDFToImages(PDDocument doc, String prefix,
-			String type) throws IOException {
-		List<PDPage> pages = doc.getDocumentCatalog().getAllPages();
-		if (pages.size() > 0) {
-			for (int i = 0; i < pages.size(); i++) {
-				PDPage page = (PDPage) pages.get(i);
-				BufferedImage image = page.convertToImage();
-				String name = prefix + "_" + i;
-				File file = new File(
-						Constants.TRANSFER_PDF_TO_IMAGES_DIR_STRING + "\\"
-								+ name + "." + type);
-				ImageIO.write(image, type, file);
-			}
-		}
 	}
 
 	/**

@@ -1,7 +1,6 @@
 package cn.edu.scut.patent.prework;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -17,8 +16,9 @@ import cn.edu.scut.patent.model.PatentMatrix;
 import cn.edu.scut.patent.model.PatentWordTFIDFModel;
 import cn.edu.scut.patent.model.PatentsAfterWordDivideModel;
 import cn.edu.scut.patent.model.WordInfoModel;
+import cn.edu.scut.patent.prework.impl.ClusterImpl;
 import cn.edu.scut.patent.util.Constants;
-import cn.edu.scut.patent.util.DatabaseHelper;
+import cn.edu.scut.patent.dao.DatabaseHelper;
 import cn.edu.scut.patent.util.StringHelper;
 
 /**
@@ -27,7 +27,7 @@ import cn.edu.scut.patent.util.StringHelper;
  * @author CJX
  * 
  */
-public class PatentsPreprocess {
+public class Cluster implements ClusterImpl {
 
 	public static Connection con;
 	public Map<String, PatentWordTFIDFModel> titleWordDic;
@@ -35,13 +35,18 @@ public class PatentsPreprocess {
 	public Map<String, PatentWordTFIDFModel> contentWordDic;
 	int count = 0;
 
-	/**
-	 * 供外界调用的接口
-	 */
-	public static void doPatentsPreprocess() {
+	public Cluster() {
+		try {
+			con = DatabaseHelper.getConnection();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void doCluster() {
 		long totalStartTime = new Date().getTime();// 总的开始的时间
 		String result = "";
-		PatentsPreprocess pp = new PatentsPreprocess();
+		Cluster cluster = new Cluster();
 
 		// 如果数据表PATENT_WORD_TF_DF已经存在的话，则跳过下述函数，不再浪费资源重复计算。
 		if (!DatabaseHelper.isTableExisted("PATENT_WORD_TF_DF")) {
@@ -52,7 +57,7 @@ public class PatentsPreprocess {
 			long startTime = new Date().getTime();// 开始的时间
 			System.out.println("将名称和摘要分词并存入patent_word_after_divide中");
 			// 将名称和摘要分词并存入patent_word_after_divide
-			pp.divideWordToDb();
+			cluster.divideWordToDb();
 			String timeConsume1 = "1.花费了" + StringHelper.timer(startTime)
 					+ "完成专利名称和专利摘要的分词和过滤！";
 			System.out.println(timeConsume1);
@@ -65,11 +70,11 @@ public class PatentsPreprocess {
 
 			long startTime = new Date().getTime();// 开始的时间
 			// 计算TF，存入Map中
-			pp.countTF();
+			cluster.countTF();
 			// 将Map中的数据(即TF)存入到patent_word_tf_df
-			pp.saveWordDicToDatabase();
+			cluster.saveWordDicToDatabase();
 			// 更新patent_word_tf_df中的DF值
-			pp.countDF();
+			cluster.countDF();
 			String timeConsume2 = "2.花费了" + StringHelper.timer(startTime)
 					+ "完成统计在名称和摘要中某个词语出现的频率、存入数据库、和计算文档频数DF！";
 			System.out.println(timeConsume2);
@@ -82,7 +87,7 @@ public class PatentsPreprocess {
 
 			long startTime = new Date().getTime();// 开始的时间
 			// 保存（word,maxTF,DF）值到t_word_info
-			pp.extractFeatureWord();
+			cluster.extractFeatureWord();
 			String timeConsume3 = "3.花费了" + StringHelper.timer(startTime)
 					+ "完成计算所有词权重MaxTf，根据权重提取特证词并保存到数据表 T_WORD_INFO中！";
 			System.out.println(timeConsume3);
@@ -94,8 +99,8 @@ public class PatentsPreprocess {
 			DatabaseHelper.dropTable("PATENT_FEATURE_WORD");
 
 			long startTime = new Date().getTime();// 开始的时间
-			pp.countAndSaveToDb(20);
-			pp.countStandardTFIDF();
+			cluster.countAndSaveToDb(20);
+			cluster.countStandardTFIDF();
 			String timeConsume4 = "4.花费了" + StringHelper.timer(startTime)
 					+ "完成计算并规范化TF-IDF值，提取前20位存入数据表PATENT_FEATURE_WORD中！";
 			System.out.println(timeConsume4);
@@ -105,7 +110,7 @@ public class PatentsPreprocess {
 		// 如果数据表PATENT_CLUSTER已经存在的话，则跳过下述函数，不再浪费资源重复计算。
 		if (!DatabaseHelper.isTableExisted("PATENT_CLUSTER")) {
 			long startTime = new Date().getTime();// 开始的时间
-			pp.cluster2(20);
+			cluster.clusterByQYJ(20);
 			String timeConsume5 = "5.花费了" + StringHelper.timer(startTime)
 					+ "完成聚类过程！";
 			System.out.println(timeConsume5);
@@ -118,56 +123,20 @@ public class PatentsPreprocess {
 		System.out.println(result);
 	}
 
-	public PatentsPreprocess() {
-		try {
-			con = DatabaseHelper.getConnection();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * 将专利名称和专利摘要分词并过滤（根据t_stopword(具体某字词)和t_word_smark(词性)），
-	 * 之后将处理好的专利名称和摘要等信息传入到patents_after_word_divide。
-	 * 
-	 * 在数据表PATENTS_AFTER_WORD_DIVIDE中输入所有的分词内容
-	 */
 	public void divideWordToDb() {
-		Statement sta = null;
-		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			sta = con.createStatement();
 			if (!DatabaseHelper.isTableExisted("PATENTS_AFTER_WORD_DIVIDE")) {
-				String sql_create_table_PATENTS_AFTER_WORD_DIVIDE = "CREATE TABLE PATENTS_AFTER_WORD_DIVIDE ("
-						+ "PTT_NUM VARCHAR(20) NOT NULL PRIMARY KEY"
-						+ ", PTT_NAME_DIVIDED VARCHAR(200) NOT NULL"
-						+ ", PTT_DATE DATE NOT NULL"
-						+ ", CLASS_NUM_G06Q VARCHAR(20) NOT NULL"
-						+ ", PTT_ABSTRACT_DIVIDED VARCHAR(10000) NOT NULL"
-						+ ", PTT_CONTENT_DIVIDED VARCHAR(10000) NOT NULL)"
-						+ " ENGINE = InnoDB" + ";";
-				ps = con.prepareStatement(sql_create_table_PATENTS_AFTER_WORD_DIVIDE);
-				ps.executeUpdate();
+				DatabaseHelper.createTablePATENTS_AFTER_WORD_DIVIDE();
 			}
 			if (!DatabaseHelper.isTableExisted("T_STOPWORD")) {
-				String sql_create_table_T_STOPWORD = "CREATE TABLE T_STOPWORD ("
-						+ "WORD VARCHAR(20) NOT NULL PRIMARY KEY"
-						+ ", FLAG INT NOT NULL)" + " ENGINE = InnoDB" + ";";
-				ps = con.prepareStatement(sql_create_table_T_STOPWORD);
-				ps.executeUpdate();
+				DatabaseHelper.createTableT_STOPWORD();
 			}
 			if (!DatabaseHelper.isTableExisted("T_WORD_SMARK")) {
-				String sql_create_table_T_WORD_SMARK = "CREATE TABLE T_WORD_SMARK ("
-						+ "WORD_SMARK VARCHAR(10) NOT NULL PRIMARY KEY"
-						+ ", REMARK VARCHAR(50) NOT NULL"
-						+ ", FLAG INT NOT NULL)" + " ENGINE = InnoDB" + ";";
-				ps = con.prepareStatement(sql_create_table_T_WORD_SMARK);
-				ps.executeUpdate();
+				DatabaseHelper.createTableT_WORD_SMARK();
 			}
 
-			String sql = "SELECT PTT_NUM,PTT_NAME,PTT_DATE,CLASS_NUM_G06Q,PTT_ABSTRACT FROM patents";
-			rs = sta.executeQuery(sql);
+			rs = DatabaseHelper.getPatentsKeys();
 
 			PatentsAfterWordDivideModel pttAWDM;
 			while (rs.next()) {
@@ -183,22 +152,7 @@ public class PatentsPreprocess {
 						rs.getString("PTT_ABSTRACT"), 0, null, null));
 
 				// 存入到patents_after_word_divide数据表
-				sta = con.createStatement();
-				String sql2 = "INSERT INTO patents_after_word_divide (PTT_NUM,PTT_NAME_DIVIDED,PTT_DATE,CLASS_NUM_G06Q,PTT_ABSTRACT_DIVIDED,PTT_CONTENT_DIVIDED) VALUES ('"
-						+ pttAWDM.getPtt_num()
-						+ "','"
-						+ pttAWDM.getPtt_name()
-						+ "','"
-						+ pttAWDM.getPtt_date()
-						+ "','"
-						+ pttAWDM.getClass_num_g06q()
-						+ "','"
-						+ pttAWDM.getPtt_abstract()
-						+ "','"
-						+ pttAWDM.getPtt_content() + "');";
-				sta.execute(sql2);
-				// 8624
-				System.out.println("Number : " + rs.getRow() + "\n" + sql2);
+				DatabaseHelper.insertPATENTS_AFTER_WORD_DIVIDE(pttAWDM);
 				// *************************************
 				if (rs.getRow() >= 1000) {
 					break;
@@ -212,12 +166,6 @@ public class PatentsPreprocess {
 				if (rs != null) {
 					rs.close();
 				}
-				if (sta != null) {
-					sta.close();
-				}
-				if (ps != null) {
-					ps.close();
-				}
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -225,19 +173,10 @@ public class PatentsPreprocess {
 		}
 	}
 
-	/**
-	 * 分开统计在名称和摘要中某个词语出现的频率，以（词语_专利号，PatentWordTFIDFModel（id,pttNum,word,tf,df,
-	 * flag））为一个元素保存于HashMap中，以词语_专利号为唯一标识。
-	 * 
-	 * 统计词语在某个文档中出现的频率TF，并保存到HashMap中
-	 */
 	public void countTF() {
-		Statement sta = null;
 		ResultSet rs = null;
 		try {
-			sta = con.createStatement();
-			String sql = "SELECT * FROM patents_after_word_divide";
-			rs = sta.executeQuery(sql);
+			rs = DatabaseHelper.getPatentsFromPATENTS_AFTER_WORD_DIVIDE();
 
 			PatentsAfterWordDivideModel pawd;
 			String[] titleArr;
@@ -339,9 +278,6 @@ public class PatentsPreprocess {
 				if (rs != null) {
 					rs.close();
 				}
-				if (sta != null) {
-					sta.close();
-				}
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -349,38 +285,9 @@ public class PatentsPreprocess {
 		}
 	}
 
-	/**
-	 * 将两个字典存入数据库
-	 * 
-	 * 把HashMap中统计词语在某个文档中出现的频率TF并保存到数据表PATENT_WORD_TF_DF中
-	 */
 	public void saveWordDicToDatabase() {
-		PreparedStatement ps = null;
-		try {
-			if (!DatabaseHelper.isTableExisted("PATENT_WORD_TF_DF")) {
-				String sql_create_table_PATENT_WORD_TF_DF = "CREATE TABLE PATENT_WORD_TF_DF ("
-						+ "ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT"
-						+ ", PTT_NUM VARCHAR(20) NOT NULL"
-						+ ", WORD VARCHAR(100) NOT NULL"
-						+ ", TF INT NOT NULL"
-						+ ", DF INT NOT NULL"
-						+ ", FLAG INT NOT NULL)"
-						+ " ENGINE = InnoDB AUTO_INCREMENT = 1" + ";";
-				ps = con.prepareStatement(sql_create_table_PATENT_WORD_TF_DF);
-				ps.executeUpdate();
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				if (ps != null) {
-					ps.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		if (!DatabaseHelper.isTableExisted("PATENT_WORD_TF_DF")) {
+			DatabaseHelper.createTablePATENT_WORD_TF_DF();
 		}
 		Iterator<Map.Entry<String, PatentWordTFIDFModel>> iterator1 = titleWordDic
 				.entrySet().iterator();
@@ -406,9 +313,6 @@ public class PatentsPreprocess {
 		System.out.println("成功把content的TF保存到数据表PATENT_WORD_TF_DF中!");
 	}
 
-	/**
-	 * 计算所有词的文档频数DF，并保存到数据表PATENT_WORD_TF_DF中
-	 */
 	public void countDF() {
 		Statement sta = null;
 		ResultSet rs = null;
@@ -418,7 +322,7 @@ public class PatentsPreprocess {
 		ResultSet tempRs2 = null;
 		try {
 			sta = con.createStatement();
-			rs = sta.executeQuery("SELECT DISTINCT WORD FROM patent_word_tf_df");
+			rs = sta.executeQuery("SELECT DISTINCT WORD FROM PATENT_WORD_TF_DF");
 
 			// int count = 0;
 			while (rs.next()) {
@@ -427,13 +331,13 @@ public class PatentsPreprocess {
 				tempSta1 = con.createStatement(ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_UPDATABLE);
 				tempRs1 = tempSta1
-						.executeQuery("SELECT * FROM patent_word_tf_df WHERE WORD='"
+						.executeQuery("SELECT * FROM PATENT_WORD_TF_DF WHERE WORD='"
 								+ rs.getString(1) + "'");
 
 				// 统计某词出现的文档频率
 				tempSta2 = con.createStatement();
 				tempRs2 = tempSta2
-						.executeQuery("SELECT DISTINCT PTT_NUM FROM patent_word_tf_df WHERE WORD='"
+						.executeQuery("SELECT DISTINCT PTT_NUM FROM PATENT_WORD_TF_DF WHERE WORD='"
 								+ rs.getString(1) + "'");
 				int f = DatabaseHelper.getSize(tempRs2);
 
@@ -472,9 +376,6 @@ public class PatentsPreprocess {
 		}
 	}
 
-	/**
-	 * 计算所有词权重MaxTf，按权重提取特证词，并保存到数据表 T_WORD_INFO中
-	 */
 	public void extractFeatureWord() {
 		Map<String, Number> wordMaxTFmap = new HashMap<String, Number>();
 		Statement sta = null;
@@ -507,26 +408,8 @@ public class PatentsPreprocess {
 				tempWim.setWord(word);
 				tempWim.setMaxTf(tempNum);
 				tempWim.setDf(df);
-
-				PreparedStatement ps = null;
-				try {
-					if (!DatabaseHelper.isTableExisted("T_WORD_INFO")) {
-						String sql_create_table_T_WORD_INFO = "CREATE TABLE T_WORD_INFO ("
-								+ "WORD VARCHAR(100) NOT NULL PRIMARY KEY"
-								+ ", MAX_TF INT NOT NULL"
-								+ ", DF INT NOT NULL)"
-								+ " ENGINE = InnoDB"
-								+ ";";
-						ps = con.prepareStatement(sql_create_table_T_WORD_INFO);
-						ps.executeUpdate();
-					}
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} finally {
-					if (ps != null) {
-						ps.close();
-					}
+				if (!DatabaseHelper.isTableExisted("T_WORD_INFO")) {
+					DatabaseHelper.createTableT_WORD_INFO();
 				}
 				tempWim.write();
 				count++;
@@ -554,40 +437,10 @@ public class PatentsPreprocess {
 		}
 	}
 
-	/**
-	 * 计算TF-IDF值并提取前size位存入数据表PATENT_FEATURE_WORD中
-	 * 
-	 * @param size
-	 *            为前多少位词语作为特征词。
-	 */
 	public void countAndSaveToDb(int size) {
-		PreparedStatement ps = null;
-		try {
-			if (!DatabaseHelper.isTableExisted("PATENT_FEATURE_WORD")) {
-				String sql_create_table_PATENT_FEATURE_WORD = "CREATE TABLE PATENT_FEATURE_WORD ("
-						+ "ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT"
-						+ ", PTT_NUM VARCHAR(20) NOT NULL"
-						+ ", FEATURE_WORD VARCHAR(100) NOT NULL"
-						+ ", TFIDF_VALUE DOUBLE NOT NULL"
-						+ ", TFIDF_VALUE_STANDARD DOUBLE NOT NULL)"
-						+ " ENGINE = InnoDB AUTO_INCREMENT = 1" + ";";
-				ps = con.prepareStatement(sql_create_table_PATENT_FEATURE_WORD);
-				ps.executeUpdate();
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				if (ps != null) {
-					ps.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		if (!DatabaseHelper.isTableExisted("PATENT_FEATURE_WORD")) {
+			DatabaseHelper.createTablePATENT_FEATURE_WORD();
 		}
-
 		Statement sta = null;
 		ResultSet rs = null;
 		ResultSet pttnumRs = null;
@@ -675,11 +528,6 @@ public class PatentsPreprocess {
 		}
 	}
 
-	/**
-	 * 规范化TF-IDF值，使同一篇文档中所有特征权重的平方和等于1
-	 * 
-	 * 更新数据表PATENT_FEATURE_WORD中的TFIDF_VALUE_STANDARD
-	 */
 	public void countStandardTFIDF() {
 		Statement sta = null;
 		ResultSet rs = null;
@@ -735,38 +583,11 @@ public class PatentsPreprocess {
 		}
 	}
 
-	/**
-	 * 根据patent_feature_word表对专利进行分类和k-Means聚类
-	 * 
-	 * @param k
-	 *            为聚类中心个数
-	 */
 	@SuppressWarnings("unchecked")
-	public void cluster(int k) {
-		PreparedStatement ps = null;
-		try {
-			if (!DatabaseHelper.isTableExisted("PATENT_CLUSTER")) {
-				String sql_create_table_PATENT_CLUSTER = "CREATE TABLE PATENT_CLUSTER ("
-						+ "PTT_NUM VARCHAR(20) NOT NULL PRIMARY KEY"
-						+ ", CLUSTER INT NOT NULL)" + " ENGINE = InnoDB" + ";";
-
-				ps = con.prepareStatement(sql_create_table_PATENT_CLUSTER);
-				ps.executeUpdate();
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				if (ps != null) {
-					ps.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+	public void clusterByCJX(int k) {
+		if (!DatabaseHelper.isTableExisted("PATENT_CLUSTER")) {
+			DatabaseHelper.createTablePATENT_CLUSTER();
 		}
-
 		List<PatentMatrix> pttMatrix = new ArrayList<PatentMatrix>();
 		int n = 0;
 		Statement sta = null;
@@ -924,35 +745,10 @@ public class PatentsPreprocess {
 		System.out.println("聚类成功！");
 	}
 
-	/**
-	 * 根据patent_feature_word表对专利进行分类和k-Means聚类
-	 * 
-	 * @param k
-	 *            为聚类中心个数
-	 */
 	@SuppressWarnings("unchecked")
-	public void cluster2(int k) {
-		PreparedStatement ps = null;
-		try {
-			if (!DatabaseHelper.isTableExisted("PATENT_CLUSTER")) {
-				String sql_create_table_PATENT_CLUSTER = "CREATE TABLE PATENT_CLUSTER ("
-						+ "PTT_NUM VARCHAR(20) NOT NULL PRIMARY KEY"
-						+ ", CLUSTER INT NOT NULL)" + " ENGINE = InnoDB" + ";";
-				ps = con.prepareStatement(sql_create_table_PATENT_CLUSTER);
-				ps.executeUpdate();
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				if (ps != null) {
-					ps.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+	public void clusterByQYJ(int k) {
+		if (!DatabaseHelper.isTableExisted("PATENT_CLUSTER")) {
+			DatabaseHelper.createTablePATENT_CLUSTER();
 		}
 		// 以专利为单位，存储所有专利所有特征词的权重
 		System.out.println("以专利为单位，存储所有专利所有特征词的权重");
@@ -1113,13 +909,7 @@ public class PatentsPreprocess {
 		System.out.println("聚类成功！");
 	}
 
-	/**
-	 * 获取聚类的中心点
-	 * 
-	 * @param cluster
-	 * @return
-	 */
-	private PatentMatrix getClusterCenter(ArrayList<PatentMatrix> cluster) {
+	public PatentMatrix getClusterCenter(ArrayList<PatentMatrix> cluster) {
 		int len = cluster.size();
 		System.out.println("当前聚类群中含有的点数：" + len);//
 		// double[][] distance = new double[len][len]; // 存储各数据间相互距离的二维数组
@@ -1182,7 +972,7 @@ public class PatentsPreprocess {
 		// *********************************
 		double[] standardDiviation = new double[len];
 		for (int n = 0; n < len; n++) {
-			standardDiviation[n] = countStandardDiviation2(n);
+			standardDiviation[n] = countStandardDiviationByQYJ(n);
 		}
 
 		double min = standardDiviation[0];
@@ -1197,14 +987,7 @@ public class PatentsPreprocess {
 		return cluster.get(index);
 	}
 
-	/**
-	 * 计算两个专利之间的距离
-	 * 
-	 * @param pm
-	 * @param center
-	 * @return
-	 */
-	private double getDistance(PatentMatrix pm, PatentMatrix center) {
+	public double getDistance(PatentMatrix pm, PatentMatrix center) {
 		double value = 0;
 		// 规范化后的距离 |dx|*|dy|=1 distance=dx*dy/|dx|*|dy|=dx*dy
 		if (pm.pttNum.equals(center.pttNum)) {
@@ -1218,13 +1001,7 @@ public class PatentsPreprocess {
 		return Math.abs(1 - value);
 	}
 
-	/**
-	 * 获取某个专利距离最近的聚类群的编号
-	 * 
-	 * @param distances
-	 * @return
-	 */
-	private int getNearestCluster(double[] distances) {
+	public int getNearestCluster(double[] distances) {
 		int i = 0;
 		double min = distances[0];
 		for (int j = 1; j < distances.length; j++) {
@@ -1236,13 +1013,7 @@ public class PatentsPreprocess {
 		return i;
 	}
 
-	/**
-	 * 某一点与其他点距离的标准差
-	 * 
-	 * @param distance
-	 * @return
-	 */
-	private double countStandardDiviation(double[] distance) {
+	public double countStandardDiviationByCJX(double[] distance) {
 		int len = distance.length;
 		double sum = 0;
 		for (int i = 0; i < len; i++) {
@@ -1259,9 +1030,11 @@ public class PatentsPreprocess {
 	/**
 	 * 某一点与其他点距离的标准差
 	 * 
+	 * @param n
 	 * @return
+	 * @author Vincent_Melancholy
 	 */
-	private double countStandardDiviation2(int n) {
+	public double countStandardDiviationByQYJ(int n) {
 		List<Double> distance = new ArrayList<Double>();
 		Statement sta = null;
 		ResultSet rs = null;
@@ -1308,9 +1081,5 @@ public class PatentsPreprocess {
 			s2 += Math.pow(distance.get(j) - average, 2);
 		}
 		return Math.sqrt(s2 / len);
-	}
-
-	public static void main(String[] args) {
-		doPatentsPreprocess();
 	}
 }

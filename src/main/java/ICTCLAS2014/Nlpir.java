@@ -77,8 +77,8 @@ public class Nlpir {
 	/**
 	 * 执行ICTCLAS分词
 	 */
-	private static String doNlpir(String inputString, int charset_type, String[] addWord,
-			String[] deleteWord, String MaxKeyLimit) {
+	private static String doNlpir(String inputString, int charset_type,
+			String[] addWord, String[] deleteWord, String MaxKeyLimit) {
 		// ICTCLAS词库library(即Data文件夹)的相对路径
 		String library = Constants.ICTCLAS_LIBRARY_STRING;
 		// String system_charset = "GBK";//GBK----0
@@ -142,8 +142,8 @@ public class Nlpir {
 	/**
 	 * 供外界调用的静态方法，执行ICTCLAS分词
 	 */
-	public static String doNlpirString(String inputString, int charset_type, String[] addWord,
-			String[] deleteWord) {
+	public static String doNlpirString(String inputString, int charset_type,
+			String[] addWord, String[] deleteWord) {
 		return doNlpir(inputString, charset_type, addWord, deleteWord, null);
 	}
 
@@ -155,6 +155,9 @@ public class Nlpir {
 		String[] addWord = { "要求美方加强对输 n", "华玉米的产地来源 n" };
 		String[] delWord = { "要求美方加强对输 n" };
 		String maxKey = "10";
-		doNlpir(inputString, 1, addWord, delWord, maxKey);
+		for (int i = 0; i < 10; i++) {
+			System.out
+					.println(doNlpir(inputString, 1, addWord, delWord, maxKey));
+		}
 	}
 }
