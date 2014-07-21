@@ -1,4 +1,4 @@
-package cn.edu.scut.patent.service;
+package cn.edu.scut.patent.core;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,11 +29,12 @@ import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
-import cn.edu.scut.patent.model.PatentDao;
+import cn.edu.scut.patent.core.impl.SearchImpl;
+import cn.edu.scut.patent.model.Patent;
+import cn.edu.scut.patent.service.PatentService;
 import cn.edu.scut.patent.util.Constants;
 import cn.edu.scut.patent.util.StringHelper;
 import cn.edu.scut.patent.ICTCLASAnalyzer.ICTCLASAnalyzer;
-import cn.edu.scut.patent.service.impl.SearchImpl;
 
 /**
  * @author qyj
@@ -42,7 +43,7 @@ import cn.edu.scut.patent.service.impl.SearchImpl;
 public class Search implements SearchImpl {
 
 	@SuppressWarnings("resource")
-	public List<PatentDao> doSearch(PatentDao patentdao,
+	public List<Patent> doSearch(Patent patentdao,
 			List<String> pttTypeList) throws IOException {
 		TopDocs td = null;
 		Query query = null;
@@ -67,9 +68,9 @@ public class Search implements SearchImpl {
 		}
 	}
 
-	public Query htmlConditionsToQuery(PatentDao patentdao,
+	public Query htmlConditionsToQuery(Patent patent,
 			List<String> pttTypeList) {
-		Map<String, String> map = patentdao.getAll();
+		Map<String, String> map = new PatentService().getAll(patent);
 		if (map.size() > 0) {
 			System.out.println("size:" + map.size());
 			BooleanQuery booleanQuery = new BooleanQuery();
@@ -177,14 +178,14 @@ public class Search implements SearchImpl {
 		return null;
 	}
 
-	public List<PatentDao> searchResultToPatentdao(TopDocs td,
+	public List<Patent> searchResultToPatentdao(TopDocs td,
 			IndexSearcher searcher, Query query, Analyzer analyzer)
 			throws IOException {
-		List<PatentDao> patentList = new ArrayList<PatentDao>();
+		List<Patent> patentList = new ArrayList<Patent>();
 		ScoreDoc[] sds = td.scoreDocs;
 		for (int i = 0; i < sds.length; i++) {
 			System.out.println("******第" + (i + 1) + "个结果******");
-			PatentDao pttDao = new PatentDao();
+			Patent pttDao = new Patent();
 			Document d = searcher.doc(sds[i].doc);
 			String highlighterStr = toHighlighter(query, analyzer,
 					d.get("PTT_TYPE"));

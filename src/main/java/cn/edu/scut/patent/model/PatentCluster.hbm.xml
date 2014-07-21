@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="cn.edu.scut.patent.model.PatentCluster" table="PATENT_CLUSTER">
+		<comment>专利聚类表</comment>
+		<!-- id必须放在第一位 -->
+		<id name="pttNum" type="java.lang.String">
+			<column name="PTT_NUM" length="20">
+				<comment>专利号码</comment>
+			</column>
+		</id>
+		<property name="cluster" type="java.lang.Integer">
+			<column name="CLUSTER" not-null="true">
+				<comment>专利聚类号</comment>
+			</column>
+		</property>
+	</class>
+</hibernate-mapping>

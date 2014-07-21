@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="cn.edu.scut.patent.model.Patent" table="PATENTS">
+		<comment>专利表</comment>
+		<!-- id必须放在第一位 -->
+		<id name="pttNum" type="java.lang.String">
+			<column name="PTT_NUM" length="20">
+				<comment>专利号码</comment>
+			</column>
+		</id>
+		<property name="applyNum" type="java.lang.String">
+			<column name="APPLY_NUM" length="20" not-null="true">
+				<comment>专利号</comment>
+			</column>
+		</property>
+		<property name="applyDate" type="java.sql.Date">
+			<column name="APPLY_DATE" not-null="true">
+				<comment>申请日期</comment>
+			</column>
+		</property>
+		<property name="pttName" type="java.lang.String">
+			<column name="PTT_NAME" length="200" not-null="true">
+				<comment>专利名称</comment>
+			</column>
+		</property>
+		<property name="pttDate" type="java.sql.Date">
+			<column name="PTT_DATE" not-null="true">
+				<comment>专利日期</comment>
+			</column>
+		</property>
+		<property name="pttMainClassNum" type="java.lang.String">
+			<column name="PTT_MAIN_CLASS_NUM" length="200" not-null="true">
+				<comment>专利主分类号</comment>
+			</column>
+		</property>
+		<property name="pttClassNum" type="java.lang.String">
+			<column name="PTT_CLASS_NUM" length="1000" not-null="true">
+				<comment>专利分类号</comment>
+			</column>
+		</property>
+		<property name="proposer" type="java.lang.String">
+			<column name="PROPOSER" length="300" not-null="true">
+				<comment>出版社</comment>
+			</column>
+		</property>
+		<property name="proposerAddress" type="java.lang.String">
+			<column name="PROPOSER_ADDRESS" length="500" not-null="true">
+				<comment>出版社地址</comment>
+			</column>
+		</property>
+		<property name="inventor" type="java.lang.String">
+			<column name="INVENTOR" length="500" not-null="true">
+				<comment>专利发明者</comment>
+			</column>
+		</property>
+		<property name="internationalApply" type="java.lang.String">
+			<column name="INTERNATIONAL_APPLY" length="200">
+				<comment>专利国际申请号</comment>
+			</column>
+		</property>
+		<property name="internationalPublication" type="java.lang.String">
+			<column name="INTERNATIONAL_PUBLICATION" length="200">
+				<comment>专利国际发布</comment>
+			</column>
+		</property>
+		<property name="intoDate" type="java.sql.Date">
+			<column name="INTO_DATE">
+				<comment>初始日</comment>
+			</column>
+		</property>
+		<property name="pttAgencyOrg" type="java.lang.String">
+			<column name="PTT_AGENCY_ORG" length="500" not-null="true">
+				<comment>专利代理机构</comment>
+			</column>
+		</property>
+		<property name="pttAgencyPerson" type="java.lang.String">
+			<column name="PTT_AGENCY_PERSON" length="200" not-null="true">
+				<comment>专利代理人</comment>
+			</column>
+		</property>
+		<property name="pttAbstract" type="java.lang.String">
+			<column name="PTT_ABSTRACT" length="10000" not-null="true">
+				<comment>专利摘要</comment>
+			</column>
+		</property>
+		<property name="pttType" type="java.lang.String">
+			<column name="PTT_TYPE" length="4" not-null="true">
+				<comment>专利类型</comment>
+			</column>
+		</property>
+		<property name="classNumG06Q" type="java.lang.String">
+			<column name="CLASS_NUM_G06Q" length="200" not-null="true">
+				<comment>商业专利分类</comment>
+			</column>
+		</property>
+	</class>
+</hibernate-mapping>

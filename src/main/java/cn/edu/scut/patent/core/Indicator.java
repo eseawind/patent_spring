@@ -1,4 +1,4 @@
-package cn.edu.scut.patent.service;
+package cn.edu.scut.patent.core;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import cn.edu.scut.patent.model.ClusterValueItem;
 import cn.edu.scut.patent.model.IndicatorData;
 import cn.edu.scut.patent.model.IndicatorParam;
 import cn.edu.scut.patent.model.IndicatorValueItem;
-import cn.edu.scut.patent.model.PatentDao;
+import cn.edu.scut.patent.model.Patent;
 import cn.edu.scut.patent.dao.DatabaseHelper;
 import cn.edu.scut.patent.util.StringHelper;
 
@@ -27,13 +27,13 @@ public class Indicator {
 			data.indicatorType = param.indicatorType;
 			System.out.println(param.keyWord);
 
-			PatentDao patentdao = new PatentDao();
+			Patent patentdao = new Patent();
 			patentdao.setPttName(param.keyWord);
 			List<String> pttTypeList = new ArrayList<String>();
 			pttTypeList.add("11");
 			pttTypeList.add("22");
 			pttTypeList.add("33");
-			List<PatentDao> patentList = new Search().doSearch(patentdao,
+			List<Patent> patentList = new Search().doSearch(patentdao,
 					pttTypeList);
 			Map<String, Integer> map = new HashMap<String, Integer>();
 			double sum = 0;
@@ -48,7 +48,7 @@ public class Indicator {
 			} else {
 				int len = patentList.size();
 				for (int i = 0; i < len; i++) {
-					PatentDao temp = patentList.get(i);
+					Patent temp = patentList.get(i);
 					if (temp.getPttType().indexOf("11") >= 0) {
 						String year = StringHelper.getYear(temp.getPttDate()
 								.toString());
@@ -93,13 +93,13 @@ public class Indicator {
 			data.indicatorType = param.indicatorType;
 			System.out.println(param.keyWord);
 
-			PatentDao patentdao = new PatentDao();
+			Patent patentdao = new Patent();
 			patentdao.setPttName(param.keyWord);
 			List<String> pttTypeList = new ArrayList<String>();
 			pttTypeList.add("11");
 			pttTypeList.add("22");
 			pttTypeList.add("33");
-			List<PatentDao> patentList = new Search().doSearch(patentdao,
+			List<Patent> patentList = new Search().doSearch(patentdao,
 					pttTypeList);
 			Map<String, Integer> map11 = new HashMap<String, Integer>();
 			Map<String, Integer> yearSum = new HashMap<String, Integer>();
@@ -114,7 +114,7 @@ public class Indicator {
 			} else {
 				int len = patentList.size();
 				for (int i = 0; i < len; i++) {
-					PatentDao temp = patentList.get(i);
+					Patent temp = patentList.get(i);
 					String year = StringHelper.getYear(temp.getPttDate()
 							.toString());
 
@@ -168,19 +168,19 @@ public class Indicator {
 			String keyWord = param.keyWord;
 			System.out.println(keyWord);
 
-			PatentDao patentDao = new PatentDao();
+			Patent patentDao = new Patent();
 			patentDao.setPttName(keyWord);
 			List<String> pttTypeList = new ArrayList<String>();
 			pttTypeList.add("11");
 			pttTypeList.add("22");
 			pttTypeList.add("33");
-			List<PatentDao> patentList = new Search().doSearch(patentDao,
+			List<Patent> patentList = new Search().doSearch(patentDao,
 					pttTypeList);
 
 			if (patentList == null) {
 				return null;
 			}
-			for (PatentDao patentdao : patentList) {
+			for (Patent patentdao : patentList) {
 				String temp_PTT_NUM = patentdao.getPttNum();
 				int clusterNumber = DatabaseHelper
 						.getClusterNumber(temp_PTT_NUM);

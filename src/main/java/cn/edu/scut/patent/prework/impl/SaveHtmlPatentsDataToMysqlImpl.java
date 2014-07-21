@@ -3,7 +3,7 @@ package cn.edu.scut.patent.prework.impl;
 import java.io.File;
 import java.io.IOException;
 import org.htmlparser.util.ParserException;
-import cn.edu.scut.patent.model.PatentDao;
+import cn.edu.scut.patent.model.Patent;
 
 public interface SaveHtmlPatentsDataToMysqlImpl {
 
@@ -36,6 +36,6 @@ public interface SaveHtmlPatentsDataToMysqlImpl {
 	 * @return
 	 * @throws ParserException
 	 */
-	PatentDao parseHtmlToPatentDao(String html, String type)
+	Patent parseHtmlToPatentDao(String html, String type)
 			throws ParserException;
 }

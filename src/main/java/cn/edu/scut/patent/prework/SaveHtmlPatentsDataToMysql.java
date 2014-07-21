@@ -13,10 +13,10 @@ import org.htmlparser.tags.TableRow;
 import org.htmlparser.tags.TableTag;
 import org.htmlparser.util.NodeList;
 import org.htmlparser.util.ParserException;
-import cn.edu.scut.patent.model.PatentDao;
+import cn.edu.scut.patent.model.Patent;
 import cn.edu.scut.patent.prework.impl.SaveHtmlPatentsDataToMysqlImpl;
+import cn.edu.scut.patent.service.PatentService;
 import cn.edu.scut.patent.util.Constants;
-import cn.edu.scut.patent.dao.DatabaseHelper;
 
 /**
  * 将保存下来的专利网页的专利信息保存到数据库
@@ -56,20 +56,20 @@ public class SaveHtmlPatentsDataToMysql implements
 		while ((tempbf = br.readLine()) != null) {
 			html.append(tempbf + "\n");
 		}
-		PatentDao pttDao = new PatentDao();
+		Patent patent = new Patent();
 		try {
 			// 从html中读取数据，以PattentDao保存
-			pttDao = parseHtmlToPatentDao(html.toString(), type);
+			patent = parseHtmlToPatentDao(html.toString(), type);
 			// 保存patents数据表
-			DatabaseHelper.savePatentsToDatabase(pttDao);
+			new PatentService().save(patent);
 		} catch (ParserException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public PatentDao parseHtmlToPatentDao(String html, String type)
+	public Patent parseHtmlToPatentDao(String html, String type)
 			throws ParserException {
-		PatentDao pttDao = new PatentDao();
+		Patent pttDao = new Patent();
 		pttDao.setPttType(type);
 		Parser parser = new Parser(html.toString());
 

@@ -8,7 +8,8 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import cn.edu.scut.patent.model.PatentDao;
+import cn.edu.scut.patent.model.Patent;
+import cn.edu.scut.patent.service.PatentService;
 
 public class CheckHelper {
 
@@ -17,9 +18,9 @@ public class CheckHelper {
 	 * 
 	 * @throws IOException
 	 */
-	public static void printKeyWords(Analyzer analyzer, PatentDao patentdao)
+	public static void printKeyWords(Analyzer analyzer, Patent patent)
 			throws IOException {
-		Map<String, String> map = patentdao.getAll();
+		Map<String, String> map = new PatentService().getAll(patent);
 		System.out.println("当前使用的分词器：" + analyzer.getClass().getSimpleName());
 		if (map != null) {
 			Set<String> keySet = map.keySet();

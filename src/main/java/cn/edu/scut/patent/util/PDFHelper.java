@@ -22,8 +22,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 import ICTCLAS2014.Nlpir;
-import cn.edu.scut.patent.dao.DatabaseHelper;
-import cn.edu.scut.patent.model.PatentDao;
+import cn.edu.scut.patent.model.Patent;
+import cn.edu.scut.patent.service.PatentService;
 
 public class PDFHelper {
 
@@ -40,7 +40,7 @@ public class PDFHelper {
 		String result = "";
 		FileInputStream is = null;
 		PDDocument doc = null;
-		PatentDao patentdao = null;
+		Patent patent = null;
 		try {
 			is = new FileInputStream(pdf);
 			PDFParser parser = new PDFParser(is);
@@ -54,8 +54,8 @@ public class PDFHelper {
 			// 转化图片
 			// transferPDFToImages(doc, title, Constants.TYPE);
 			// 获取专利的各项属性
-			patentdao = getPatentDetails(result);
-			DatabaseHelper.savePatentsToDatabase(patentdao);
+			patent = getPatentDetails(result);
+			new PatentService().save(patent);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -80,7 +80,7 @@ public class PDFHelper {
 				null), Field.Store.YES));
 		document.add(new TextField("path", pdfpath, Field.Store.YES));
 
-		Map<String, String> map = patentdao.getAll();
+		Map<String, String> map = new PatentService().getAll(patent);
 		// 遍历map把各项专利的属性加入到document当中
 		if (map != null) {
 			Set<String> keySet = map.keySet();
@@ -92,18 +92,18 @@ public class PDFHelper {
 			}
 		}
 		// 打印分词结果
-		CheckHelper.printKeyWords(analyzer, patentdao);
+		CheckHelper.printKeyWords(analyzer, patent);
 		// 测试所有Analyzer的分词结果
-		// testAllAnalyzer(patentdao);
+		// testAllAnalyzer(patent);
 		return document;
 	}
 
 	/**
 	 * 从SOOPAT的PDF专利文档获取专利的各个属性
 	 */
-	private static PatentDao getPatentDetails(String text) {
+	private static Patent getPatentDetails(String text) {
 		String[] result = text.split("\n");
-		PatentDao patentdao = new PatentDao();
+		Patent patentdao = new Patent();
 
 		// 获取专利名称
 		for (int i = 0; i < result.length; i++) {
@@ -191,7 +191,7 @@ public class PDFHelper {
 	 * 
 	 * @throws IOException
 	 */
-	private static void testAllAnalyzer(PatentDao patentdao) throws IOException {
+	private static void testAllAnalyzer(Patent patentdao) throws IOException {
 
 		Analyzer standardAnalyzer = new StandardAnalyzer(Version.LUCENE_46);
 		CheckHelper.printKeyWords(standardAnalyzer, patentdao);

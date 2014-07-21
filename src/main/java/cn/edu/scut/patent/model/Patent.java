@@ -1,10 +1,10 @@
 package cn.edu.scut.patent.model;
 
+import java.io.Serializable;
 import java.sql.Date;
-import java.util.HashMap;
-import java.util.Map;
 
-public class PatentDao {
+@SuppressWarnings("serial")
+public class Patent implements Serializable {
 	// 申请号
 	private String applyNum;
 	// 申请日期
@@ -41,94 +41,6 @@ public class PatentDao {
 	private Date intoDate;
 	// 专利类型
 	private String pttType;
-
-	public Map<String, String> getAll(){
-		Map<String, String> map = new HashMap<String, String>();
-		if(applyNum != null){
-			map.put("APPLY_NUM", applyNum);
-		}
-		if(applyDate != null){
-			map.put("APPLY_DATE", applyDate.toString());
-		}
-		if(pttName != null){
-			map.put("PTT_NAME", pttName);
-		}
-		if(pttNum != null){
-			map.put("PTT_NUM", pttNum);
-		}
-		if(pttDate != null){
-			map.put("PTT_DATE", pttDate.toString());
-		}
-		if(pttMainClassNum != null){
-			map.put("PTT_MAIN_CLASS_NUM", pttMainClassNum);
-		}
-		if(pttClassNum != null){
-			map.put("PTT_CLASS_NUM", pttClassNum);
-		}
-		if(proposer != null){
-			map.put("PROPOSER", proposer);
-		}
-		if(proposerAddress != null){
-			map.put("PROPOSER_ADDRESS", proposerAddress);
-		}
-		if(inventor != null){
-			map.put("INVENTOR", inventor);
-		}
-		if(internationalApply != null){
-			map.put("INTERNATIONAL_APPLY", internationalApply);
-		}
-		if(internationalPublication != null){
-			map.put("INTERNATIONAL_PUBLICATION", internationalPublication);
-		}
-		if(intoDate != null){
-			map.put("INTO_DATE", intoDate.toString());
-		}
-		if(pttAgencyOrg != null){
-			map.put("PTT_AGENCY_ORG", pttAgencyOrg);
-		}
-		if(pttAgencyPerson != null){
-			map.put("PTT_AGENCY_PERSON", pttAgencyPerson);
-		}
-		if(pttAbstract != null){
-			map.put("PTT_ABSTRACT", pttAbstract);
-		}
-		if(pttType != null){
-			map.put("pttType", pttType);
-		}
-		return map;
-	}
-
-	public String getPttType() {
-		return pttType;
-	}
-
-	public void setPttType(String pttType) {
-		this.pttType = pttType;
-	}
-
-	public String getInternationalApply() {
-		return internationalApply;
-	}
-
-	public void setInternationalApply(String internationalApply) {
-		this.internationalApply = internationalApply;
-	}
-
-	public String getInternationalPublication() {
-		return internationalPublication;
-	}
-
-	public void setInternationalPublication(String internationalPublication) {
-		this.internationalPublication = internationalPublication;
-	}
-
-	public Date getIntoDate() {
-		return intoDate;
-	}
-
-	public void setIntoDate(Date intoDate) {
-		this.intoDate = intoDate;
-	}
 
 	public String getApplyNum() {
 		return applyNum;
@@ -242,6 +154,38 @@ public class PatentDao {
 
 	public void setClassNumG06Q(String classNumG06Q) {
 		this.classNumG06Q = classNumG06Q;
+	}
+
+	public String getInternationalApply() {
+		return internationalApply;
+	}
+
+	public void setInternationalApply(String internationalApply) {
+		this.internationalApply = internationalApply;
+	}
+
+	public String getInternationalPublication() {
+		return internationalPublication;
+	}
+
+	public void setInternationalPublication(String internationalPublication) {
+		this.internationalPublication = internationalPublication;
+	}
+
+	public Date getIntoDate() {
+		return intoDate;
+	}
+
+	public void setIntoDate(Date intoDate) {
+		this.intoDate = intoDate;
+	}
+
+	public String getPttType() {
+		return pttType;
+	}
+
+	public void setPttType(String pttType) {
+		this.pttType = pttType;
 	}
 
 	private String getG06QClass(String classStr) {

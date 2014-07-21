@@ -1,4 +1,4 @@
-package cn.edu.scut.patent.service.impl;
+package cn.edu.scut.patent.core.impl;
 
 import java.io.IOException;
 import java.util.List;
@@ -6,7 +6,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
-import cn.edu.scut.patent.model.PatentDao;
+import cn.edu.scut.patent.model.Patent;
 
 public interface SearchImpl {
 
@@ -18,7 +18,7 @@ public interface SearchImpl {
 	 * @return
 	 * @throws IOException
 	 */
-	List<PatentDao> doSearch(PatentDao patentdao, List<String> pttTypeList)
+	List<Patent> doSearch(Patent patentdao, List<String> pttTypeList)
 			throws IOException;
 
 	/**
@@ -28,7 +28,7 @@ public interface SearchImpl {
 	 * @param pttTypeList
 	 * @return
 	 */
-	Query htmlConditionsToQuery(PatentDao patentdao, List<String> pttTypeList);
+	Query htmlConditionsToQuery(Patent patentdao, List<String> pttTypeList);
 
 	/**
 	 * 提取检索的结果并以List<PatentDao>的形式返回
@@ -40,6 +40,6 @@ public interface SearchImpl {
 	 * @return
 	 * @throws IOException
 	 */
-	List<PatentDao> searchResultToPatentdao(TopDocs td, IndexSearcher searcher,
+	List<Patent> searchResultToPatentdao(TopDocs td, IndexSearcher searcher,
 			Query query, Analyzer analyzer) throws IOException;
 }

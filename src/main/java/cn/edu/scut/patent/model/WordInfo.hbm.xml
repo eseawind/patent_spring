@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="cn.edu.scut.patent.model.WordInfo" table="T_WORD_INFO">
+		<comment>最大词频表</comment>
+		<!-- id必须放在第一位 -->
+		<id name="word" type="java.lang.String">
+			<column name="WORD" length="100">
+				<comment>词汇</comment>
+			</column>
+		</id>
+		<property name="maxTf" type="java.lang.Integer">
+			<column name="MAX_TF" not-null="true">
+				<comment>最大词频</comment>
+			</column>
+		</property>
+		<property name="df" type="java.lang.Integer">
+			<column name="DF" not-null="true">
+				<comment>文档频数</comment>
+			</column>
+		</property>
+	</class>
+</hibernate-mapping>

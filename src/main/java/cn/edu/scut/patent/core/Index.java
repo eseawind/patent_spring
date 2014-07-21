@@ -1,4 +1,4 @@
-package cn.edu.scut.patent.service;
+package cn.edu.scut.patent.core;
 
 import java.io.File;
 import java.util.Date;
@@ -12,10 +12,11 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import cn.edu.scut.patent.ICTCLASAnalyzer.ICTCLASAnalyzer;
+import cn.edu.scut.patent.core.impl.IndexImpl;
 import cn.edu.scut.patent.dao.DatabaseHelper;
 import cn.edu.scut.patent.prework.GetPatentsFromNetwork;
 import cn.edu.scut.patent.prework.SaveHtmlPatentsDataToMysql;
-import cn.edu.scut.patent.service.impl.IndexImpl;
+import cn.edu.scut.patent.service.PatentService;
 import cn.edu.scut.patent.util.Constants;
 import cn.edu.scut.patent.util.FileHelper;
 import cn.edu.scut.patent.util.PDFHelper;
@@ -91,6 +92,7 @@ public class Index implements IndexImpl {
 	}
 
 	public void doIndexPrework() {
+		DatabaseHelper.checkMySQL();
 		if (!FileHelper.hasFiles(Constants.WEBSITE_PATH)) {
 			System.out.println("开始进行GetPatents专利网页下载工作。");
 			GetPatentsFromNetwork getPatentsFromNetwork = new GetPatentsFromNetwork();
@@ -99,7 +101,7 @@ public class Index implements IndexImpl {
 		} else {
 			System.out.println("专利网页已经存在，不需要进行GetPatents网页下载，跳过。");
 		}
-		if (!DatabaseHelper.isTableExisted("PATENTS")) {
+		if (PatentService.isEmpty()) {
 			System.out.println("开始把保存下来专利网页的专利信息保存到数据库。");
 			SaveHtmlPatentsDataToMysql saveHtmlPatentsDataToMysql = new SaveHtmlPatentsDataToMysql();
 			saveHtmlPatentsDataToMysql.doSaveToMysql();

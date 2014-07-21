@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="cn.edu.scut.patent.model.Data" table="DATA">
+		<comment>数据表</comment>
+		<!-- 联合主键 -->
+		<composite-id>  
+            <key-property name="i" type="java.lang.Integer">  
+                <column name="I">
+                	<comment>i</comment>
+                </column>  
+            </key-property>  
+            <key-property name="j" type="java.lang.Integer">  
+                <column name="J">
+                	<comment>j</comment>
+                </column>  
+            </key-property>  
+        </composite-id>
+       <property name="distance" type="java.lang.Double">
+			<column name="DISTANCE" not-null="true">
+				<comment>距离</comment>
+			</column>
+		</property>
+	</class>
+</hibernate-mapping>

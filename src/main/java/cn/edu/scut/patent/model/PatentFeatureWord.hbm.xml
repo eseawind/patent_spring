@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="cn.edu.scut.patent.model.PatentFeatureWord" table="PATENT_FEATURE_WORD">
+		<comment>特征词权重表</comment>
+		<!-- id必须放在第一位 -->
+		<id name="id" type="java.lang.Integer">
+			<column name="ID">
+				<comment>自增长ID</comment>
+			</column>
+			<generator class="identity" />
+		</id>
+		<property name="pttNum" type="java.lang.String">
+			<column name="PTT_NUM" length="20" not-null="true">
+				<comment>专利编号</comment>
+			</column>
+		</property>
+		<property name="featureWord" type="java.lang.String">
+			<column name="FEATURE_WORD" length="100" not-null="true">
+				<comment>特征词</comment>
+			</column>
+		</property>
+		<property name="tfIdfValue" type="java.lang.Double">
+			<column name="TFIDF_VALUE" not-null="true">
+				<comment>权重</comment>
+			</column>
+		</property>
+		<property name="tfIdfValueStandard" type="java.lang.Double">
+			<column name="TFIDF_VALUE_STANDARD" not-null="true">
+				<comment>权重标化值</comment>
+			</column>
+		</property>
+	</class>
+</hibernate-mapping>

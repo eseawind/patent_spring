@@ -23,7 +23,7 @@ public class DaoController {
 		String PTT_NUM = request.getParameter("PTT_NUM");
 		String[] TRIZ_NUM = request.getParameterValues("triz");
 		String result;
-		if (DatabaseHelper.insertTrizNumber(PTT_NUM, TRIZ_NUM)) {
+		if (DatabaseHelper.insertClassificationNumber(PTT_NUM, TRIZ_NUM)) {
 			result = "专利分类信息已存入数据库！感谢您的支持！";
 		} else {
 			result = "专利分类信息已存入数据库失败！";

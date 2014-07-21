@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="cn.edu.scut.patent.model.PatentsAfterWordDivide" table="PATENTS_AFTER_WORD_DIVIDE">
+		<comment>PATENTS_AFTER_WORD_DIVIDE表</comment>
+		<!-- id必须放在第一位 -->
+		<id name="pttNum" type="java.lang.String">
+			<column name="PTT_NUM">
+				<comment>专利编号</comment>
+			</column>
+		</id>
+		<property name="pttNameDivided" type="java.lang.String">
+			<column name="PTT_NAME_DIVIDED" length="200" not-null="true">
+				<comment>已分词的专利名称</comment>
+			</column>
+		</property>
+		<property name="pttDate" type="java.sql.Date">
+			<column name="PTT_DATE" not-null="true">
+				<comment>专利公开日</comment>
+			</column>
+		</property>
+		<property name="classNumG06Q" type="java.lang.String">
+			<column name="CLASS_NUM_G06Q" length="20" not-null="true">
+				<comment>商业方法类下的分类号</comment>
+			</column>
+		</property>
+		<property name="pttAbstractDivided" type="java.lang.String">
+			<column name="PTT_ABSTRACT_DIVIDED" length="10000" not-null="true">
+				<comment>已分词的专利概述</comment>
+			</column>
+		</property>
+		<property name="pttContentDivided" type="java.lang.String">
+			<column name="PTT_CONTENT_DIVIDED" length="10000" not-null="true">
+				<comment>已分词的专利内容</comment>
+			</column>
+		</property>
+	</class>
+</hibernate-mapping>

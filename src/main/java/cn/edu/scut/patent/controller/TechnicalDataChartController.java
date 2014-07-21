@@ -12,11 +12,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import cn.edu.scut.patent.core.Indicator;
 import cn.edu.scut.patent.model.ClusterValueItem;
 import cn.edu.scut.patent.model.IndicatorData;
 import cn.edu.scut.patent.model.IndicatorParam;
 import cn.edu.scut.patent.model.IndicatorValueItem;
-import cn.edu.scut.patent.service.Indicator;
 import cn.edu.scut.patent.util.Constants;
 import cn.edu.scut.patent.util.StringHelper;
 

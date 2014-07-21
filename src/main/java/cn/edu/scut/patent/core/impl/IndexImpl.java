@@ -1,4 +1,4 @@
-package cn.edu.scut.patent.service.impl;
+package cn.edu.scut.patent.core.impl;
 
 public interface IndexImpl {
 	

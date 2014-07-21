@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="cn.edu.scut.patent.model.Classification" table="CLASSIFICATION">
+		<comment>分类表</comment>
+		<!-- 联合主键 -->
+		<composite-id>  
+            <key-property name="pttNum" type="java.lang.String">  
+                <column name="PTT_NUM" length="20">
+                	<comment>专利号码</comment>
+                </column>  
+            </key-property>  
+            <key-property name="trizNum" type="java.lang.Integer">  
+                <column name="TRIZ_NUM">
+                	<comment>TRIZ编号</comment>
+                </column>  
+            </key-property>  
+        </composite-id>
+        <many-to-one name="pttNum" class="cn.edu.scut.patent.model.Patent" column="PTT_NUM" not-null="true" insert="false" update="false" />  
+    	<many-to-one name="trizNum" class="cn.edu.scut.patent.model.Triz" column="TRIZ_NUM" not-null="true" insert="false" update="false" />
+	</class>
+</hibernate-mapping>

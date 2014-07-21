@@ -11,12 +11,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import ICTCLAS2014.Nlpir;
-import cn.edu.scut.patent.model.PatentFeatureWordModel;
+import cn.edu.scut.patent.model.PatentFeatureWord;
 import cn.edu.scut.patent.model.PatentMatrix;
-import cn.edu.scut.patent.model.PatentWordTFIDFModel;
-import cn.edu.scut.patent.model.PatentsAfterWordDivideModel;
-import cn.edu.scut.patent.model.WordInfoModel;
+import cn.edu.scut.patent.model.PatentWordTfDf;
+import cn.edu.scut.patent.model.PatentsAfterWordDivide;
+import cn.edu.scut.patent.model.WordInfo;
 import cn.edu.scut.patent.prework.impl.ClusterImpl;
+import cn.edu.scut.patent.service.DataService;
+import cn.edu.scut.patent.service.PatentClusterService;
+import cn.edu.scut.patent.service.PatentFeatureWordService;
+import cn.edu.scut.patent.service.PatentWordTfDfService;
+import cn.edu.scut.patent.service.PatentsAfterWordDivideService;
+import cn.edu.scut.patent.service.StopwordService;
+import cn.edu.scut.patent.service.WordInfoService;
+import cn.edu.scut.patent.service.WordSmarkService;
 import cn.edu.scut.patent.util.Constants;
 import cn.edu.scut.patent.dao.DatabaseHelper;
 import cn.edu.scut.patent.util.StringHelper;
@@ -30,9 +38,9 @@ import cn.edu.scut.patent.util.StringHelper;
 public class Cluster implements ClusterImpl {
 
 	public static Connection con;
-	public Map<String, PatentWordTFIDFModel> titleWordDic;
-	public Map<String, PatentWordTFIDFModel> abstractWordDic;
-	public Map<String, PatentWordTFIDFModel> contentWordDic;
+	public Map<String, PatentWordTfDf> titleWordDic;
+	public Map<String, PatentWordTfDf> abstractWordDic;
+	public Map<String, PatentWordTfDf> contentWordDic;
 	int count = 0;
 
 	public Cluster() {
@@ -48,11 +56,11 @@ public class Cluster implements ClusterImpl {
 		String result = "";
 		Cluster cluster = new Cluster();
 
-		// 如果数据表PATENT_WORD_TF_DF已经存在的话，则跳过下述函数，不再浪费资源重复计算。
-		if (!DatabaseHelper.isTableExisted("PATENT_WORD_TF_DF")) {
-			DatabaseHelper.dropTable("PATENTS_AFTER_WORD_DIVIDE");
-			DatabaseHelper.dropTable("T_STOPWORD");
-			DatabaseHelper.dropTable("T_WORD_SMARK");
+		// 如果数据表PATENT_WORD_TF_DF不为空，则跳过下述函数，不再浪费资源重复计算。
+		if (PatentWordTfDfService.isEmpty()) {
+			PatentsAfterWordDivideService.cleanTable();
+			StopwordService.cleanTable();
+			WordSmarkService.cleanTable();
 
 			long startTime = new Date().getTime();// 开始的时间
 			System.out.println("将名称和摘要分词并存入patent_word_after_divide中");
@@ -64,9 +72,9 @@ public class Cluster implements ClusterImpl {
 			result += timeConsume1 + "\n";
 		}
 
-		// 如果数据表T_WORD_INFO已经存在的话，则跳过下述函数，不再浪费资源重复计算。
-		if (!DatabaseHelper.isTableExisted("T_WORD_INFO")) {
-			DatabaseHelper.dropTable("PATENT_WORD_TF_DF");
+		// 如果数据表T_WORD_INFO不为空，则跳过下述函数，不再浪费资源重复计算。
+		if (WordInfoService.isEmpty()) {
+			PatentWordTfDfService.cleanTable();
 
 			long startTime = new Date().getTime();// 开始的时间
 			// 计算TF，存入Map中
@@ -81,9 +89,9 @@ public class Cluster implements ClusterImpl {
 			result += timeConsume2 + "\n";
 		}
 
-		// 如果数据表PATENT_FEATURE_WORD已经存在的话，则跳过下述函数，不再浪费资源重复计算。
-		if (!DatabaseHelper.isTableExisted("PATENT_FEATURE_WORD")) {
-			DatabaseHelper.dropTable("T_WORD_INFO");
+		// 如果数据表PATENT_FEATURE_WORD不为空，则跳过下述函数，不再浪费资源重复计算。
+		if (PatentFeatureWordService.isEmpty()) {
+			WordInfoService.cleanTable();
 
 			long startTime = new Date().getTime();// 开始的时间
 			// 保存（word,maxTF,DF）值到t_word_info
@@ -94,9 +102,9 @@ public class Cluster implements ClusterImpl {
 			result += timeConsume3 + "\n";
 		}
 
-		// 如果数据表PATENT_CLUSTER已经存在的话，则跳过下述函数，不再浪费资源重复计算。
-		if (!DatabaseHelper.isTableExisted("PATENT_CLUSTER")) {
-			DatabaseHelper.dropTable("PATENT_FEATURE_WORD");
+		// 如果数据表PATENT_CLUSTER不为空，则跳过下述函数，不再浪费资源重复计算。
+		if (PatentClusterService.isEmpty()) {
+			PatentFeatureWordService.cleanTable();
 
 			long startTime = new Date().getTime();// 开始的时间
 			cluster.countAndSaveToDb(20);
@@ -107,8 +115,8 @@ public class Cluster implements ClusterImpl {
 			result += timeConsume4 + "\n";
 		}
 
-		// 如果数据表PATENT_CLUSTER已经存在的话，则跳过下述函数，不再浪费资源重复计算。
-		if (!DatabaseHelper.isTableExisted("PATENT_CLUSTER")) {
+		// 如果数据表PATENT_CLUSTER不为空，则跳过下述函数，不再浪费资源重复计算。
+		if (PatentClusterService.isEmpty()) {
 			long startTime = new Date().getTime();// 开始的时间
 			cluster.clusterByQYJ(20);
 			String timeConsume5 = "5.花费了" + StringHelper.timer(startTime)
@@ -126,33 +134,23 @@ public class Cluster implements ClusterImpl {
 	public void divideWordToDb() {
 		ResultSet rs = null;
 		try {
-			if (!DatabaseHelper.isTableExisted("PATENTS_AFTER_WORD_DIVIDE")) {
-				DatabaseHelper.createTablePATENTS_AFTER_WORD_DIVIDE();
-			}
-			if (!DatabaseHelper.isTableExisted("T_STOPWORD")) {
-				DatabaseHelper.createTableT_STOPWORD();
-			}
-			if (!DatabaseHelper.isTableExisted("T_WORD_SMARK")) {
-				DatabaseHelper.createTableT_WORD_SMARK();
-			}
-
 			rs = DatabaseHelper.getPatentsKeys();
 
-			PatentsAfterWordDivideModel pttAWDM;
+			PatentsAfterWordDivide pttAWDM;
 			while (rs.next()) {
-				pttAWDM = new PatentsAfterWordDivideModel();
-				pttAWDM.setPtt_num(rs.getString("PTT_NUM"));
-				pttAWDM.setPtt_date(rs.getDate("PTT_DATE"));
-				pttAWDM.setClass_num_g06q(rs.getString("CLASS_NUM_G06Q"));
+				pttAWDM = new PatentsAfterWordDivide();
+				pttAWDM.setPttNum(rs.getString("PTT_NUM"));
+				pttAWDM.setPttDate(rs.getDate("PTT_DATE"));
+				pttAWDM.setClassNumG06Q(rs.getString("CLASS_NUM_G06Q"));
 
 				// 将专利名称和摘要分词
-				pttAWDM.setPtt_name(Nlpir.doNlpirString(
+				pttAWDM.setPttNameDivided(Nlpir.doNlpirString(
 						rs.getString("PTT_NAME"), 0, null, null));
-				pttAWDM.setPtt_abstract(Nlpir.doNlpirString(
+				pttAWDM.setPttAbstractDivided(Nlpir.doNlpirString(
 						rs.getString("PTT_ABSTRACT"), 0, null, null));
 
 				// 存入到patents_after_word_divide数据表
-				DatabaseHelper.insertPATENTS_AFTER_WORD_DIVIDE(pttAWDM);
+				new PatentsAfterWordDivideService().save(pttAWDM);
 				// *************************************
 				if (rs.getRow() >= 1000) {
 					break;
@@ -178,81 +176,79 @@ public class Cluster implements ClusterImpl {
 		try {
 			rs = DatabaseHelper.getPatentsFromPATENTS_AFTER_WORD_DIVIDE();
 
-			PatentsAfterWordDivideModel pawd;
+			PatentsAfterWordDivide pawd;
 			String[] titleArr;
 			String[] abstractArr;
 			String[] contentArr;
-			titleWordDic = new HashMap<String, PatentWordTFIDFModel>();
-			abstractWordDic = new HashMap<String, PatentWordTFIDFModel>();
-			contentWordDic = new HashMap<String, PatentWordTFIDFModel>();
+			titleWordDic = new HashMap<String, PatentWordTfDf>();
+			abstractWordDic = new HashMap<String, PatentWordTfDf>();
+			contentWordDic = new HashMap<String, PatentWordTfDf>();
 
 			// 数据集循环
 			while (rs.next()) {
-				pawd = new PatentsAfterWordDivideModel();
-				pawd.read(rs);
+				pawd = new PatentsAfterWordDivideService().read(rs);
 
 				String tempStr;
 				// 以空格切开专利名词（折扣/n 卡/n 系统/n ）
-				titleArr = pawd.getPtt_name().split(" ");
+				titleArr = pawd.getPttNameDivided().split(" ");
 				for (int i = 0; i < titleArr.length; i++) {
 					tempStr = titleArr[i];
-					PatentWordTFIDFModel p;
+					PatentWordTfDf p;
 					// 以word_专利名称为格式判断是否唯一，如果是唯一的tf为1
-					if (titleWordDic.get(tempStr + "_" + pawd.getPtt_num()) == null) {
-						p = new PatentWordTFIDFModel();
+					if (titleWordDic.get(tempStr + "_" + pawd.getPttNum()) == null) {
+						p = new PatentWordTfDf();
 						p.setFlag(1); // 1为标题
 						p.setWord(tempStr);
-						p.setPttNum(pawd.getPtt_num());
-						titleWordDic.put(tempStr + "_" + pawd.getPtt_num(), p);
+						p.setPttNum(pawd.getPttNum());
+						titleWordDic.put(tempStr + "_" + pawd.getPttNum(), p);
 					}
 					// 如果不唯一，tf+1
 					else {
-						p = titleWordDic.get(tempStr + "_" + pawd.getPtt_num());
+						p = titleWordDic.get(tempStr + "_" + pawd.getPttNum());
 						p.setTf(p.getTf() + 1);
 					}
 				}
 
 				// 以空格切开专利摘要
-				abstractArr = pawd.getPtt_abstract().split(" ");
+				abstractArr = pawd.getPttAbstractDivided().split(" ");
 				for (int j = 0; j < abstractArr.length; j++) {
 					tempStr = abstractArr[j];
 					if (tempStr.lastIndexOf("/") != -1)
 						tempStr = tempStr
 								.substring(0, tempStr.lastIndexOf("/"));
-					PatentWordTFIDFModel p;
-					if (abstractWordDic.get(tempStr + "_" + pawd.getPtt_num()) == null) {
-						p = new PatentWordTFIDFModel();
+					PatentWordTfDf p;
+					if (abstractWordDic.get(tempStr + "_" + pawd.getPttNum()) == null) {
+						p = new PatentWordTfDf();
 						p.setFlag(0); // 0为摘要
 						p.setWord(tempStr);
-						p.setPttNum(pawd.getPtt_num());
-						abstractWordDic.put(tempStr + "_" + pawd.getPtt_num(),
-								p);
+						p.setPttNum(pawd.getPttNum());
+						abstractWordDic
+								.put(tempStr + "_" + pawd.getPttNum(), p);
 					} else {
 						p = abstractWordDic.get(tempStr + "_"
-								+ pawd.getPtt_num());
+								+ pawd.getPttNum());
 						p.setTf(p.getTf() + 1);
 					}
 				}
 
 				// 以空格切开专利说明书
-				contentArr = pawd.getPtt_content().split(" ");
+				contentArr = pawd.getPttContentDivided().split(" ");
 				for (int k = 0; k < contentArr.length; k++) {
 					tempStr = contentArr[k];
 					if (tempStr.lastIndexOf("/") != -1) {
 						tempStr = tempStr
 								.substring(0, tempStr.lastIndexOf("/"));
 					}
-					PatentWordTFIDFModel p;
-					if (contentWordDic.get(tempStr + "_" + pawd.getPtt_num()) == null) {
-						p = new PatentWordTFIDFModel();
+					PatentWordTfDf p;
+					if (contentWordDic.get(tempStr + "_" + pawd.getPttNum()) == null) {
+						p = new PatentWordTfDf();
 						p.setFlag(2); // 设定2为专利说明书的内容
 						p.setWord(tempStr);
-						p.setPttNum(pawd.getPtt_num());
-						contentWordDic
-								.put(tempStr + "_" + pawd.getPtt_num(), p);
+						p.setPttNum(pawd.getPttNum());
+						contentWordDic.put(tempStr + "_" + pawd.getPttNum(), p);
 					} else {
-						p = contentWordDic.get(tempStr + "_"
-								+ pawd.getPtt_num());
+						p = contentWordDic
+								.get(tempStr + "_" + pawd.getPttNum());
 						p.setTf(p.getTf() + 1);
 					}
 				}
@@ -262,14 +258,14 @@ public class Cluster implements ClusterImpl {
 						|| titleWordDic.size() > 60000
 						|| contentWordDic.size() > 60000) {
 					saveWordDicToDatabase();
-					abstractWordDic = new HashMap<String, PatentWordTFIDFModel>();
-					titleWordDic = new HashMap<String, PatentWordTFIDFModel>();
-					contentWordDic = new HashMap<String, PatentWordTFIDFModel>();
+					abstractWordDic = new HashMap<String, PatentWordTfDf>();
+					titleWordDic = new HashMap<String, PatentWordTfDf>();
+					contentWordDic = new HashMap<String, PatentWordTfDf>();
 					System.out.println("长度过长，保存数据，清空哈希表，继续统计！");
 				}
 
 				System.out.println(rs.getRow() + "\t" + "ok!\t"
-						+ pawd.getPtt_num() + "\t" + pawd.getPtt_name());
+						+ pawd.getPttNum() + "\t" + pawd.getPttNameDivided());
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -286,29 +282,26 @@ public class Cluster implements ClusterImpl {
 	}
 
 	public void saveWordDicToDatabase() {
-		if (!DatabaseHelper.isTableExisted("PATENT_WORD_TF_DF")) {
-			DatabaseHelper.createTablePATENT_WORD_TF_DF();
-		}
-		Iterator<Map.Entry<String, PatentWordTFIDFModel>> iterator1 = titleWordDic
+		Iterator<Map.Entry<String, PatentWordTfDf>> iterator1 = titleWordDic
 				.entrySet().iterator();
-		Iterator<Map.Entry<String, PatentWordTFIDFModel>> iterator2 = abstractWordDic
+		Iterator<Map.Entry<String, PatentWordTfDf>> iterator2 = abstractWordDic
 				.entrySet().iterator();
-		Iterator<Map.Entry<String, PatentWordTFIDFModel>> iterator3 = contentWordDic
+		Iterator<Map.Entry<String, PatentWordTfDf>> iterator3 = contentWordDic
 				.entrySet().iterator();
-		Map.Entry<String, PatentWordTFIDFModel> entry;
+		Map.Entry<String, PatentWordTfDf> entry;
 		while (iterator1.hasNext()) {
 			entry = iterator1.next();
-			entry.getValue().write(con);
+			new PatentWordTfDfService().save(entry.getValue());
 		}
 		System.out.println("成功把title的TF保存到数据表PATENT_WORD_TF_DF中!");
 		while (iterator2.hasNext()) {
 			entry = iterator2.next();
-			entry.getValue().write(con);
+			new PatentWordTfDfService().save(entry.getValue());
 		}
 		System.out.println("成功把abstract的TF保存到数据表PATENT_WORD_TF_DF中!");
 		while (iterator3.hasNext()) {
 			entry = iterator3.next();
-			entry.getValue().write(con);
+			new PatentWordTfDfService().save(entry.getValue());
 		}
 		System.out.println("成功把content的TF保存到数据表PATENT_WORD_TF_DF中!");
 	}
@@ -388,7 +381,7 @@ public class Cluster implements ClusterImpl {
 					.executeQuery("SELECT DISTINCT WORD FROM patent_word_tf_df");
 			int tempNum;
 			String word;
-			WordInfoModel tempWim;
+			WordInfo tempWim;
 			while (rs1.next()) {
 				tempNum = 0;
 				sta = con.createStatement();
@@ -404,14 +397,11 @@ public class Cluster implements ClusterImpl {
 				wordMaxTFmap.put(word, tempNum);
 
 				// 保存进数据库
-				tempWim = new WordInfoModel();
+				tempWim = new WordInfo();
 				tempWim.setWord(word);
 				tempWim.setMaxTf(tempNum);
 				tempWim.setDf(df);
-				if (!DatabaseHelper.isTableExisted("T_WORD_INFO")) {
-					DatabaseHelper.createTableT_WORD_INFO();
-				}
-				tempWim.write();
+				new WordInfoService().save(tempWim);
 				count++;
 				System.out.println("map count:" + count + "\tkey:" + word
 						+ "\tvalue:" + tempNum);
@@ -438,9 +428,6 @@ public class Cluster implements ClusterImpl {
 	}
 
 	public void countAndSaveToDb(int size) {
-		if (!DatabaseHelper.isTableExisted("PATENT_FEATURE_WORD")) {
-			DatabaseHelper.createTablePATENT_FEATURE_WORD();
-		}
 		Statement sta = null;
 		ResultSet rs = null;
 		ResultSet pttnumRs = null;
@@ -459,9 +446,9 @@ public class Cluster implements ClusterImpl {
 			sta = con.createStatement();
 			rs = sta.executeQuery("SELECT DISTINCT PTT_NUM FROM patent_word_tf_df");
 			String pttnum;
-			ArrayList<PatentFeatureWordModel> tempArr;
+			ArrayList<PatentFeatureWord> tempArr;
 			while (rs.next()) {
-				tempArr = new ArrayList<PatentFeatureWordModel>();
+				tempArr = new ArrayList<PatentFeatureWord>();
 				sta = con.createStatement();
 				pttnum = rs.getString(1);
 				pttnumRs = sta
@@ -482,17 +469,16 @@ public class Cluster implements ClusterImpl {
 					int df = pttnumRs.getInt(5);
 					Number tempValue = (0.5 + 0.5 * tf / maxTf)
 							* (Math.log(n / df));
-					PatentFeatureWordModel pfwm = new PatentFeatureWordModel(
-							pttnum, pttnumRs.getString(3),
-							tempValue.doubleValue());
+					PatentFeatureWord pfwm = new PatentFeatureWord(pttnum,
+							pttnumRs.getString(3), tempValue.doubleValue());
 					tempArr.add(pfwm);
 				}
 
 				for (int i = 0; i < tempArr.size() - 1; i++) {
 					for (int j = i + 1; j < tempArr.size(); j++) {
-						if (tempArr.get(i).getTfidfValue() < tempArr.get(j)
-								.getTfidfValue()) {
-							PatentFeatureWordModel tempPfwm = tempArr.get(i);
+						if (tempArr.get(i).getTfIdfValue() < tempArr.get(j)
+								.getTfIdfValue()) {
+							PatentFeatureWord tempPfwm = tempArr.get(i);
 							tempArr.set(i, tempArr.get(j));
 							tempArr.set(j, tempPfwm);
 						}
@@ -502,7 +488,7 @@ public class Cluster implements ClusterImpl {
 				int len = Math.min(size, tempArr.size());
 				for (int m = 0; m < len; m++) {
 					// 写入数据库
-					tempArr.get(m).write();
+					new PatentFeatureWordService().save(tempArr.get(m));
 				}
 				count++;
 				System.out.println("第" + count + "个专利" + pttnum + "的特征词数量为"
@@ -542,21 +528,21 @@ public class Cluster implements ClusterImpl {
 				rs2 = sta2
 						.executeQuery("select * from patent_feature_word where PTT_NUM='"
 								+ pttNum + "'");
-				List<PatentFeatureWordModel> pfwnList = new ArrayList<PatentFeatureWordModel>();
+				List<PatentFeatureWord> pfwnList = new ArrayList<PatentFeatureWord>();
 				while (rs2.next()) {
-					PatentFeatureWordModel pfwm = new PatentFeatureWordModel();
-					pfwm.read(rs2);
+					PatentFeatureWord pfwm = new PatentFeatureWordService()
+							.read(rs2);
 					pfwnList.add(pfwm);
 				}
 				double sum = 0;
 				for (int i = 0; i < pfwnList.size(); i++) {
-					sum += Math.pow(pfwnList.get(i).getTfidfValue(), 2);
+					sum += Math.pow(pfwnList.get(i).getTfIdfValue(), 2);
 				}
 				sum = Math.sqrt(sum);
 				for (int j = 0; j < pfwnList.size(); j++) {
-					PatentFeatureWordModel p = pfwnList.get(j);
-					p.setTfidfValueStandard(p.getTfidfValue() / sum);
-					p.updateTfidfValueStandard();
+					PatentFeatureWord p = pfwnList.get(j);
+					p.setTfIdfValueStandard(p.getTfIdfValue() / sum);
+					new PatentFeatureWordService().update(p);
 				}
 				System.out.println(pttNum);
 			}
@@ -585,9 +571,6 @@ public class Cluster implements ClusterImpl {
 
 	@SuppressWarnings("unchecked")
 	public void clusterByCJX(int k) {
-		if (!DatabaseHelper.isTableExisted("PATENT_CLUSTER")) {
-			DatabaseHelper.createTablePATENT_CLUSTER();
-		}
 		List<PatentMatrix> pttMatrix = new ArrayList<PatentMatrix>();
 		int n = 0;
 		Statement sta = null;
@@ -609,9 +592,9 @@ public class Cluster implements ClusterImpl {
 				int index = 0;
 				double sum = 0;
 				while (rs2.next()) {
-					PatentFeatureWordModel pfwm = new PatentFeatureWordModel();
-					pfwm.read(rs2);
-					pm.value[index] = pfwm.getTfidfValueStandard();
+					PatentFeatureWord pfwm = new PatentFeatureWordService()
+							.read(rs2);
+					pm.value[index] = pfwm.getTfIdfValueStandard();
 					sum += pm.value[index] * pm.value[index];
 					index += 1;
 				}
@@ -747,9 +730,6 @@ public class Cluster implements ClusterImpl {
 
 	@SuppressWarnings("unchecked")
 	public void clusterByQYJ(int k) {
-		if (!DatabaseHelper.isTableExisted("PATENT_CLUSTER")) {
-			DatabaseHelper.createTablePATENT_CLUSTER();
-		}
 		// 以专利为单位，存储所有专利所有特征词的权重
 		System.out.println("以专利为单位，存储所有专利所有特征词的权重");
 		List<PatentMatrix> pttMatrix = new ArrayList<PatentMatrix>();
@@ -772,9 +752,9 @@ public class Cluster implements ClusterImpl {
 				int index = 0;
 				double sum = 0;
 				while (rs2.next()) {
-					PatentFeatureWordModel pfwm = new PatentFeatureWordModel();
-					pfwm.read(rs2);
-					pm.value[index] = pfwm.getTfidfValueStandard();
+					PatentFeatureWord pfwm = new PatentFeatureWordService()
+							.read(rs2);
+					pm.value[index] = pfwm.getTfIdfValueStandard();
 					sum += pm.value[index] * pm.value[index];
 					index += 1;
 				}
@@ -928,15 +908,7 @@ public class Cluster implements ClusterImpl {
 		Statement sta = null;
 		try {
 			sta = con.createStatement();
-			if (!DatabaseHelper.isTableExisted("DATA")) {
-				String sql_create_table_DATA = "CREATE TABLE DATA ("
-						+ "I INT NOT NULL" + ", J INT NOT NULL"
-						+ ", DISTANCE DOUBLE NOT NULL" + ", PRIMARY KEY(I, J))"
-						+ " ENGINE = InnoDB" + ";";
-				sta.execute(sql_create_table_DATA);
-			}
-			String sql_drop_table_DATA = "TRUNCATE TABLE DATA;";
-			sta.execute(sql_drop_table_DATA);
+			DataService.cleanTable();
 
 			for (int j = 0; j < len; j++) {
 				for (int i = j; i < len; i++) {
@@ -1040,13 +1012,6 @@ public class Cluster implements ClusterImpl {
 		ResultSet rs = null;
 		try {
 			sta = con.createStatement();
-			if (!DatabaseHelper.isTableExisted("DATA")) {
-				String sql_create_table_DATA = "CREATE TABLE DATA ("
-						+ "I INT NOT NULL" + ", J INT NOT NULL"
-						+ ", DISTANCE DOUBLE NOT NULL" + ", PRIMARY KEY(I, J))"
-						+ " ENGINE = InnoDB" + ";";
-				sta.execute(sql_create_table_DATA);
-			}
 			String sql_select_from_DATA = "SELECT DISTANCE FROM DATA WHERE I="
 					+ n;
 			rs = sta.executeQuery(sql_select_from_DATA);

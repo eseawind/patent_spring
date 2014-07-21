@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="cn.edu.scut.patent.model.PatentWordTfDf" table="PATENT_WORD_TF_DF">
+		<comment>专利特征词表</comment>
+		<!-- id必须放在第一位 -->
+		<id name="id" type="java.lang.Integer">
+			<column name="ID">
+				<comment>唯一标识ID</comment>
+			</column>
+			<generator class="identity" />
+		</id>
+		<property name="pttNum" type="java.lang.String">
+			<column name="PTT_NUM" length="20" not-null="true">
+				<comment>专利编号</comment>
+			</column>
+		</property>
+		<property name="word" type="java.lang.String">
+			<column name="WORD" length="100" not-null="true">
+				<comment>词汇</comment>
+			</column>
+		</property>
+		<property name="tf" type="java.lang.Integer">
+			<column name="TF" not-null="true">
+				<comment>词频</comment>
+			</column>
+		</property>
+		<property name="df" type="java.lang.Integer">
+			<column name="DF" not-null="true">
+				<comment>文档频数</comment>
+			</column>
+		</property>
+		<property name="flag" type="java.lang.Integer">
+			<column name="FLAG" not-null="true">
+				<comment>标识</comment>
+			</column>
+		</property>
+	</class>
+</hibernate-mapping>

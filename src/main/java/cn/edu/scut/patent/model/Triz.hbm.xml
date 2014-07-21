@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="cn.edu.scut.patent.model.Triz" table="TRIZ">
+		<comment>TRIZ原理表</comment>
+		<!-- id必须放在第一位 -->
+		<id name="trizNum" type="java.lang.Integer">
+			<column name="TRIZ_NUM">
+				<comment>TRIZ编号</comment>
+			</column>
+		</id>
+		<property name="trizText" type="java.lang.String">
+			<column name="TRIZ_TEXT" length="200" not-null="true">
+				<comment>TRIZ名称</comment>
+			</column>
+		</property>
+	</class>
+</hibernate-mapping>
