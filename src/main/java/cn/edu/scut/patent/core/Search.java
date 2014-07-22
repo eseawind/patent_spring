@@ -70,7 +70,7 @@ public class Search implements SearchImpl {
 
 	public Query htmlConditionsToQuery(Patent patent,
 			List<String> pttTypeList) {
-		Map<String, String> map = new PatentService().getAll(patent);
+		Map<String, String> map = new PatentService().getAllPatentProperties(patent);
 		if (map.size() > 0) {
 			System.out.println("size:" + map.size());
 			BooleanQuery booleanQuery = new BooleanQuery();

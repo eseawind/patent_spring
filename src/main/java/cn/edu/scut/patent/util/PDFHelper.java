@@ -80,7 +80,7 @@ public class PDFHelper {
 				null), Field.Store.YES));
 		document.add(new TextField("path", pdfpath, Field.Store.YES));
 
-		Map<String, String> map = new PatentService().getAll(patent);
+		Map<String, String> map = new PatentService().getAllPatentProperties(patent);
 		// 遍历map把各项专利的属性加入到document当中
 		if (map != null) {
 			Set<String> keySet = map.keySet();

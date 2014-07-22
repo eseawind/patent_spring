@@ -1,5 +1,9 @@
 package cn.edu.scut.patent.dao;
 
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import cn.edu.scut.patent.model.Patent;
 
@@ -45,5 +49,44 @@ public class PatentDao extends TotalDao {
 		Patent patent = (Patent) session.get(Patent.class, pttNum);
 		session.getTransaction().commit();
 		return patent;
+	}
+
+	/**
+	 * 获取所有的专利数据
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Patent> getAllPatents(Session session) {
+		session.beginTransaction();
+		Query query = session.createQuery("from Patent");
+		session.getTransaction().commit();
+		List<Patent> list = query.list();
+		return list;
+	}
+
+	/**
+	 * 获取PATENTS所有专利关键属性的数据
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Patent> getPatentsKey(Session session) {
+		List<Patent> list = new ArrayList<Patent>();
+		session.beginTransaction();
+		Query query = session
+				.createQuery("select pttNum, pttName, pttDate, classNumG06Q, pttAbstract from Patent");
+		session.getTransaction().commit();
+		List<Object[]> templist = query.list();
+		for (Object[] object : templist) {
+			Patent patent = new Patent();
+			patent.setPttNum((String) object[0]);
+			patent.setPttName((String) object[1]);
+			patent.setPttDate((Date) object[2]);
+			patent.setClassNumG06Q((String) object[3]);
+			patent.setPttAbstract((String) object[4]);
+			list.add(patent);
+		}
+		return list;
 	}
 }

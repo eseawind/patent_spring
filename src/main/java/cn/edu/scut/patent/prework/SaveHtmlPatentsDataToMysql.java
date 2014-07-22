@@ -17,6 +17,7 @@ import cn.edu.scut.patent.model.Patent;
 import cn.edu.scut.patent.prework.impl.SaveHtmlPatentsDataToMysqlImpl;
 import cn.edu.scut.patent.service.PatentService;
 import cn.edu.scut.patent.util.Constants;
+import cn.edu.scut.patent.util.StringHelper;
 
 /**
  * 将保存下来的专利网页的专利信息保存到数据库
@@ -94,7 +95,8 @@ public class SaveHtmlPatentsDataToMysql implements
 
 		row = tableTag.getRow(2);
 		colAry = row.getColumns();
-		pttDao.setPttNum(colAry[1].getStringText().replace("&nbsp;", ""));
+		pttDao.setPttNum(StringHelper.replaceSpecialCharacters(colAry[1]
+				.getStringText().replace("&nbsp;", "")));
 		pttDao.setPttDate(Date.valueOf(colAry[3].getStringText()
 				.replaceAll("&nbsp;|\\s", "").replace(".", "-")));
 

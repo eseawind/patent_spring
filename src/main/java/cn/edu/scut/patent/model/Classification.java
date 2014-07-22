@@ -10,6 +10,15 @@ public class Classification implements Serializable {
 	// TRIZ编号
 	private int trizNum;
 
+	public Classification(){
+		
+	}
+	
+	public Classification(String pttNum, int trizNum){
+		this.pttNum = pttNum;
+		this.trizNum = trizNum;
+	}
+	
 	public String getPttNum() {
 		return pttNum;
 	}

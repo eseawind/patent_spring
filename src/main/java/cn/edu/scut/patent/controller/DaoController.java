@@ -5,32 +5,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-import cn.edu.scut.patent.dao.DatabaseHelper;
+import cn.edu.scut.patent.service.ClassificationService;
 
 @Controller
 public class DaoController {
-
-	/**
-	 * 插入Triz号码
-	 * 
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	@RequestMapping(value = "insertTrizNumber")
-	public ModelAndView insertTrizNumber(HttpServletRequest request,
-			HttpServletResponse response) {
-		String PTT_NUM = request.getParameter("PTT_NUM");
-		String[] TRIZ_NUM = request.getParameterValues("triz");
-		String result;
-		if (DatabaseHelper.insertClassificationNumber(PTT_NUM, TRIZ_NUM)) {
-			result = "专利分类信息已存入数据库！感谢您的支持！";
-		} else {
-			result = "专利分类信息已存入数据库失败！";
-		}
-		ModelAndView mv = new ModelAndView("/index", "command", result);
-		return mv;
-	}
 
 	/**
 	 * 更新Triz号码
@@ -49,7 +27,8 @@ public class DaoController {
 		}
 		System.out.println();
 		String result;
-		if (DatabaseHelper.updateTrizNumber(PTT_NUM, TRIZ_NUM)) {
+		if (new ClassificationService().updateClassificationNumber(PTT_NUM,
+				TRIZ_NUM)) {
 			result = "专利分类信息已存入数据库！感谢您的支持！";
 		} else {
 			result = "专利分类信息已存入数据库失败！";

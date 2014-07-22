@@ -1,5 +1,6 @@
 package cn.edu.scut.patent.dao;
 
+import java.math.BigInteger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -38,6 +39,25 @@ public class TotalDao {
 	}
 
 	/**
+	 * 获取表格长度
+	 * 
+	 * @param session
+	 * @param tableName
+	 * @return
+	 */
+	public int getTableSize(Session session, String tableName) {
+		session.beginTransaction();
+		Query query = session.createSQLQuery("select count(*) from "
+				+ tableName);
+		session.getTransaction().commit();
+		if (query.uniqueResult() == null) {
+			return 0;
+		} else {
+			return ((BigInteger) query.uniqueResult()).intValue();
+		}
+	}
+
+	/**
 	 * 保存
 	 * 
 	 * @param session
@@ -48,7 +68,7 @@ public class TotalDao {
 		session.save(object);
 		session.getTransaction().commit();
 	}
-	
+
 	/**
 	 * 更新
 	 * 
@@ -56,8 +76,33 @@ public class TotalDao {
 	 * @param object
 	 */
 	public void update(Session session, Object object) {
+		session.clear();
 		session.beginTransaction();
 		session.update(object);
+		session.getTransaction().commit();
+	}
+
+	/**
+	 * 更新或另存为
+	 * 
+	 * @param session
+	 * @param object
+	 */
+	public void saveOrUpdate(Session session, Object object) {
+		session.beginTransaction();
+		session.saveOrUpdate(object);
+		session.getTransaction().commit();
+	}
+
+	/**
+	 * 删除
+	 * 
+	 * @param session
+	 * @param object
+	 */
+	public void delete(Session session, Object object) {
+		session.beginTransaction();
+		session.delete(object);
 		session.getTransaction().commit();
 	}
 }

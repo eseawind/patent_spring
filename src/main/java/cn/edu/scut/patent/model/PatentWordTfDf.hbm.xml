@@ -18,7 +18,7 @@
 			</column>
 		</property>
 		<property name="word" type="java.lang.String">
-			<column name="WORD" length="100" not-null="true">
+			<column name="WORD" length="500" not-null="true">
 				<comment>词汇</comment>
 			</column>
 		</property>

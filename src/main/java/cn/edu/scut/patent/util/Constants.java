@@ -48,4 +48,7 @@ public class Constants {
 	public static int TECHNICAL_MATURE_RATE_NUMBER = 102;
 	// 聚类的指标号码
 	public static int CLUSTER_NUMBER = 103;
+
+	// 聚类专利数的限制，0代表不限制
+	public static int CLUSTER_LIMIT = 100;
 }

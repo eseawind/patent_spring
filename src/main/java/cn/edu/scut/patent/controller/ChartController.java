@@ -8,7 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import cn.edu.scut.patent.dao.DatabaseHelper;
+import cn.edu.scut.patent.service.ClassificationService;
+import cn.edu.scut.patent.service.TrizService;
 import cn.edu.scut.patent.util.StringHelper;
 
 @Controller
@@ -25,7 +26,7 @@ public class ChartController {
 		
 		String dateString = StringHelper.getTime();
 		String X_Categories = "";
-		List<String> listTRIZ = DatabaseHelper.getAllTRIZ();
+		List<String> listTRIZ = new TrizService().getAllTrizString();
 		for(int i = 0; i < listTRIZ.size(); i++){
 			X_Categories += "'" + listTRIZ.get(i) + "'";
 			if(i != listTRIZ.size() - 1){
@@ -34,7 +35,7 @@ public class ChartController {
 		}
 		
 		String Data = "{name: 'TRIZ',data: [";
-		List<String> listCount = DatabaseHelper.getCount();
+		List<String> listCount = new ClassificationService().getCount();
 		for(int i = 0; i < listCount.size(); i++){
 			Data += listCount.get(i);
 			if(i != listCount.size() - 1){

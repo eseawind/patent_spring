@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import ICTCLAS2014.Nlpir;
+import cn.edu.scut.patent.model.Patent;
 import cn.edu.scut.patent.model.PatentFeatureWord;
 import cn.edu.scut.patent.model.PatentMatrix;
 import cn.edu.scut.patent.model.PatentWordTfDf;
@@ -20,6 +21,7 @@ import cn.edu.scut.patent.prework.impl.ClusterImpl;
 import cn.edu.scut.patent.service.DataService;
 import cn.edu.scut.patent.service.PatentClusterService;
 import cn.edu.scut.patent.service.PatentFeatureWordService;
+import cn.edu.scut.patent.service.PatentService;
 import cn.edu.scut.patent.service.PatentWordTfDfService;
 import cn.edu.scut.patent.service.PatentsAfterWordDivideService;
 import cn.edu.scut.patent.service.StopwordService;
@@ -132,151 +134,121 @@ public class Cluster implements ClusterImpl {
 	}
 
 	public void divideWordToDb() {
-		ResultSet rs = null;
-		try {
-			rs = DatabaseHelper.getPatentsKeys();
 
-			PatentsAfterWordDivide pttAWDM;
-			while (rs.next()) {
-				pttAWDM = new PatentsAfterWordDivide();
-				pttAWDM.setPttNum(rs.getString("PTT_NUM"));
-				pttAWDM.setPttDate(rs.getDate("PTT_DATE"));
-				pttAWDM.setClassNumG06Q(rs.getString("CLASS_NUM_G06Q"));
+		List<Patent> list = new PatentService().getPatentsKey();
+		PatentsAfterWordDivide pttAWDM;
+		int count = 0;
+		for (Patent patent : list) {
+			pttAWDM = new PatentsAfterWordDivide();
+			pttAWDM.setPttNum(patent.getPttNum());
+			pttAWDM.setPttDate(patent.getPttDate());
+			pttAWDM.setClassNumG06Q(patent.getClassNumG06Q());
 
-				// 将专利名称和摘要分词
-				pttAWDM.setPttNameDivided(Nlpir.doNlpirString(
-						rs.getString("PTT_NAME"), 0, null, null));
-				pttAWDM.setPttAbstractDivided(Nlpir.doNlpirString(
-						rs.getString("PTT_ABSTRACT"), 0, null, null));
+			// 将专利名称和摘要分词
+			pttAWDM.setPttNameDivided(Nlpir.doNlpirString(patent.getPttName(),
+					0, null, null));
+			pttAWDM.setPttAbstractDivided(Nlpir.doNlpirString(
+					patent.getPttAbstract(), 0, null, null));
 
-				// 存入到patents_after_word_divide数据表
-				new PatentsAfterWordDivideService().save(pttAWDM);
-				// *************************************
-				if (rs.getRow() >= 1000) {
+			// 存入到patents_after_word_divide数据表
+			new PatentsAfterWordDivideService().save(pttAWDM);
+			count++;
+
+			// *************************************
+			// 用于限制聚类的个数
+			if (Constants.CLUSTER_LIMIT > 0) {
+				if (count >= Constants.CLUSTER_LIMIT) {
 					break;
 				}
-				// *************************************
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs != null) {
-					rs.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			// *************************************
 		}
 	}
 
 	public void countTF() {
-		ResultSet rs = null;
-		try {
-			rs = DatabaseHelper.getPatentsFromPATENTS_AFTER_WORD_DIVIDE();
+		List<PatentsAfterWordDivide> list = new PatentsAfterWordDivideService()
+				.getAllPatentsAfterWordDivide();
 
-			PatentsAfterWordDivide pawd;
-			String[] titleArr;
-			String[] abstractArr;
-			String[] contentArr;
-			titleWordDic = new HashMap<String, PatentWordTfDf>();
-			abstractWordDic = new HashMap<String, PatentWordTfDf>();
-			contentWordDic = new HashMap<String, PatentWordTfDf>();
+		PatentsAfterWordDivide pawd;
+		String[] titleArr;
+		String[] abstractArr;
+		String[] contentArr;
+		titleWordDic = new HashMap<String, PatentWordTfDf>();
+		abstractWordDic = new HashMap<String, PatentWordTfDf>();
+		contentWordDic = new HashMap<String, PatentWordTfDf>();
 
-			// 数据集循环
-			while (rs.next()) {
-				pawd = new PatentsAfterWordDivideService().read(rs);
+		// 数据集循环
+		for (PatentsAfterWordDivide patentsAfterWordDivide : list) {
+			pawd = patentsAfterWordDivide;
 
-				String tempStr;
-				// 以空格切开专利名词（折扣/n 卡/n 系统/n ）
-				titleArr = pawd.getPttNameDivided().split(" ");
-				for (int i = 0; i < titleArr.length; i++) {
-					tempStr = titleArr[i];
-					PatentWordTfDf p;
-					// 以word_专利名称为格式判断是否唯一，如果是唯一的tf为1
-					if (titleWordDic.get(tempStr + "_" + pawd.getPttNum()) == null) {
-						p = new PatentWordTfDf();
-						p.setFlag(1); // 1为标题
-						p.setWord(tempStr);
-						p.setPttNum(pawd.getPttNum());
-						titleWordDic.put(tempStr + "_" + pawd.getPttNum(), p);
-					}
-					// 如果不唯一，tf+1
-					else {
-						p = titleWordDic.get(tempStr + "_" + pawd.getPttNum());
-						p.setTf(p.getTf() + 1);
-					}
+			String tempStr;
+			// 以空格切开专利名词（折扣/n 卡/n 系统/n ）
+			titleArr = pawd.getPttNameDivided().split(" ");
+			for (int i = 0; i < titleArr.length; i++) {
+				tempStr = titleArr[i];
+				PatentWordTfDf p;
+				// 以word_专利名称为格式判断是否唯一，如果是唯一的tf为1
+				if (titleWordDic.get(tempStr + "_" + pawd.getPttNum()) == null) {
+					p = new PatentWordTfDf();
+					p.setFlag(1); // 1为标题
+					p.setWord(tempStr);
+					p.setPttNum(pawd.getPttNum());
+					titleWordDic.put(tempStr + "_" + pawd.getPttNum(), p);
 				}
-
-				// 以空格切开专利摘要
-				abstractArr = pawd.getPttAbstractDivided().split(" ");
-				for (int j = 0; j < abstractArr.length; j++) {
-					tempStr = abstractArr[j];
-					if (tempStr.lastIndexOf("/") != -1)
-						tempStr = tempStr
-								.substring(0, tempStr.lastIndexOf("/"));
-					PatentWordTfDf p;
-					if (abstractWordDic.get(tempStr + "_" + pawd.getPttNum()) == null) {
-						p = new PatentWordTfDf();
-						p.setFlag(0); // 0为摘要
-						p.setWord(tempStr);
-						p.setPttNum(pawd.getPttNum());
-						abstractWordDic
-								.put(tempStr + "_" + pawd.getPttNum(), p);
-					} else {
-						p = abstractWordDic.get(tempStr + "_"
-								+ pawd.getPttNum());
-						p.setTf(p.getTf() + 1);
-					}
+				// 如果不唯一，tf+1
+				else {
+					p = titleWordDic.get(tempStr + "_" + pawd.getPttNum());
+					p.setTf(p.getTf() + 1);
 				}
-
-				// 以空格切开专利说明书
-				contentArr = pawd.getPttContentDivided().split(" ");
-				for (int k = 0; k < contentArr.length; k++) {
-					tempStr = contentArr[k];
-					if (tempStr.lastIndexOf("/") != -1) {
-						tempStr = tempStr
-								.substring(0, tempStr.lastIndexOf("/"));
-					}
-					PatentWordTfDf p;
-					if (contentWordDic.get(tempStr + "_" + pawd.getPttNum()) == null) {
-						p = new PatentWordTfDf();
-						p.setFlag(2); // 设定2为专利说明书的内容
-						p.setWord(tempStr);
-						p.setPttNum(pawd.getPttNum());
-						contentWordDic.put(tempStr + "_" + pawd.getPttNum(), p);
-					} else {
-						p = contentWordDic
-								.get(tempStr + "_" + pawd.getPttNum());
-						p.setTf(p.getTf() + 1);
-					}
-				}
-
-				// 判断哈希表长度，防止内存溢出。
-				if (abstractWordDic.size() > 60000
-						|| titleWordDic.size() > 60000
-						|| contentWordDic.size() > 60000) {
-					saveWordDicToDatabase();
-					abstractWordDic = new HashMap<String, PatentWordTfDf>();
-					titleWordDic = new HashMap<String, PatentWordTfDf>();
-					contentWordDic = new HashMap<String, PatentWordTfDf>();
-					System.out.println("长度过长，保存数据，清空哈希表，继续统计！");
-				}
-
-				System.out.println(rs.getRow() + "\t" + "ok!\t"
-						+ pawd.getPttNum() + "\t" + pawd.getPttNameDivided());
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs != null) {
-					rs.close();
+
+			// 以空格切开专利摘要
+			abstractArr = pawd.getPttAbstractDivided().split(" ");
+			for (int j = 0; j < abstractArr.length; j++) {
+				tempStr = abstractArr[j];
+				if (tempStr.lastIndexOf("/") != -1)
+					tempStr = tempStr.substring(0, tempStr.lastIndexOf("/"));
+				PatentWordTfDf p;
+				if (abstractWordDic.get(tempStr + "_" + pawd.getPttNum()) == null) {
+					p = new PatentWordTfDf();
+					p.setFlag(0); // 0为摘要
+					p.setWord(tempStr);
+					p.setPttNum(pawd.getPttNum());
+					abstractWordDic.put(tempStr + "_" + pawd.getPttNum(), p);
+				} else {
+					p = abstractWordDic.get(tempStr + "_" + pawd.getPttNum());
+					p.setTf(p.getTf() + 1);
 				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			}
+
+			// 以空格切开专利说明书
+			contentArr = pawd.getPttContentDivided().split(" ");
+			for (int k = 0; k < contentArr.length; k++) {
+				tempStr = contentArr[k];
+				if (tempStr.lastIndexOf("/") != -1) {
+					tempStr = tempStr.substring(0, tempStr.lastIndexOf("/"));
+				}
+				PatentWordTfDf p;
+				if (contentWordDic.get(tempStr + "_" + pawd.getPttNum()) == null) {
+					p = new PatentWordTfDf();
+					p.setFlag(2); // 设定2为专利说明书的内容
+					p.setWord(tempStr);
+					p.setPttNum(pawd.getPttNum());
+					contentWordDic.put(tempStr + "_" + pawd.getPttNum(), p);
+				} else {
+					p = contentWordDic.get(tempStr + "_" + pawd.getPttNum());
+					p.setTf(p.getTf() + 1);
+				}
+			}
+
+			// 判断哈希表长度，防止内存溢出。
+			if (abstractWordDic.size() > 60000 || titleWordDic.size() > 60000
+					|| contentWordDic.size() > 60000) {
+				saveWordDicToDatabase();
+				abstractWordDic = new HashMap<String, PatentWordTfDf>();
+				titleWordDic = new HashMap<String, PatentWordTfDf>();
+				contentWordDic = new HashMap<String, PatentWordTfDf>();
+				System.out.println("长度过长，保存数据，清空哈希表，继续统计！");
 			}
 		}
 	}
@@ -432,7 +404,7 @@ public class Cluster implements ClusterImpl {
 		ResultSet rs = null;
 		ResultSet pttnumRs = null;
 		try {
-			int n = DatabaseHelper.getSize("patents_after_word_divide");
+			int n = new PatentsAfterWordDivideService().getTableSize();
 			int count = 0;
 			Map<String, Number> wordMaxTFmap = new HashMap<String, Number>();
 			sta = con.createStatement();

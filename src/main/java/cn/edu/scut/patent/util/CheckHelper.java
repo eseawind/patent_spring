@@ -20,7 +20,7 @@ public class CheckHelper {
 	 */
 	public static void printKeyWords(Analyzer analyzer, Patent patent)
 			throws IOException {
-		Map<String, String> map = new PatentService().getAll(patent);
+		Map<String, String> map = new PatentService().getAllPatentProperties(patent);
 		System.out.println("当前使用的分词器：" + analyzer.getClass().getSimpleName());
 		if (map != null) {
 			Set<String> keySet = map.keySet();

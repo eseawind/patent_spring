@@ -10,7 +10,7 @@ import cn.edu.scut.patent.model.IndicatorData;
 import cn.edu.scut.patent.model.IndicatorParam;
 import cn.edu.scut.patent.model.IndicatorValueItem;
 import cn.edu.scut.patent.model.Patent;
-import cn.edu.scut.patent.dao.DatabaseHelper;
+import cn.edu.scut.patent.service.PatentClusterService;
 import cn.edu.scut.patent.util.StringHelper;
 
 public class Indicator {
@@ -182,8 +182,8 @@ public class Indicator {
 			}
 			for (Patent patentdao : patentList) {
 				String temp_PTT_NUM = patentdao.getPttNum();
-				int clusterNumber = DatabaseHelper
-						.getClusterNumber(temp_PTT_NUM);
+				int clusterNumber = new PatentClusterService()
+						.find(temp_PTT_NUM);
 				if (clusterNumber != -1) {
 					String classNumG06Q = patentdao.getClassNumG06Q()
 							.replaceAll(" ", "").substring(0, 9);

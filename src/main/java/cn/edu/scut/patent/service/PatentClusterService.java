@@ -20,7 +20,7 @@ public class PatentClusterService extends TotalService {
 	public static void cleanTable() {
 		PatentClusterDao.cleanTable(session);
 	}
-	
+
 	/**
 	 * 保存
 	 * 
@@ -28,5 +28,18 @@ public class PatentClusterService extends TotalService {
 	 */
 	public void save(PatentCluster patentCluster) {
 		new PatentClusterDao().save(session, patentCluster);
+	}
+
+	/**
+	 * 获取具体专利文献的聚类数据，返回该专利的聚类号；如果不存在就返回-1
+	 * 
+	 * @return
+	 */
+	public int find(String pttNum) {
+		if (isEmpty()) {
+			return -1;
+		} else {
+			return new PatentClusterDao().find(session, pttNum);
+		}
 	}
 }

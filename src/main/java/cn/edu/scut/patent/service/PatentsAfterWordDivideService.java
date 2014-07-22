@@ -2,6 +2,7 @@ package cn.edu.scut.patent.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import cn.edu.scut.patent.dao.PatentsAfterWordDivideDao;
 import cn.edu.scut.patent.model.PatentsAfterWordDivide;
 
@@ -22,7 +23,16 @@ public class PatentsAfterWordDivideService extends TotalService {
 	public static void cleanTable() {
 		PatentsAfterWordDivideDao.cleanTable(session);
 	}
-	
+
+	/**
+	 * 获取表格长度
+	 * 
+	 * @return
+	 */
+	public int getTableSize() {
+		return new PatentsAfterWordDivideDao().getTableSize(session);
+	}
+
 	/**
 	 * 保存
 	 * 
@@ -31,7 +41,17 @@ public class PatentsAfterWordDivideService extends TotalService {
 	public void save(PatentsAfterWordDivide patentsAfterWordDivide) {
 		new PatentsAfterWordDivideDao().save(session, patentsAfterWordDivide);
 	}
-	
+
+	/**
+	 * 获取所有的PatentsAfterWordDivide数据
+	 * 
+	 * @return
+	 */
+	public List<PatentsAfterWordDivide> getAllPatentsAfterWordDivide() {
+		return new PatentsAfterWordDivideDao()
+				.getAllPatentsAfterWordDivide(session);
+	}
+
 	/**
 	 * 根据结果集生成PatentsAfterWordDivide并返回
 	 * 

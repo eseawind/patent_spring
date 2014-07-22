@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.TextField;
+import ICTCLAS2014.Nlpir;
 import cn.edu.scut.patent.dao.PatentDao;
 import cn.edu.scut.patent.model.Patent;
 
@@ -37,12 +42,92 @@ public class PatentService extends TotalService {
 	}
 
 	/**
+	 * 获取所有的专利数据
+	 * 
+	 * @return
+	 */
+	public List<Patent> getAllPatents() {
+		return new PatentDao().getAllPatents(session);
+	}
+
+	/**
+	 * 获取PATENTS所有专利关键属性的数据
+	 * 
+	 * @return
+	 */
+	public List<Patent> getPatentsKey() {
+		return new PatentDao().getPatentsKey(session);
+	}
+
+	/**
+	 * 从数据库获取索引数据
+	 * 
+	 * @param analyzer
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Document> getDocumentsFromPatents(Analyzer analyzer)
+			throws Exception {
+		List<Patent> listPatent = getAllPatents();
+		if (listPatent == null || listPatent.size() == 0) {
+			return null;
+		}
+		List<Document> listDocument = new ArrayList<Document>();
+		for (int i = 0; i < listPatent.size(); i++) {
+			Patent pttDao = listPatent.get(i);
+			Document document = new Document();
+			document.add(new TextField("PTT_TYPE", pttDao.getPttType(),
+					Field.Store.YES));
+			document.add(new TextField("APPLY_NUM", pttDao.getApplyNum(),
+					Field.Store.YES));
+			document.add(new TextField("APPLY_DATE", pttDao.getApplyDate()
+					.toString(), Field.Store.YES));
+			System.out.println(pttDao.getPttName());
+			document.add(new TextField("PTT_NAME", Nlpir.doNlpirString(
+					pttDao.getPttName(), 0, null, null), Field.Store.YES));
+			document.add(new TextField("PTT_NUM", pttDao.getPttNum(),
+					Field.Store.YES));
+			document.add(new TextField("PTT_DATE", pttDao.getPttDate()
+					.toString(), Field.Store.YES));
+			document.add(new TextField("PTT_MAIN_CLASS_NUM", Nlpir
+					.doNlpirString(pttDao.getPttMainClassNum(), 0, null, null),
+					Field.Store.YES));
+			document.add(new TextField("PTT_CLASS_NUM", Nlpir.doNlpirString(
+					pttDao.getPttClassNum(), 0, null, null), Field.Store.YES));
+			document.add(new TextField("PROPOSER", Nlpir.doNlpirString(
+					pttDao.getProposer(), 0, null, null), Field.Store.YES));
+			document.add(new TextField("PROPOSER_ADDRESS", Nlpir.doNlpirString(
+					pttDao.getProposerAddress(), 0, null, null),
+					Field.Store.YES));
+			document.add(new TextField("INVENTOR", Nlpir.doNlpirString(
+					pttDao.getInventor(), 0, null, null), Field.Store.YES));
+			document.add(new TextField("INTERNATIONAL_APPLY", Nlpir
+					.doNlpirString(pttDao.getInternationalApply(), 0, null,
+							null), Field.Store.YES));
+			document.add(new TextField("INTERNATIONAL_PUBLICATION", Nlpir
+					.doNlpirString(pttDao.getInternationalPublication(), 0,
+							null, null), Field.Store.YES));
+			document.add(new TextField("INTO_DATE", pttDao.getIntoDate()
+					.toString(), Field.Store.YES));
+			document.add(new TextField("PTT_AGENCY_ORG", Nlpir.doNlpirString(
+					pttDao.getPttAgencyOrg(), 0, null, null), Field.Store.YES));
+			document.add(new TextField("PTT_AGENCY_PERSON", Nlpir
+					.doNlpirString(pttDao.getPttAgencyPerson(), 0, null, null),
+					Field.Store.YES));
+			document.add(new TextField("PTT_ABSTRACT", Nlpir.doNlpirString(
+					pttDao.getPttAbstract(), 0, null, null), Field.Store.YES));
+			listDocument.add(document);
+		}
+		return listDocument;
+	}
+
+	/**
 	 * 以Map<String, String>的形式返回Patent的所有属性
 	 * 
 	 * @param patent
 	 * @return
 	 */
-	public Map<String, String> getAll(Patent patent) {
+	public Map<String, String> getAllPatentProperties(Patent patent) {
 		Map<String, String> map = new HashMap<String, String>();
 		if (patent.getApplyNum() != null) {
 			map.put("APPLY_NUM", patent.getApplyNum());

@@ -47,8 +47,8 @@ public class Index implements IndexImpl {
 		config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
 		// config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
 		IndexWriter indexWriter = new IndexWriter(directory, config);
-		List<Document> listDocument = DatabaseHelper
-				.getDocumentFromDatabase(analyzer);
+		List<Document> listDocument = new PatentService()
+				.getDocumentsFromPatents(analyzer);
 		if (listDocument == null || listDocument.size() == 0) {
 			return;
 		}

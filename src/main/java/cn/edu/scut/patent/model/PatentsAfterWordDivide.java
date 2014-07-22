@@ -23,7 +23,7 @@ public class PatentsAfterWordDivide implements Serializable {
 	// 已分词的专利概述
 	private String pttAbstractDivided;
 	// 已分词的专利内容
-	private String pttContentDivided;
+	private String pttContentDivided = "testing";
 
 	public String getPttNum() {
 		return pttNum;

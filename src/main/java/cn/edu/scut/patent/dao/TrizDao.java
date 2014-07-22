@@ -1,5 +1,7 @@
 package cn.edu.scut.patent.dao;
 
+import java.util.List;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import cn.edu.scut.patent.model.Triz;
 
@@ -255,5 +257,19 @@ public class TrizDao extends TotalDao {
 		triz40.setTrizNum(40);
 		triz40.setTrizText("复合材料原理");
 		save(session, triz40);
+	}
+	
+	/**
+	 * 获取所有的TRIZ
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Triz> getAllTriz(Session session) {
+		session.beginTransaction();
+		Query query = session.createQuery("from Triz");
+		session.getTransaction().commit();
+		List<Triz> list = query.list();
+		return list;
 	}
 }
