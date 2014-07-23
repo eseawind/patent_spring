@@ -1,7 +1,6 @@
 package cn.edu.scut.patent.service;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.List;
 import cn.edu.scut.patent.dao.PatentFeatureWordDao;
 import cn.edu.scut.patent.model.PatentFeatureWord;
 
@@ -40,25 +39,23 @@ public class PatentFeatureWordService extends TotalService {
 	public void update(PatentFeatureWord patentFeatureWord) {
 		new PatentFeatureWordDao().update(session, patentFeatureWord);
 	}
-	
+
 	/**
-	 * 根据结果集生成PatentFeatureWord并返回
+	 * 获取所有的pttNum
 	 * 
-	 * @param rs
 	 * @return
 	 */
-	public PatentFeatureWord read(ResultSet rs) {
-		PatentFeatureWord patentFeatureWord = new PatentFeatureWord();
-		try {
-			patentFeatureWord.setId(rs.getInt("ID"));
-			patentFeatureWord.setPttNum(rs.getString("PTT_NUM"));
-			patentFeatureWord.setFeatureWord(rs.getString("FEATURE_WORD"));
-			patentFeatureWord.setTfIdfValue(rs.getDouble("TFIDF_VALUE"));
-			patentFeatureWord.setTfIdfValueStandard(rs
-					.getDouble("TFIDF_VALUE_STANDARD"));
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return patentFeatureWord;
+	public List<String> getAllPttNum() {
+		return new PatentFeatureWordDao().getAllPttNum(session);
+	}
+
+	/**
+	 * 根据pttNum获取符合要求的数据
+	 * 
+	 * @param pttNum
+	 * @return
+	 */
+	public List<PatentFeatureWord> getAllFromPttNum(String pttNum) {
+		return new PatentFeatureWordDao().getAllFromPttNum(session, pttNum);
 	}
 }

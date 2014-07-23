@@ -13,7 +13,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import cn.edu.scut.patent.ICTCLASAnalyzer.ICTCLASAnalyzer;
 import cn.edu.scut.patent.core.impl.IndexImpl;
-import cn.edu.scut.patent.dao.DatabaseHelper;
+import cn.edu.scut.patent.util.DatabaseHelper;
 import cn.edu.scut.patent.prework.GetPatentsFromNetwork;
 import cn.edu.scut.patent.prework.SaveHtmlPatentsDataToMysql;
 import cn.edu.scut.patent.service.PatentService;

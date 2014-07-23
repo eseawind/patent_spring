@@ -1,7 +1,6 @@
 package cn.edu.scut.patent.service;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.List;
 import cn.edu.scut.patent.dao.WordInfoDao;
 import cn.edu.scut.patent.model.WordInfo;
 
@@ -22,7 +21,7 @@ public class WordInfoService extends TotalService {
 	public static void cleanTable() {
 		WordInfoDao.cleanTable(session);
 	}
-	
+
 	/**
 	 * 保存
 	 * 
@@ -31,22 +30,13 @@ public class WordInfoService extends TotalService {
 	public void save(WordInfo wordInfo) {
 		new WordInfoDao().save(session, wordInfo);
 	}
-	
+
 	/**
-	 * 根据结果集读取并返回
+	 * 获取表格中所有的数据
 	 * 
-	 * @param rs
 	 * @return
 	 */
-	public WordInfo read(ResultSet rs) {
-		WordInfo wordInfo = new WordInfo();
-		try {
-			wordInfo.setWord(rs.getString("WORD"));
-			wordInfo.setMaxTf(rs.getInt("MAX_TF"));
-			wordInfo.setDf(rs.getInt("DF"));
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return wordInfo;
+	public List<WordInfo> getAll() {
+		return new WordInfoDao().getAll(session);
 	}
 }

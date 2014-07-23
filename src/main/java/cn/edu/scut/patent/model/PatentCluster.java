@@ -16,6 +16,15 @@ public class PatentCluster implements Serializable {
 	// 专利聚类号
 	private int cluster;
 
+	public PatentCluster() {
+
+	}
+
+	public PatentCluster(String pttNum, int cluster) {
+		this.pttNum = pttNum;
+		this.cluster = cluster;
+	}
+
 	public String getPttNum() {
 		return pttNum;
 	}

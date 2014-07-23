@@ -38,6 +38,21 @@ public class PatentDao extends TotalDao {
 	}
 
 	/**
+	 * 获取所有的pttNum
+	 * 
+	 * @param session
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<String> getAllPttNum(Session session) {
+		session.beginTransaction();
+		Query query = session.createQuery("select pttNum from Patent");
+		session.getTransaction().commit();
+		List<String> list = query.list();
+		return list;
+	}
+
+	/**
 	 * 查找
 	 * 
 	 * @param session

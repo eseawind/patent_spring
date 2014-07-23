@@ -9,6 +9,16 @@ public class Data implements Serializable {
 	private int j;
 	private double distance;
 
+	public Data() {
+
+	}
+
+	public Data(int i, int j, double distance) {
+		this.i = i;
+		this.j = j;
+		this.distance = distance;
+	}
+
 	public int getI() {
 		return i;
 	}

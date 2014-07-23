@@ -1,9 +1,6 @@
 package cn.edu.scut.patent.prework;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,7 +8,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import ICTCLAS2014.Nlpir;
+import cn.edu.scut.patent.model.Data;
 import cn.edu.scut.patent.model.Patent;
+import cn.edu.scut.patent.model.PatentCluster;
 import cn.edu.scut.patent.model.PatentFeatureWord;
 import cn.edu.scut.patent.model.PatentMatrix;
 import cn.edu.scut.patent.model.PatentWordTfDf;
@@ -28,7 +27,7 @@ import cn.edu.scut.patent.service.StopwordService;
 import cn.edu.scut.patent.service.WordInfoService;
 import cn.edu.scut.patent.service.WordSmarkService;
 import cn.edu.scut.patent.util.Constants;
-import cn.edu.scut.patent.dao.DatabaseHelper;
+import cn.edu.scut.patent.util.DatabaseHelper;
 import cn.edu.scut.patent.util.StringHelper;
 
 /**
@@ -279,265 +278,134 @@ public class Cluster implements ClusterImpl {
 	}
 
 	public void countDF() {
-		Statement sta = null;
-		ResultSet rs = null;
-		Statement tempSta1 = null;
-		Statement tempSta2 = null;
-		ResultSet tempRs1 = null;
-		ResultSet tempRs2 = null;
-		try {
-			sta = con.createStatement();
-			rs = sta.executeQuery("SELECT DISTINCT WORD FROM PATENT_WORD_TF_DF");
+		List<String> list = new PatentWordTfDfService().getAllWord();
+		int count = 0;
+		for (String word : list) {
+			System.out.println(count++ + "\t" + word);
+			List<PatentWordTfDf> listPatentWordTfDf = new PatentWordTfDfService()
+					.getAllFromWord(word);
+			// 统计某词出现的文档频率
+			List<String> listPttNum = new PatentWordTfDfService()
+					.getAllPttNumFromWord(word);
+			int df = listPttNum.size();
+			System.out.println("DF : " + df);
 
-			// int count = 0;
-			while (rs.next()) {
-				System.out.println(rs.getRow() + "\t" + rs.getString("WORD"));
-
-				tempSta1 = con.createStatement(ResultSet.TYPE_FORWARD_ONLY,
-						ResultSet.CONCUR_UPDATABLE);
-				tempRs1 = tempSta1
-						.executeQuery("SELECT * FROM PATENT_WORD_TF_DF WHERE WORD='"
-								+ rs.getString(1) + "'");
-
-				// 统计某词出现的文档频率
-				tempSta2 = con.createStatement();
-				tempRs2 = tempSta2
-						.executeQuery("SELECT DISTINCT PTT_NUM FROM PATENT_WORD_TF_DF WHERE WORD='"
-								+ rs.getString(1) + "'");
-				int f = DatabaseHelper.getSize(tempRs2);
-
-				System.out.println("DF : " + f);
-				while (tempRs1.next()) {
-					tempRs1.updateInt(5, f);
-					tempRs1.updateRow();
-				}
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs != null) {
-					rs.close();
-				}
-				if (tempRs1 != null) {
-					tempRs1.close();
-				}
-				if (tempRs2 != null) {
-					tempRs2.close();
-				}
-				if (sta != null) {
-					sta.close();
-				}
-				if (tempSta1 != null) {
-					tempSta1.close();
-				}
-				if (tempSta2 != null) {
-					tempSta2.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			for (PatentWordTfDf patentWordTfDf : listPatentWordTfDf) {
+				patentWordTfDf.setDf(df);
+				new PatentWordTfDfService().update(patentWordTfDf);
 			}
 		}
 	}
 
 	public void extractFeatureWord() {
 		Map<String, Number> wordMaxTFmap = new HashMap<String, Number>();
-		Statement sta = null;
-		ResultSet rs1 = null;
-		ResultSet rs2 = null;
-		try {
-			int count = 0;
-			sta = con.createStatement();
-			rs1 = sta
-					.executeQuery("SELECT DISTINCT WORD FROM patent_word_tf_df");
-			int tempNum;
-			String word;
-			WordInfo tempWim;
-			while (rs1.next()) {
-				tempNum = 0;
-				sta = con.createStatement();
-				word = rs1.getString(1);
-				rs2 = sta
-						.executeQuery("select * from patent_word_tf_df where WORD='"
-								+ word + "'");
-				int df = 1;
-				while (rs2.next()) {
-					df = rs2.getInt(5);
-					tempNum = Math.max(tempNum, rs2.getInt(4));
-				}
-				wordMaxTFmap.put(word, tempNum);
+		int count = 0;
+		List<String> listWord = new PatentWordTfDfService().getAllWord();
+		int tempNum;
+		WordInfo tempWim;
+		for (String word : listWord) {
+			tempNum = 0;
+			List<PatentWordTfDf> listPatentWordTfDf = new PatentWordTfDfService()
+					.getAllFromWord(word);
+			int df = 1;
+			for (PatentWordTfDf patentWordTfDf : listPatentWordTfDf) {
+				df = patentWordTfDf.getDf();
+				tempNum = Math.max(tempNum, patentWordTfDf.getTf());
+			}
+			wordMaxTFmap.put(word, tempNum);
 
-				// 保存进数据库
-				tempWim = new WordInfo();
-				tempWim.setWord(word);
-				tempWim.setMaxTf(tempNum);
-				tempWim.setDf(df);
-				new WordInfoService().save(tempWim);
-				count++;
-				System.out.println("map count:" + count + "\tkey:" + word
-						+ "\tvalue:" + tempNum);
-			}
-			System.out.println("map保存成功！");
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs1 != null) {
-					rs1.close();
-				}
-				if (rs2 != null) {
-					rs2.close();
-				}
-				if (sta != null) {
-					sta.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			// 保存进数据库
+			tempWim = new WordInfo();
+			tempWim.setWord(word);
+			tempWim.setMaxTf(tempNum);
+			tempWim.setDf(df);
+			new WordInfoService().save(tempWim);
+			count++;
+			System.out.println("map count:" + count + "\tkey:" + word
+					+ "\tvalue:" + tempNum);
 		}
+		System.out.println("map保存成功！");
 	}
 
 	public void countAndSaveToDb(int size) {
-		Statement sta = null;
-		ResultSet rs = null;
-		ResultSet pttnumRs = null;
-		try {
-			int n = new PatentsAfterWordDivideService().getTableSize();
-			int count = 0;
-			Map<String, Number> wordMaxTFmap = new HashMap<String, Number>();
-			sta = con.createStatement();
-			rs = sta.executeQuery("select * from t_word_info");
-			while (rs.next()) {
-				wordMaxTFmap.put(rs.getString("WORD"), rs.getInt("MAX_TF"));
-			}
-			System.out.println(wordMaxTFmap.get("web"));
-			System.out.println(wordMaxTFmap.size());
+		int n = new PatentsAfterWordDivideService().getTableSize();
+		int count = 0;
+		Map<String, Number> wordMaxTFmap = new HashMap<String, Number>();
+		List<WordInfo> listWordInfo = new WordInfoService().getAll();
 
-			sta = con.createStatement();
-			rs = sta.executeQuery("SELECT DISTINCT PTT_NUM FROM patent_word_tf_df");
-			String pttnum;
-			ArrayList<PatentFeatureWord> tempArr;
-			while (rs.next()) {
-				tempArr = new ArrayList<PatentFeatureWord>();
-				sta = con.createStatement();
-				pttnum = rs.getString(1);
-				pttnumRs = sta
-						.executeQuery("select * from patent_word_tf_df where PTT_NUM='"
-								+ pttnum + "'");
+		for (WordInfo wordInfo : listWordInfo) {
+			wordMaxTFmap.put(wordInfo.getWord(), wordInfo.getMaxTf());
+		}
+		System.out.println(wordMaxTFmap.get("web"));
+		System.out.println(wordMaxTFmap.size());
 
-				while (pttnumRs.next()) {
-					int tf = pttnumRs.getInt(4);
-					int maxTf = 0;
-					if (wordMaxTFmap.get(pttnumRs.getString(3)) == null) {
-						System.out.println(pttnumRs.getString(3)
-								+ "\tnullpointerexception!");
-						continue;
-					} else {
-						maxTf = wordMaxTFmap.get(pttnumRs.getString(3))
-								.intValue();
-					}
-					int df = pttnumRs.getInt(5);
-					Number tempValue = (0.5 + 0.5 * tf / maxTf)
-							* (Math.log(n / df));
-					PatentFeatureWord pfwm = new PatentFeatureWord(pttnum,
-							pttnumRs.getString(3), tempValue.doubleValue());
-					tempArr.add(pfwm);
+		List<String> listPttNum = new PatentWordTfDfService().getAllPttNum();
+		ArrayList<PatentFeatureWord> tempArr;
+		for (String pttNum : listPttNum) {
+			tempArr = new ArrayList<PatentFeatureWord>();
+
+			List<PatentWordTfDf> listPatentWordTfDf = new PatentWordTfDfService()
+					.getAllFromPttNum(pttNum);
+			for (PatentWordTfDf patentWordTfDf : listPatentWordTfDf) {
+				int tf = patentWordTfDf.getTf();
+				int maxTf = 0;
+				if (wordMaxTFmap.get(patentWordTfDf.getWord()) == null) {
+					System.out.println(patentWordTfDf.getWord()
+							+ "\tnullpointerexception!");
+					continue;
+				} else {
+					maxTf = wordMaxTFmap.get(patentWordTfDf.getWord())
+							.intValue();
 				}
+				int df = patentWordTfDf.getDf();
+				Number tempValue = (0.5 + 0.5 * tf / maxTf)
+						* (Math.log(n / df));
+				PatentFeatureWord pfwm = new PatentFeatureWord(pttNum,
+						patentWordTfDf.getWord(), tempValue.doubleValue());
+				tempArr.add(pfwm);
+			}
 
-				for (int i = 0; i < tempArr.size() - 1; i++) {
-					for (int j = i + 1; j < tempArr.size(); j++) {
-						if (tempArr.get(i).getTfIdfValue() < tempArr.get(j)
-								.getTfIdfValue()) {
-							PatentFeatureWord tempPfwm = tempArr.get(i);
-							tempArr.set(i, tempArr.get(j));
-							tempArr.set(j, tempPfwm);
-						}
+			for (int i = 0; i < tempArr.size() - 1; i++) {
+				for (int j = i + 1; j < tempArr.size(); j++) {
+					if (tempArr.get(i).getTfIdfValue() < tempArr.get(j)
+							.getTfIdfValue()) {
+						PatentFeatureWord tempPfwm = tempArr.get(i);
+						tempArr.set(i, tempArr.get(j));
+						tempArr.set(j, tempPfwm);
 					}
 				}
+			}
 
-				int len = Math.min(size, tempArr.size());
-				for (int m = 0; m < len; m++) {
-					// 写入数据库
-					new PatentFeatureWordService().save(tempArr.get(m));
-				}
-				count++;
-				System.out.println("第" + count + "个专利" + pttnum + "的特征词数量为"
-						+ len);
+			int len = Math.min(size, tempArr.size());
+			for (int m = 0; m < len; m++) {
+				// 写入数据库
+				new PatentFeatureWordService().save(tempArr.get(m));
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (sta != null) {
-					sta.close();
-				}
-				if (rs != null) {
-					rs.close();
-				}
-				if (pttnumRs != null) {
-					pttnumRs.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			count++;
+			System.out.println("第" + count + "个专利" + pttNum + "的特征词数量为" + len);
 		}
 	}
 
 	public void countStandardTFIDF() {
-		Statement sta = null;
-		ResultSet rs = null;
-		Statement sta2 = null;
-		ResultSet rs2 = null;
-		try {
-			sta = con.createStatement();
-			rs = sta.executeQuery("select PTT_NUM from patents");
-			while (rs.next()) {
-				String pttNum = rs.getString(1);
-				sta2 = con.createStatement();
-				rs2 = sta2
-						.executeQuery("select * from patent_feature_word where PTT_NUM='"
-								+ pttNum + "'");
-				List<PatentFeatureWord> pfwnList = new ArrayList<PatentFeatureWord>();
-				while (rs2.next()) {
-					PatentFeatureWord pfwm = new PatentFeatureWordService()
-							.read(rs2);
-					pfwnList.add(pfwm);
-				}
-				double sum = 0;
-				for (int i = 0; i < pfwnList.size(); i++) {
-					sum += Math.pow(pfwnList.get(i).getTfIdfValue(), 2);
-				}
-				sum = Math.sqrt(sum);
-				for (int j = 0; j < pfwnList.size(); j++) {
-					PatentFeatureWord p = pfwnList.get(j);
-					p.setTfIdfValueStandard(p.getTfIdfValue() / sum);
-					new PatentFeatureWordService().update(p);
-				}
-				System.out.println(pttNum);
+		List<String> listPttNum = new PatentService().getAllPttNum();
+		for (String pttNum : listPttNum) {
+			List<PatentFeatureWord> listPatentFeatureWord = new PatentFeatureWordService()
+					.getAllFromPttNum(pttNum);
+			double sum = 0;
+			for (int i = 0; i < listPatentFeatureWord.size(); i++) {
+				sum += Math
+						.pow(listPatentFeatureWord.get(i).getTfIdfValue(), 2);
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs2 != null) {
-					rs2.close();
-				}
-				if (rs != null) {
-					rs.close();
-				}
-				if (sta2 != null) {
-					sta2.close();
-				}
-				if (sta != null) {
-					sta.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+
+			sum = Math.sqrt(sum);
+			for (int j = 0; j < listPatentFeatureWord.size(); j++) {
+				PatentFeatureWord patentFeatureWord = listPatentFeatureWord
+						.get(j);
+				patentFeatureWord.setTfIdfValueStandard(patentFeatureWord
+						.getTfIdfValue() / sum);
+				new PatentFeatureWordService().update(patentFeatureWord);
 			}
+			System.out.println(pttNum);
 		}
 	}
 
@@ -545,64 +413,32 @@ public class Cluster implements ClusterImpl {
 	public void clusterByCJX(int k) {
 		List<PatentMatrix> pttMatrix = new ArrayList<PatentMatrix>();
 		int n = 0;
-		Statement sta = null;
-		ResultSet rs = null;
-		Statement sta2 = null;
-		ResultSet rs2 = null;
-		try {
-			sta = con.createStatement();
-			rs = sta.executeQuery("select PTT_NUM from patents");
-			while (rs.next()) {
-				String pttNum = rs.getString(1);
-				PatentMatrix pm = new PatentMatrix();
-				pm.pttNum = pttNum;
 
-				sta2 = con.createStatement();
-				rs2 = sta2
-						.executeQuery("select * from patent_feature_word where PTT_NUM='"
-								+ pttNum + "'");
-				int index = 0;
-				double sum = 0;
-				while (rs2.next()) {
-					PatentFeatureWord pfwm = new PatentFeatureWordService()
-							.read(rs2);
-					pm.value[index] = pfwm.getTfIdfValueStandard();
-					sum += pm.value[index] * pm.value[index];
-					index += 1;
-				}
-				for (int t = index; t < 20; t++) {
-					pm.value[t] = 0;
-				}
-				pttMatrix.add(pm);
+		List<String> listPttNum = new PatentService().getAllPttNum();
+		for (String pttNum : listPttNum) {
+			PatentMatrix pm = new PatentMatrix();
+			pm.pttNum = pttNum;
 
-				System.out.println(":" + n);
-				System.out.println("" + sum);
-				// if(n == 100)
-				// {
-				// break;
-				// }
-				n++;
+			List<PatentFeatureWord> listPatentFeatureWord = new PatentFeatureWordService()
+					.getAllFromPttNum(pttNum);
+			int index = 0;
+			double sum = 0;
+			for (PatentFeatureWord patentFeatureWord : listPatentFeatureWord) {
+				pm.value[index] = patentFeatureWord.getTfIdfValueStandard();
+				sum += pm.value[index] * pm.value[index];
+				index += 1;
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs2 != null) {
-					rs2.close();
-				}
-				if (rs != null) {
-					rs.close();
-				}
-				if (sta2 != null) {
-					sta2.close();
-				}
-				if (sta != null) {
-					sta.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			for (int t = index; t < 20; t++) {
+				pm.value[t] = 0;
 			}
+			pttMatrix.add(pm);
+			System.out.println(":" + n);
+			System.out.println("" + sum);
+			// if(n == 100)
+			// {
+			// break;
+			// }
+			n++;
 		}
 
 		// 变量定义
@@ -676,26 +512,9 @@ public class Cluster implements ClusterImpl {
 			count++;
 		}
 
-		Statement sta3 = null;
-		for (int ii = 0; ii < n; ii++) {
-			try {
-				sta3 = con.createStatement();
-				sta3.execute("INSERT INTO patent_cluster (PTT_NUM,CLUSTER) VALUES ('"
-						+ pttMatrix.get(ii).pttNum
-						+ "',"
-						+ clusterAssignments[ii] + ")");
-			} catch (SQLException e) {
-				e.printStackTrace();
-			} finally {
-				try {
-					if (sta3 != null) {
-						sta3.close();
-					}
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
+		for (int i = 0; i < n; i++) {
+			new PatentClusterService().save(new PatentCluster(
+					pttMatrix.get(i).pttNum, clusterAssignments[i]));
 		}
 		System.out.println("聚类成功！");
 	}
@@ -706,58 +525,26 @@ public class Cluster implements ClusterImpl {
 		System.out.println("以专利为单位，存储所有专利所有特征词的权重");
 		List<PatentMatrix> pttMatrix = new ArrayList<PatentMatrix>();
 		int n = 0;
-		Statement sta = null;
-		ResultSet rs = null;
-		Statement sta2 = null;
-		ResultSet rs2 = null;
-		try {
-			sta = con.createStatement();
-			rs = sta.executeQuery("SELECT DISTINCT PTT_NUM FROM PATENT_FEATURE_WORD");
-			while (rs.next()) {
-				String pttNum = rs.getString(1);
-				PatentMatrix pm = new PatentMatrix();
-				pm.pttNum = pttNum;
-				sta2 = con.createStatement();
-				rs2 = sta2
-						.executeQuery("select * from patent_feature_word where PTT_NUM='"
-								+ pttNum + "'");
-				int index = 0;
-				double sum = 0;
-				while (rs2.next()) {
-					PatentFeatureWord pfwm = new PatentFeatureWordService()
-							.read(rs2);
-					pm.value[index] = pfwm.getTfIdfValueStandard();
-					sum += pm.value[index] * pm.value[index];
-					index += 1;
-				}
-				for (int t = index; t < 20; t++) {
-					pm.value[t] = 0;
-				}
-				pttMatrix.add(pm);
-				System.out.println("第" + n + "个专利");
-				System.out.println("权重平方和为:" + sum);
-				n++;
+		List<String> listPttNum = new PatentFeatureWordService().getAllPttNum();
+		for (String pttNum : listPttNum) {
+			PatentMatrix pm = new PatentMatrix();
+			pm.pttNum = pttNum;
+			List<PatentFeatureWord> listPatentFeatureWord = new PatentFeatureWordService()
+					.getAllFromPttNum(pttNum);
+			int index = 0;
+			double sum = 0;
+			for (PatentFeatureWord patentFeatureWord : listPatentFeatureWord) {
+				pm.value[index] = patentFeatureWord.getTfIdfValueStandard();
+				sum += pm.value[index] * pm.value[index];
+				index += 1;
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs2 != null) {
-					rs2.close();
-				}
-				if (rs != null) {
-					rs.close();
-				}
-				if (sta2 != null) {
-					sta2.close();
-				}
-				if (sta != null) {
-					sta.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			for (int t = index; t < 20; t++) {
+				pm.value[t] = 0;
 			}
+			pttMatrix.add(pm);
+			System.out.println("第" + n + "个专利");
+			System.out.println("权重平方和为:" + sum);
+			n++;
 		}
 
 		// 变量定义
@@ -837,26 +624,9 @@ public class Cluster implements ClusterImpl {
 			count++;
 		}
 
-		for (int ii = 0; ii < n; ii++) {
-			Statement sta3 = null;
-			try {
-				sta3 = con.createStatement();
-				sta3.execute("INSERT INTO patent_cluster (PTT_NUM,CLUSTER) VALUES ('"
-						+ pttMatrix.get(ii).pttNum
-						+ "',"
-						+ clusterAssignments[ii] + ")");
-			} catch (SQLException e) {
-				e.printStackTrace();
-			} finally {
-				try {
-					if (sta3 != null) {
-						sta3.close();
-					}
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
+		for (int i = 0; i < n; i++) {
+			new PatentClusterService().save(new PatentCluster(
+					pttMatrix.get(i).pttNum, clusterAssignments[i]));
 		}
 		System.out.println("聚类成功！");
 	}
@@ -877,39 +647,17 @@ public class Cluster implements ClusterImpl {
 		// }
 
 		// *********************************
-		Statement sta = null;
-		try {
-			sta = con.createStatement();
-			DataService.cleanTable();
 
-			for (int j = 0; j < len; j++) {
-				for (int i = j; i < len; i++) {
-					String sql_insert_table_DATA = "";
-					if (i == j) {
-						sql_insert_table_DATA = "INSERT INTO DATA (I, J, DISTANCE) VALUES ("
-								+ i + ", " + j + ", " + 0 + ");";
-						sta.execute(sql_insert_table_DATA);
-					} else {
-						double dis = getDistance(cluster.get(i), cluster.get(j));
-						sql_insert_table_DATA = "INSERT INTO DATA (I, J, DISTANCE) VALUES ("
-								+ i + ", " + j + ", " + dis + ");";
-						sta.execute(sql_insert_table_DATA);
-						sql_insert_table_DATA = "INSERT INTO DATA (I, J, DISTANCE) VALUES ("
-								+ j + ", " + i + ", " + dis + ");";
-						sta.execute(sql_insert_table_DATA);
-					}
+		DataService.cleanTable();
+		for (int j = 0; j < len; j++) {
+			for (int i = j; i < len; i++) {
+				if (i == j) {
+					new DataService().save(new Data(i, j, 0));
+				} else {
+					double dis = getDistance(cluster.get(i), cluster.get(j));
+					new DataService().save(new Data(i, j, dis));
+					new DataService().save(new Data(j, i, dis));
 				}
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (sta != null) {
-					sta.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
 
@@ -979,33 +727,7 @@ public class Cluster implements ClusterImpl {
 	 * @author Vincent_Melancholy
 	 */
 	public double countStandardDiviationByQYJ(int n) {
-		List<Double> distance = new ArrayList<Double>();
-		Statement sta = null;
-		ResultSet rs = null;
-		try {
-			sta = con.createStatement();
-			String sql_select_from_DATA = "SELECT DISTANCE FROM DATA WHERE I="
-					+ n;
-			rs = sta.executeQuery(sql_select_from_DATA);
-			while (rs.next()) {
-				distance.add(rs.getDouble(1));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs != null) {
-					rs.close();
-				}
-				if (sta != null) {
-					sta.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
+		List<Double> distance = new DataService().getAllDistanceFromI(n);
 		int len = distance.size();
 		double sum = 0;
 		for (int i = 0; i < len; i++) {

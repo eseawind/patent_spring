@@ -1,4 +1,4 @@
-package cn.edu.scut.patent.dao;
+package cn.edu.scut.patent.util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
+import cn.edu.scut.patent.service.DataService;
 import cn.edu.scut.patent.service.TrizService;
 import cn.edu.scut.patent.util.Constants;
 
@@ -132,23 +134,10 @@ public class DatabaseHelper {
 		return true;
 	}
 
-	/**
-	 * 得到resultSet的行数
-	 * 
-	 * @param rs
-	 * @return
-	 */
-	public static int getSize(ResultSet rs) {
-		try {
-			rs.last();
-			return rs.getRow();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return -1;
-		}
-	}
-
 	public static void main(String[] args) {
-
+		List<Double> list = new DataService().getAllDistanceFromI(0);
+		for (Double dou : list) {
+			System.out.println(dou);
+		}
 	}
 }

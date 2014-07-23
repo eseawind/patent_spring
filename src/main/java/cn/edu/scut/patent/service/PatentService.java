@@ -42,6 +42,15 @@ public class PatentService extends TotalService {
 	}
 
 	/**
+	 * 获取所有的pttNum
+	 * 
+	 * @return
+	 */
+	public List<String> getAllPttNum() {
+		return new PatentDao().getAllPttNum(session);
+	}
+
+	/**
 	 * 获取所有的专利数据
 	 * 
 	 * @return

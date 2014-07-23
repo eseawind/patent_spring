@@ -1,5 +1,6 @@
 package cn.edu.scut.patent.service;
 
+import java.util.List;
 import cn.edu.scut.patent.dao.DataDao;
 import cn.edu.scut.patent.model.Data;
 
@@ -20,7 +21,7 @@ public class DataService extends TotalService {
 	public static void cleanTable() {
 		DataDao.cleanTable(session);
 	}
-	
+
 	/**
 	 * 保存
 	 * 
@@ -28,5 +29,15 @@ public class DataService extends TotalService {
 	 */
 	public void save(Data data) {
 		new DataDao().save(session, data);
+	}
+
+	/**
+	 * 根据i获取与之相关的所有距离
+	 * 
+	 * @param i
+	 * @return
+	 */
+	public List<Double> getAllDistanceFromI(int i) {
+		return new DataDao().getAllDistanceFromI(session, i);
 	}
 }
