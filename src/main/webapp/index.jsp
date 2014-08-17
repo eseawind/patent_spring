@@ -22,6 +22,6 @@ String basePath = request.getScheme() + "://"
 <div><p id="title">华南理工大学专利检索系统</p></div>
 <p id="button" class="button1"><input type="button" value="专利检索" onClick="window.location.href='/patent_spring/view/search.jsp';"></input></p>
 <p id="button" class="button1"><input type="button" value="统计指标" onClick="window.location.href='/patent_spring/view/indicator.jsp';"></input></p>
-<p id="button" class="button1"><input type="button" value="初始化" onClick="window.location.href='/patent_spring/view/initialize.jsp';"></input></p>
+<p id="button" class="button1"><input type="button" value="初始化" onClick="window.location.href='/patent_spring/view/administrator.jsp';"></input></p>
 </body>
 </html>

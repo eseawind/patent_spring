@@ -13,74 +13,91 @@ String basePath = request.getScheme() + "://"
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>专利检索</title>
 <base href="<%=basePath%>">
-<link rel="stylesheet" href="css/all.css" type="text/css">
+<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="js/useful_function.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    //让div居中
+	mediate($('.searchDivClass'));
+	//加入日期选择控件
+	$('#PTT_DATE, #APPLY_DATE, #INTO_DATE').datepicker({
+		changeMonth:true,
+		changeYear:true,
+		dateFormat:'yy-mm-dd',
+		yearRange:'-100:+100'
+	});
+	//设置waitingDialog的效果
+	$('#waitingDialog').dialog({
+		autoOpen:false,
+		closeOnEscape:false,
+		draggable:false,
+		modal:true,
+		title:"查询"
+	});
+	//在searchForm提交后显示等待的dialog
+	$('#searchForm').submit(function(){
+		$('#waitingDialog').dialog('open');
+	});
+});
+</script>
+<link href="css/search.css" rel="stylesheet" type="text/css" />
+<link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-<div class="image">
-<img src="img/school_badge.png"/>
-</div>
-<hr width=100%/>
-<form name="searchForm" method="post" action="search">
-<table cellpadding="20px" cellspacing="20px" border=0>
-<tr>
-<td colspan="4" class="td1">
-<input type="checkbox" name="FMZL" value="11" checked="checked">
-<label for="FMZL">发明</label>
-<input type="checkbox" name="SYXX" value="22" checked="checked">
-<label for="SYXX">实用新型</label>
-<input type="checkbox" name="WGSJ" value="33" checked="checked">
-<label for="WGZL" style="vertical-align:middle">外观设计</label>
-</td>
-</tr>
+<div class="searchDivClass">
+<form id="searchForm" name="searchForm" method="post" action="search">
+<table cellspacing="10px">
 <tr>
 <td colspan="4">
+<div>
+<span><input type="checkbox" name="FMZL" value="11" checked="checked"><label for="FMZL">发明</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span><input type="checkbox" name="SYXX" value="22" checked="checked"><label for="SYXX">实用新型</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span><input type="checkbox" name="WGSJ" value="33" checked="checked"><label for="WGZL">外观设计</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+</div>
 </td>
 </tr>
-<tr><td><input type="button" value="申请号" class="RowButton"></td><td><input type="text" name="APPLY_NUM" value="" class="RowInput"/></td>
-<td><input type="button" value="申请日期" class="RowButton"></td><td><input type="text" name="APPLY_DATE" value="" class="RowInput"/></td></tr>
-<tr><td><input type="button" value="专利名称" class="RowButton"></td><td><input type="text" name="PTT_NAME" value="" class="RowInput"/></td>
-<td><input type="button" value="专利公开号" class="RowButton"></td><td><input type="text" name="PTT_NUM" value="" class="RowInput"/></td></tr>
-<tr><td><input type="button" value="专利公开日" class="RowButton"></td><td><input type="text" name="PTT_DATE" value="" class="RowInput"/></td>
-<td><input type="button" value="主分类号" class="RowButton"></td><td><input type="text" name="PTT_MAIN_CLASS_NUM" value="" class="RowInput"/></td></tr>
-<tr><td><input type="button" value="分类号" class="RowButton"></td><td><input type="text" name="PTT_CLASS_NUM" value="" class="RowInput"/></td>
-<td><input type="button" value="申请（专利权）人" class="RowButton"></td><td><input type="text" name="PROPOSER" value="" class="RowInput"/></td></tr>
-<tr><td><input type="button" value="申请人地址" class="RowButton"></td><td><input type="text" name="PROPOSER_ADDRESS" value="" class="RowInput"/></td>
-<td><input type="button" value="发明（设计）人" class="RowButton"></td><td><input type="text" name="INVENTOR" value="" class="RowInput"/></td></tr>
-<tr><td><input type="button" value="国际申请" class="RowButton"></td><td><input type="text" name="INTERNATIONAL_APPLY" value="" class="RowInput"/></td>
-<td><input type="button" value="国际公布" class="RowButton"></td><td><input type="text" name="INTERNATIONAL_PUBLICATION" value="" class="RowInput"/></td></tr>
-<tr><td><input type="button" value="初始日" class="RowButton"></td><td><input type="text" name="INTO_DATE" value="" class="RowInput"/></td>
-<td><input type="button" value="专利代理机构" class="RowButton"></td><td><input type="text" name="PTT_AGENCY_ORG" value="" class="RowInput"/></td></tr>
-<tr><td><input type="button" value="专利代理人" class="RowButton"></td><td><input type="text" name="PTT_AGENCY_PERSON" value="" class="RowInput"/></td>
-<td><input type="button" value="专利摘要" class="RowButton"></td><td><input type="text" name="PTT_ABSTRACT" value="" class="RowInput"/></td></tr>
-<tr><td colspan="2" class="submit1"><input type="submit" value="提交"></td><td colspan="2" class="reset1"><input type="reset" value="重置"></td></tr>
+<tr><td></td></tr>
+<tr><td></td></tr>
+<tr><td width="15%"><label class="RowLabel">申请号</label></td>
+<td width="35%"><input type="text" name="APPLY_NUM" value="" class="RowInput"/></td>
+<td width="15%"><label class="RowLabel">申请日期</label></td>
+<td width="35%"><input type="text" id="APPLY_DATE" name="APPLY_DATE" value="" class="RowInput"/></td></tr>
+<tr><td><label class="RowLabel">专利名称</label></td>
+<td><input type="text" name="PTT_NAME" value="" class="RowInput"/></td>
+<td><label class="RowLabel">专利公开号</label></td>
+<td><input type="text" name="PTT_NUM" value="" class="RowInput"/></td></tr>
+<tr><td><label class="RowLabel">专利公开日</label></td>
+<td><input type="text" id="PTT_DATE" name="PTT_DATE" value="" class="RowInput"/></td>
+<td><label class="RowLabel">主分类号</label></td>
+<td><input type="text" name="PTT_MAIN_CLASS_NUM" value="" class="RowInput"/></td></tr>
+<tr><td><label class="RowLabel">分类号</label></td>
+<td><input type="text" name="PTT_CLASS_NUM" value="" class="RowInput"/></td>
+<td><label class="RowLabel">申请（专利权）人</label></td>
+<td><input type="text" name="PROPOSER" value="" class="RowInput"/></td></tr>
+<tr><td><label class="RowLabel">申请人地址</label></td>
+<td><input type="text" name="PROPOSER_ADDRESS" value="" class="RowInput"/></td>
+<td><label class="RowLabel">发明（设计）人</label></td>
+<td><input type="text" name="INVENTOR" value="" class="RowInput"/></td></tr>
+<tr><td><label class="RowLabel">国际申请</label></td>
+<td><input type="text" name="INTERNATIONAL_APPLY" value="" class="RowInput"/></td>
+<td><label class="RowLabel">国际公布</label></td>
+<td><input type="text" name="INTERNATIONAL_PUBLICATION" value="" class="RowInput"/></td></tr>
+<tr><td><label class="RowLabel">初始日</label></td>
+<td><input type="text" id="INTO_DATE" name="INTO_DATE" value="" class="RowInput"/></td>
+<td><label class="RowLabel">专利代理机构</label></td>
+<td><input type="text" name="PTT_AGENCY_ORG" value="" class="RowInput"/></td></tr>
+<tr><td><label class="RowLabel">专利代理人</label></td>
+<td><input type="text" name="PTT_AGENCY_PERSON" value="" class="RowInput"/></td>
+<td><label class="RowLabel">专利摘要</label></td>
+<td><input type="text" name="PTT_ABSTRACT" value="" class="RowInput"/></td></tr>
+<tr><td colspan="4">
+<input type="submit" class="buttonClass" value="提交">&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" class="buttonClass" value="重置"></td></tr>
 </table>
 </form>
-<%--显示所有的专利<%
-try{
-// 加载驱动
-Class.forName("com.mysql.jdbc.Driver").newInstance();
-String url = "jdbc:mysql://localhost/patentdb";
-String user = "root";
-String password = "123";
-Connection conn = DriverManager.getConnection(url, user, password);
-//创建用于将SQL语句发送到数据库的SQLServerStatement对象。
-Statement st = conn.createStatement();
-//执行给定的SQL语句，该语句返回单个ResultSet对象。
-String sqlString = "select * from patents";
-ResultSet rs = st.executeQuery(sqlString);
-String targethtml = "/patent_spring/view/showPDF.jsp";
-out.println("<h1>专利列表</h1><hr><table><tr><td>专利编号</td><td>专利名称</td><td>专利申请号</td><td>专利申请</td></tr>");
-while(rs.next()){
-out.print("<tr>");
-out.print("<td>" + "<a href='" + targethtml + "?FILE_NAME=" + java.net.URLEncoder.encode(rs.getString("FILE_NAME"), "UTF-8") + "&PTT_NUM=" + java.net.URLEncoder.encode(rs.getString("PTT_NUM"), "UTF-8") + "'>" +rs.getString("PTT_NUM") + "</a>" + "</td><td>" + rs.getString("PTT_NAME") + "</td><td>" + rs.getString("APPLY_NUM") + "</td><td>" + rs.getString("PROPOSER") + "</td>");
-out.print("</tr>");
-}
-out.print("</table><hr>");
-conn.close();
-}catch(Exception e){
-out.print("无数据");
-out.print(e.getMessage());
-}
-%>--%>
+</div>
+<div id="waitingDialog">
+正在查询中，请稍候...
+</div>
 </body>
 </html>

@@ -32,42 +32,13 @@
 	file_path += "&id=" + "CN" + APPLY_NUM;
 	List<String> checkboxList = new ArrayList<String>();
 %>
-<%--直接在整个页面显示PDF<%
-   out.clear();
-   out = pageContext.pushBody();
-   response.setContentType("application/pdf");
-
-   try {
-	String path_dir = new String("E://dir//file//");
-	String file_name = request.getParameter("FILE_NAME");
-    String file_path = path_dir + file_name;
-    //判断该路径下的文件是否存在
-    File file = new File(file_path);
-    if (file.exists()) {
-     DataOutputStream temps = new DataOutputStream(response
-       .getOutputStream());
-     DataInputStream in = new DataInputStream(
-       new FileInputStream(file_path));
-
-     byte[] b = new byte[2048];
-     while ((in.read(b)) != -1) {
-      temps.write(b);
-      temps.flush();
-     }
-     in.close();
-     temps.close();
-    } else {
-     out.print(file_path + " 文件不存在!");
-    }
-   } catch (Exception e) {
-    out.println(e.getMessage());
-   }
-%>--%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>专利展示</title>
+<base href="<%=basePath%>">
+<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
 <script type="text/javascript" language="javascript">
 	function dyniframesize(down) {
 		var pTar = null;
@@ -90,8 +61,15 @@
 			}
 		}
 	}
+	$(document).ready(function(){
+		$('#submitForm').submit(function(){
+			$.getJSON('updateTrizNumber',$(this).serialize(),function(data){
+				alert(data.result);
+			});
+			return false;
+		});
+	});
 </script>
-<base href="<%=basePath%>">
 <link rel="stylesheet" href="css/all.css" type="text/css">
 </head>
 <body>
@@ -108,7 +86,7 @@
 			<td width="40%" height="100%">
 				<div id="showdialog">
 					40个TRIZ原理
-					<form name="submitForm" method="post" action="updateTrizNumber">
+					<form id="submitForm" name="submitForm" method="post" action="updateTrizNumber">
 						<input type="hidden" name="PTT_NUM" value="<%=PTT_NUM%>" />
 						<%
 							try {

@@ -1,14 +1,17 @@
 package cn.edu.scut.patent.controller;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 import cn.edu.scut.patent.service.ClassificationService;
 
 @Controller
-public class DaoController {
+public class ClassificationController {
 
 	/**
 	 * 更新Triz号码
@@ -18,8 +21,16 @@ public class DaoController {
 	 * @return
 	 */
 	@RequestMapping(value = "updateTrizNumber")
-	public ModelAndView updateTrizNumber(HttpServletRequest request,
+	public void updateTrizNumber(HttpServletRequest request,
 			HttpServletResponse response) {
+		try {
+			request.setCharacterEncoding("utf-8");
+			response.setContentType("text/html;charset=utf-8");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 		String PTT_NUM = request.getParameter("PTT_NUM");
 		String[] TRIZ_NUM = request.getParameterValues("triz");
 		for (int i = 0; i < TRIZ_NUM.length; i++) {
@@ -33,7 +44,17 @@ public class DaoController {
 		} else {
 			result = "专利分类信息已存入数据库失败！";
 		}
-		ModelAndView mv = new ModelAndView("alert", "command", result);
-		return mv;
+		JSONObject jsonObj = new JSONObject();
+		jsonObj.put("result", result);
+		PrintWriter out;
+		try {
+			out = response.getWriter();
+			out.write(jsonObj.toString());
+			out.flush();
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

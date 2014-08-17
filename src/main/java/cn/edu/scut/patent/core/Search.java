@@ -187,10 +187,9 @@ public class Search implements SearchImpl {
 			System.out.println("******第" + (i + 1) + "个结果******");
 			Patent pttDao = new Patent();
 			Document d = searcher.doc(sds[i].doc);
-			String highlighterStr = toHighlighter(query, analyzer,
-					d.get("PTT_TYPE"));
-			System.out.println("PTT_TYPE" + ":[" + highlighterStr + "]");
-			pttDao.setPttType(highlighterStr);
+			String highlighterStr;
+			System.out.println("PTT_TYPE" + ":[" + d.get("PTT_TYPE") + "]");
+			pttDao.setPttType(d.get("PTT_TYPE"));
 			highlighterStr = toHighlighter(query, analyzer, d.get("APPLY_NUM"));
 			System.out.println("APPLY_NUM" + ":[" + highlighterStr + "]");
 			pttDao.setApplyNum(highlighterStr);

@@ -8,9 +8,10 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import cn.edu.scut.patent.core.Search;
 import cn.edu.scut.patent.model.Patent;
 import cn.edu.scut.patent.util.StringHelper;
@@ -97,13 +98,25 @@ public class SearchController {
 			patentdao.setPttAbstract(request.getParameter("PTT_ABSTRACT"));
 		}
 		System.out.println("进入search啦！");
-		List<Patent> patentList = new Search().doSearch(patentdao,
-				pttTypeList);
-
+		List<Patent> patentList = new Search().doSearch(patentdao, pttTypeList);
 		String timeConsume = StringHelper.timer(startTime);
-		request.getSession().setAttribute("PATENTLIST", patentList);
+
+		JSONArray jsonArray = new JSONArray();
+		for (Patent patent : patentList) {
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("ApplyNum", patent.getApplyNum());
+			jsonObj.put("Inventor", patent.getInventor());
+			jsonObj.put("Proposer", patent.getProposer());
+			jsonObj.put("PttDate", patent.getPttDate());
+			jsonObj.put("PttName", patent.getPttName());
+			jsonObj.put("PttNum", patent.getPttNum());
+			jsonObj.put("PttType", patent.getPttType());
+			jsonArray.put(jsonObj);
+		}
+		request.getSession().setAttribute("PATENTLIST", jsonArray.toString());
 		request.getSession().setAttribute("TIMECONSUME", timeConsume);
 		RequestDispatcher re = request.getRequestDispatcher("view/result.jsp");
+
 		try {
 			re.forward(request, response);
 		} catch (ServletException e) {

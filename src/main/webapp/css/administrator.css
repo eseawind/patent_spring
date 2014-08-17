@@ -1,0 +1,31 @@
+@charset "utf-8";
+/* CSS Document */
+
+.administratorDivClass {
+	width: 1000px;
+	margin-top: 80px;
+}
+.mainTableClass {
+	text-align: center;
+	vertical-align: middle;
+	width: 1000px;
+	color: #000;
+	background-color: #CCC;
+}
+.inputTextClass {
+	width: 40px;
+	text-align: center;
+	vertical-align: middle;
+}
+.buttonClass {
+	width: 75px;
+}
+body {
+	background-image: url(../image/background.jpg);
+}
+#welcomeDiv {
+	background-color: #CCF;
+	margin-left: -10px;
+	margin-top: -10px;
+	text-align: right;
+}
