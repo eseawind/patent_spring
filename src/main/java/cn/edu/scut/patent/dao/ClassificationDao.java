@@ -1,6 +1,8 @@
 package cn.edu.scut.patent.dao;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import cn.edu.scut.patent.model.Classification;
@@ -45,19 +47,26 @@ public class ClassificationDao extends TotalDao {
 	}
 
 	/**
-	 * 查找Classification
+	 * 根据pttNum获取符合要求的数据
 	 * 
 	 * @param session
-	 * @param queryClassification
+	 * @param pttNum
 	 * @return
 	 */
-	public Classification find(Session session,
-			Classification queryClassification) {
-		session.beginTransaction();
-		Classification classification = (Classification) session.get(
-				Classification.class, queryClassification);
-		session.getTransaction().commit();
-		return classification;
+	@SuppressWarnings("unchecked")
+	public List<Integer> getAllFromPttNum(Session session, String pttNum) {
+		List<Integer> list = new ArrayList<Integer>();
+		try {
+			session.beginTransaction();
+			Query query = session
+					.createSQLQuery("select TRIZ_NUM from CLASSIFICATION where PTT_NUM LIKE '"
+							+ pttNum + "'");
+			session.getTransaction().commit();
+			list = query.list();
+		} catch (RuntimeException e) {
+			session.getTransaction().rollback();
+		}
+		return list;
 	}
 
 	/**

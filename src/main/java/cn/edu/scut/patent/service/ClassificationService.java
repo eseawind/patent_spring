@@ -34,6 +34,16 @@ public class ClassificationService extends TotalService {
 	}
 
 	/**
+	 * 根据专利号查找相应的分类号
+	 * 
+	 * @param pttNum
+	 * @return
+	 */
+	public List<Integer> getAllFromPttNum(String pttNum) {
+		return new ClassificationDao().getAllFromPttNum(session, pttNum);
+	}
+
+	/**
 	 * 删除
 	 * 
 	 * @param classification

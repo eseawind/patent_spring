@@ -3,8 +3,10 @@ package cn.edu.scut.patent.controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,6 +52,46 @@ public class ClassificationController {
 		try {
 			out = response.getWriter();
 			out.write(jsonObj.toString());
+			out.flush();
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 获取分类号
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "getClassification")
+	public void getClassification(HttpServletRequest request,
+			HttpServletResponse response) {
+		try {
+			request.setCharacterEncoding("utf-8");
+			response.setContentType("text/html;charset=utf-8");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		String pttNum = request.getParameter("pttNum");
+		List<Integer> trizNumList = new ClassificationService()
+				.getAllFromPttNum(pttNum);
+
+		JSONArray jsonArray = new JSONArray();
+		for (int trizNum : trizNumList) {
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("trizNum", trizNum);
+			jsonArray.put(jsonObj);
+		}
+		PrintWriter out;
+		try {
+			out = response.getWriter();
+			out.write(jsonArray.toString());
 			out.flush();
 			out.close();
 		} catch (IOException e) {

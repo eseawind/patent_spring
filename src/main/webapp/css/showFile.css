@@ -1,0 +1,9 @@
+@charset "utf-8";
+/* CSS Document */
+
+.showFileTableClass {
+	width: 1000px;
+}
+body {
+	background-image: url(../image/background.jpg);
+}
