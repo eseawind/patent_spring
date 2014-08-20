@@ -45,6 +45,7 @@ $(document).ready(function() {
 <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<%@ include file="client.jsp" %>
 <div class="searchDivClass">
 <form id="searchForm" name="searchForm" method="post" action="search">
 <table cellspacing="10px">

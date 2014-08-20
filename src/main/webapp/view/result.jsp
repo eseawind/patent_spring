@@ -139,6 +139,7 @@ function fillFoot(totalItem,pageNumber,pageTotal,timeConsume){
 <link href="css/result.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<%@ include file="client.jsp" %>
 <input type="hidden" id="jsonArray" value='<%=jsonArray%>' />
 <input type="hidden" id="basePath" value='<%=basePath%>' />
 <input type="hidden" id="count" value='<%=count%>' />

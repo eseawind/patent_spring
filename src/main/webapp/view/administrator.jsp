@@ -87,10 +87,7 @@ $(document).ready(function() {
 <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-<div id="welcomeDiv">
-<label>欢迎来到华南理工大学专利检索系统</label>
-<input type="button" value="退出" />
-</div>
+<%@ include file="client.jsp" %>
 <div class="administratorDivClass">
 <div align="right">
 <input type="checkbox" id="checkAuto" /><label id="labelCheckAuto">自动审核关闭中</label>

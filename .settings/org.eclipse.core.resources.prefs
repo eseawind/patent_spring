@@ -1,6 +1,8 @@
 eclipse.preferences.version=1
 encoding//src/main/java/cn/edu/scut/patent/core/Search.java=UTF-8
+encoding//src/main/java/cn/edu/scut/patent/dao/AccountDao.java=UTF-8
 encoding//src/main/java/cn/edu/scut/patent/dao/PatentDao.java=UTF-8
+encoding//src/main/java/cn/edu/scut/patent/model/Account.java=UTF-8
 encoding//src/main/java/cn/edu/scut/patent/model/ClusterValueItem.java=UTF-8
 encoding//src/main/java/cn/edu/scut/patent/model/IndicatorData.java=UTF-8
 encoding//src/main/java/cn/edu/scut/patent/model/IndicatorParam.java=UTF-8

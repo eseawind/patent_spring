@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8"%>
+<%@ page contentType="text/html; charset=utf-8"%>
 <%@ page pageEncoding="utf-8"%>
 <%@ page language="java"
 	import="java.util.*,java.io.*,java.sql.*,java.net.*"%>
@@ -98,6 +98,7 @@ $(document).ready(function(){
 <link href="css/showFile.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<%@ include file="client.jsp" %>
 <table class="showFileTableClass" border=0 cellspacing="10px" cellpadding="10px">
 <tr>
 <td width="60%" height="100%" class="pdf"><%=PTT_NUM%><iframe id="win" name="win" onload="Javascript:dyniframesize('win')" src="<%=file_path%>" width="100%" height="100%"></iframe></td>

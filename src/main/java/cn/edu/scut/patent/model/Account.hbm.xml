@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="cn.edu.scut.patent.model.Account" table="ACCOUNT">
+		<comment>账户列表</comment>
+		<!-- id必须放在第一位 -->
+		<id name="email" type="java.lang.String">
+			<column name="EMAIL" length="50">
+				<comment>电子邮件</comment>
+			</column>
+		</id>
+		<property name="accountType" type="java.lang.String">
+			<column name="ACCOUNT_TYPE" length="20" not-null="true">
+				<comment>账户类型</comment>
+			</column>
+		</property>
+		<property name="username" type="java.lang.String">
+			<column name="USERNAME" length="50" not-null="true">
+				<comment>用户名</comment>
+			</column>
+		</property>
+		<property name="department" type="java.lang.String">
+			<column name="DEPARTMENT" length="200" not-null="false">
+				<comment>单位</comment>
+			</column>
+		</property>
+		<property name="password" type="java.lang.String">
+			<column name="PASSWORD" length="20" not-null="true">
+				<comment>密码</comment>
+			</column>
+		</property>
+	</class>
+</hibernate-mapping>
