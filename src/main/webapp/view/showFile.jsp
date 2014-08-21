@@ -2,12 +2,7 @@
 <%@ page pageEncoding="utf-8"%>
 <%@ page language="java"
 	import="java.util.*,java.io.*,java.sql.*,java.net.*"%>
-<%
-	String path = request.getContextPath();
-	String basePath = request.getScheme() + "://"
-	+ request.getServerName() + ":" + request.getServerPort()
-	+ path + "/";
-%>
+<%@ include file="path&check.jsp" %>
 <%
 	String path_dir = "http://so.baiten.cn/detail/patentdetail?";
 	String APPLY_NUM = java.net.URLEncoder.encode(
@@ -39,6 +34,7 @@
 <title>专利展示</title>
 <base href="<%=basePath%>">
 <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="js/jquery.fancybox.js"></script>
 <script type="text/javascript" src="js/useful_function.js"></script>
 <script type="text/javascript" language="javascript">
 function dyniframesize(down) {
@@ -63,6 +59,10 @@ function dyniframesize(down) {
 	}
 };
 $(document).ready(function(){
+	//居中
+	mediate($('#showDiv'));
+	//最大化宽度
+	maxWidth($('.showFileTableClass'));
 	//获取TRIZ原理
 	$.getJSON('getTriz',function(data){
 		var htmlString = '';
@@ -86,6 +86,12 @@ $(document).ready(function(){
 			htmlString += "</table></td></tr><tr><td colspan='2' align='center' class='sub_res'><input type='submit' value='提交'><input type='reset' value='重置'></td></tr>";
 			$('#mainTable').html(htmlString);
 		});
+		//用于展开iframe
+		$('.iframe').fancybox({
+			width : '90%',
+			height : '90%',
+			titlePosition: 'outside'
+		});
 	});
 	$('#submitForm').submit(function(){
 		$.getJSON('updateTrizNumber',$(this).serialize(),function(data){
@@ -95,13 +101,15 @@ $(document).ready(function(){
 	});
 });
 </script>
+<link href="css/jquery.fancybox.css" rel="stylesheet" type="text/css" />
 <link href="css/showFile.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <%@ include file="client.jsp" %>
+<div id='showDiv'>
 <table class="showFileTableClass" border=0 cellspacing="10px" cellpadding="10px">
 <tr>
-<td width="60%" height="100%" class="pdf"><%=PTT_NUM%><iframe id="win" name="win" onload="Javascript:dyniframesize('win')" src="<%=file_path%>" width="100%" height="100%"></iframe></td>
+<td width="60%" height="100%" class="pdf"><%=PTT_NUM%><a href="<%=file_path%>" class="iframe">展开</a><iframe id="win" name="win" onload="Javascript:dyniframesize('win')" src="<%=file_path%>" width="100%" height="100%"></iframe></td>
 <td width="40%" height="100%">
 <div id="showdialog">
 40个TRIZ原理
@@ -114,5 +122,6 @@ $(document).ready(function(){
 </td>
 </tr>
 </table>
+</div>
 </body>
 </html>

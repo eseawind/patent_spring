@@ -13,8 +13,11 @@ if(account == null){
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="js/useful_function.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){
+	//最大化宽度
+	maxWidth($('#welcome'));
 	if($('#welcome').val()==''){
 		$('#exit').hide();
 	}else {

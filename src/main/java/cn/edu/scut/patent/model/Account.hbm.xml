@@ -31,5 +31,10 @@
 				<comment>密码</comment>
 			</column>
 		</property>
+		<property name="pass" type="java.lang.String">
+			<column name="PASS" length="1" not-null="true">
+				<comment>通过否（1代表通过，2代表否决）</comment>
+			</column>
+		</property>
 	</class>
 </hibernate-mapping>

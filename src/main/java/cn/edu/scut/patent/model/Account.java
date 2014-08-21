@@ -15,11 +15,13 @@ public class Account implements Serializable {
 	private String department;
 	// 密码
 	private String password;
+	// 通过否
+	private String pass;
 
 	public Account() {
-		
+
 	}
-	
+
 	public Account(String email, String accountType, String username,
 			String department, String password) {
 		this.email = email;
@@ -27,6 +29,7 @@ public class Account implements Serializable {
 		this.username = username;
 		this.department = department;
 		this.password = password;
+		this.pass = "0";
 	}
 
 	public Account(String email, String accountType, String username,
@@ -35,6 +38,7 @@ public class Account implements Serializable {
 		this.accountType = accountType;
 		this.username = username;
 		this.password = password;
+		this.pass = "0";
 	}
 
 	public String getEmail() {
@@ -75,5 +79,13 @@ public class Account implements Serializable {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getPass() {
+		return pass;
+	}
+
+	public void setPass(String pass) {
+		this.pass = pass;
 	}
 }

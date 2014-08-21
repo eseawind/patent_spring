@@ -1,9 +1,9 @@
 @charset "utf-8";
 /* CSS Document */
 
-.showFileTableClass {
-	width: 1000px;
-}
 body {
 	background-image: url(../image/background.jpg);
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 16px;
+	font-weight: bold;
 }

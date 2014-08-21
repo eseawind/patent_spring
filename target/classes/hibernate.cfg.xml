@@ -50,6 +50,7 @@
 		<mapping resource="cn/edu/scut/patent/model/PatentCluster.hbm.xml" />
 		<mapping resource="cn/edu/scut/patent/model/Data.hbm.xml" />
 		<mapping resource="cn/edu/scut/patent/model/Account.hbm.xml" />
+		<mapping resource="cn/edu/scut/patent/model/Setting.hbm.xml" />
 
 	</session-factory>
 </hibernate-configuration>

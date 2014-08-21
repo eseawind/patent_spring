@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="cn.edu.scut.patent.model.Setting" table="SETTING">
+		<comment>功能列表</comment>
+		<!-- id必须放在第一位 -->
+		<id name="function" type="java.lang.String">
+			<column name="FUNCTION" length="50">
+				<comment>功能</comment>
+			</column>
+		</id>
+		<property name="flag" type="java.lang.String">
+			<column name="FLAG" length="1" not-null="true">
+				<comment>标识</comment>
+			</column>
+		</property>
+	</class>
+</hibernate-mapping>

@@ -2,17 +2,11 @@
 <%@ page pageEncoding="utf-8"%>
 <%@ page language="java"
 	import="java.sql.*,java.util.*,java.net.*,cn.edu.scut.patent.model.Patent" %>
-<%
-	String path = request.getContextPath();
-	String basePath = request.getScheme() + "://"
-	+ request.getServerName() + ":" + request.getServerPort()
-	+ path + "/";
-%>
+<%@ include file="path&check.jsp" %>
 <%
 	int count = 10;
 	String jsonArray = (String) session.getAttribute("PATENTLIST");
 	String timeConsume = (String) session.getAttribute("TIMECONSUME");
-	String pageString = (String)request.getParameter("PAGE");
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -26,7 +20,7 @@
 $(document).ready(function(){
 	//让div居中
 	mediate($('.resultDivClass'));
-	
+	//填充表格
 	var patentsString=eval('('+$('#jsonArray').val()+')');
 	var timeConsume=$('#timeConsume').val();
 	var count=$('#count').val();
@@ -144,7 +138,6 @@ function fillFoot(totalItem,pageNumber,pageTotal,timeConsume){
 <input type="hidden" id="basePath" value='<%=basePath%>' />
 <input type="hidden" id="count" value='<%=count%>' />
 <input type="hidden" id="timeConsume" value='<%=timeConsume%>' />
-<input type="hidden" id="page" value='<%=pageString%>' />
 <div class="resultDivClass">
 <div>
 <table class='mainTableClass' border=0 cellspacing='10px' cellpadding='10px'>
