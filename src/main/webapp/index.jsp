@@ -9,6 +9,7 @@
 <title>华南理工大学专利检索系统</title>
 <base href="<%=basePath%>">
 <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui.min.js"></script>
 <script type="text/javascript" src="js/jquery.validate.min.js"></script>
 <script type="text/javascript" src="js/jquery.cookie.js"></script>
 <script type="text/javascript" src="js/useful_function.js"></script>
@@ -132,8 +133,21 @@ $(document).ready(function() {
 			}
 		}
 	});
+	//设置existedEmailDialog和UnpassDialog的效果
+	$('#existedEmailDialog, #UnpassDialog').dialog({
+		autoOpen:false,
+		closeOnEscape:false,
+		draggable:false,
+		modal:true,
+		title:"警告",
+		buttons:{
+			"确定":function(){
+				$(this).dialog('close');
+			}
+		}
+	});
 	//设置登录表单提交时的事件
-	$('#loginForm').submit(function(){
+	$('#loginForm').submit(function(evt){
 		if($('#rememberUserName').prop('checked')){
 			$.cookie('username',$('#loginEmail').val(),{path:'/',expires:1000});
 		}else{
@@ -144,6 +158,35 @@ $(document).ready(function() {
 		}else{
 			$.cookie('password',null,{path:'/',expires:0});
 		}
+		//检查是否已经通过审核
+		$.ajax({
+			type:'post',
+			url:'checkPass',
+			data:{Email:$('#loginEmail').val()},
+			dataType:'json',
+			async:false,
+			success:function(data){
+				if(data.result=='unpass'){
+					$('#UnpassDialog').dialog('open');
+					evt.preventDefault();
+				}
+			}
+		});
+	});
+	//设置注册表单提交时的事件
+	$('#registerForm').submit(function(evt){
+		//检查是否开启了自动审核
+		$.ajax({
+			type:'post',
+			url:'getAutopass',
+			dataType:'json',
+			async:false,
+			success:function(data){
+				if(data.result=='0'){
+					$('#UnpassDialog').dialog('open');
+				}
+			}
+		});
 	});
 });
 function fillCookie(){
@@ -162,6 +205,7 @@ function fillCookie(){
 	}
 }
 </script>
+<link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
 <link href="css/index.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -197,7 +241,7 @@ function fillCookie(){
 <form method="post" id="registerForm" action="register">
 <table>
 <tr><td>*为必填</td></tr>
-<tr><td>*<input type="text" name="registerEmail" class="tableCss" value="电子邮箱" /></td></tr>
+<tr><td>*<input type="text" id="registerEmail" name="registerEmail" class="tableCss" value="电子邮箱" /></td></tr>
 <tr><td>*<select name="registerSelect" class="tableCss">
 <option value="" selected="selected">==账户类型==</option>
 <option value="user">用户</option>
@@ -215,6 +259,12 @@ function fillCookie(){
 </div>
 </td></tr>
 </table>
+</div>
+<div id="existedEmailDialog">
+对不起，该邮箱已被注册，请选择其他邮箱。
+</div>
+<div id="UnpassDialog">
+您的账户有待审核，请耐心等候。
 </div>
 </body>
 </html>

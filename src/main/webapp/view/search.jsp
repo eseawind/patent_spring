@@ -34,6 +34,10 @@ $(document).ready(function() {
 	$('#searchForm').submit(function(){
 		$('#waitingDialog').dialog('open');
 	});
+	//跳转到指标页面
+	$('#indicator').click(function(){
+		location.href='view/indicator.jsp';
+	});
 });
 </script>
 <link href="css/search.css" rel="stylesheet" type="text/css" />
@@ -88,7 +92,7 @@ $(document).ready(function() {
 <td><label class="RowLabel">专利摘要</label></td>
 <td><input type="text" name="PTT_ABSTRACT" value="" class="RowInput"/></td></tr>
 <tr><td colspan="4">
-<input type="submit" class="buttonClass" value="提交">&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" class="buttonClass" value="重置"></td></tr>
+<input type="submit" class="buttonClass" value="提交">&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" class="buttonClass" value="重置">&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" id="indicator" class="buttonClass" value="查看指标"></td></tr>
 </table>
 </form>
 </div>

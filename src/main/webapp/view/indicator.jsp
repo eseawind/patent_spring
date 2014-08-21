@@ -8,32 +8,52 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>统计指标</title>
 <base href="<%=basePath%>">
-<link rel="stylesheet" href="css/all.css" type="text/css">
+<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="js/useful_function.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    //让div居中
+	mediate($('.indicatorDivClass'));
+});
+</script>
+<link href="css/indicator.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-<div class="image">
-<img src="img/school_badge.png"/>
+<%@ include file="client.jsp" %>
+<div class="indicatorDivClass">
+<div>
+<form method="post" action="chart">
+<table border="0" class="tableClass">
+<tr><td>
+<input type="submit" class="buttonClass" value="统计展示"></input>
+</td></tr>
+</table>
+</form>
 </div>
-<form name="chartForm" method="post" action="chart">
-<p id="button" class="button1"><input type="submit" value="统计展示"></input></p>
-</form>
-<form name="technicalGrowthRateDataForm" method="post" action="technicalDataChart">
+<div>
+<form method="post" action="technicalDataChart">
 <input type="hidden" name="INDICATOR_TYPE" value="<%=Constants.TECHNICAL_GROWTH_RATE_NUMBER%>" />
-<table border=0 cellspacing="20px" cellpadding="20px">
-<tr><td><input type="text" name="KEY_WORD" value="" class="RowInput"/></td><td><p id="button" class="button1"><input type="submit" value="技术生长率"></input></p></td></tr>
+<table class="tableClass">
+<tr><td><input type="text" name="KEY_WORD" value="" class="textClass"/></td><td><input type="submit" class="buttonClass" value="技术生长率"></input></td></tr>
 </table>
 </form>
-<form name="technicalMatureRateDataForm" method="post" action="technicalDataChart">
+</div>
+<div>
+<form method="post" action="technicalDataChart">
 <input type="hidden" name="INDICATOR_TYPE" value="<%=Constants.TECHNICAL_MATURE_RATE_NUMBER%>" />
-<table border=0 cellspacing="20px" cellpadding="20px">
-<tr><td><input type="text" name="KEY_WORD" value="" class="RowInput"/></td><td><p id="button" class="button1"><input type="submit" value="技术成熟率"></input></p></td></tr>
+<table class="tableClass">
+<tr><td><input type="text" name="KEY_WORD" value="" class="textClass"/></td><td><input type="submit" class="buttonClass" value="技术成熟率"></input></td></tr>
 </table>
 </form>
-<form name="clusterDataForm" method="post" action="clusterDataChart">
+</div>
+<div>
+<form method="post" action="clusterDataChart">
 <input type="hidden" name="INDICATOR_TYPE" value="<%=Constants.CLUSTER_NUMBER%>" />
-<table border=0 cellspacing="20px" cellpadding="20px">
-<tr><td><input type="text" name="KEY_WORD" value="" class="RowInput"/></td><td><p id="button" class="button1"><input type="submit" value="聚类分析"></input></p></td></tr>
+<table class="tableClass">
+<tr><td><input type="text" name="KEY_WORD" value="" class="textClass"/></td><td><input type="submit" class="buttonClass" value="聚类分析"></input></td></tr>
 </table>
 </form>
+</div>
+</div>
 </body>
 </html>

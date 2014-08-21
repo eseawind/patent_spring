@@ -109,7 +109,7 @@ $(document).ready(function(){
 <div id='showDiv'>
 <table class="showFileTableClass" border=0 cellspacing="10px" cellpadding="10px">
 <tr>
-<td width="60%" height="100%" class="pdf"><%=PTT_NUM%><a href="<%=file_path%>" class="iframe">展开</a><iframe id="win" name="win" onload="Javascript:dyniframesize('win')" src="<%=file_path%>" width="100%" height="100%"></iframe></td>
+<td width="60%" height="100%" class="pdf"><%=PTT_NUM%>&nbsp;&nbsp;&nbsp;&nbsp;<a href="<%=file_path%>" class="iframe">查看原网页</a><iframe id="win" name="win" onload="Javascript:dyniframesize('win')" src="<%=file_path%>" width="100%" height="100%"></iframe></td>
 <td width="40%" height="100%">
 <div id="showdialog">
 40个TRIZ原理

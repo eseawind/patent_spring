@@ -42,6 +42,25 @@ public class AccountService extends TotalService {
 	}
 
 	/**
+	 * 检查是否已经通过审核
+	 * 
+	 * @param email
+	 * @return
+	 */
+	public Boolean isPass(String email) {
+		Account account = new AccountDao().find(session, email);
+		if (account != null) {
+			String pass = account.getPass();
+			if (pass.equals("0")) {
+				return false;
+			} else if (pass.equals("2")) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * 更新
 	 * 
 	 * @param account

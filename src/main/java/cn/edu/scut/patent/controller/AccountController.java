@@ -16,6 +16,7 @@ import cn.edu.scut.patent.model.Account;
 import cn.edu.scut.patent.model.Setting;
 import cn.edu.scut.patent.service.AccountService;
 import cn.edu.scut.patent.service.SettingService;
+import cn.edu.scut.patent.util.Constants;
 
 @Controller
 public class AccountController {
@@ -94,6 +95,8 @@ public class AccountController {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		// 设置默认的管理员账户
+		setDefaultAdministrator();
 
 		String email = request.getParameter("registerEmail");
 		String accountType = request.getParameter("registerSelect");
@@ -116,19 +119,29 @@ public class AccountController {
 			account.setPass("1");
 		}
 		new AccountService().save(account);
-
-		RequestDispatcher re;
-		request.getSession().setAttribute("Account", email);
-		if (accountType.equals("user")) {
-			re = request.getRequestDispatcher("view/search.jsp");
-		} else if (accountType.equals("classifier")) {
-			re = request.getRequestDispatcher("view/search.jsp");
-		} else {
-			request.getSession().setAttribute("UNCHECKACCOUNT",
-					getUncheckAccount().toString());
-			re = request.getRequestDispatcher("view/administrator.jsp");
-		}
 		System.out.println(email + " 注册成功");
+
+		RequestDispatcher re = null;
+		if (getAutopass().equals("1")) {
+			request.getSession().setAttribute("Account", email);
+			if (accountType.equals("user")) {
+				re = request.getRequestDispatcher("view/search.jsp");
+			} else if (accountType.equals("classifier")) {
+				re = request.getRequestDispatcher("view/search.jsp");
+			} else {
+				request.getSession().setAttribute("UNCHECKACCOUNT",
+						getUncheckAccount().toString());
+				re = request.getRequestDispatcher("view/administrator.jsp");
+			}
+		} else {
+			re = request.getRequestDispatcher("index.jsp");
+			try {
+				Thread.sleep(60 * 1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
 		try {
 			re.forward(request, response);
@@ -174,6 +187,47 @@ public class AccountController {
 	}
 
 	/**
+	 * 检查账户是否已经通过审核
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "checkPass")
+	public void checkPass(HttpServletRequest request,
+			HttpServletResponse response) {
+		try {
+			request.setCharacterEncoding("utf-8");
+			response.setContentType("text/html;charset=utf-8");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		String email = request.getParameter("Email");
+
+		String result = "";
+		if (new AccountService().isPass(email)) {
+			result = "pass";
+		} else {
+			result = "unpass";
+		}
+		JSONObject jsonObj = new JSONObject();
+		jsonObj.put("result", result);
+
+		PrintWriter out;
+		try {
+			out = response.getWriter();
+			out.write(jsonObj.toString());
+			out.flush();
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * 更新账户
 	 * 
 	 * @param request
@@ -203,6 +257,28 @@ public class AccountController {
 	/**
 	 * 获取自动审核功能的参数
 	 * 
+	 * @return
+	 */
+	public String getAutopass() {
+		String result = "";
+		// 检查自动审核是否拥有参数，如果没有，则添加上去
+		Setting autopass = new SettingService().find("autopass");
+		if (autopass == null) {
+			Setting setting = new Setting();
+			setting.setFunction("autopass");
+			setting.setFlag("1");
+			new SettingService().save(setting);
+			System.out.println("自动审核没有参数，新建后默认为1");
+			result = "1";
+		} else {
+			result = autopass.getFlag();
+		}
+		return result;
+	}
+
+	/**
+	 * 获取自动审核功能的参数
+	 * 
 	 * @param request
 	 * @param response
 	 * @return
@@ -218,21 +294,8 @@ public class AccountController {
 			e1.printStackTrace();
 		}
 
-		String result = "";
-		// 检查自动审核是否拥有参数，如果没有，则添加上去
-		Setting autopass = new SettingService().find("autopass");
-		if (autopass == null) {
-			Setting setting = new Setting();
-			setting.setFunction("autopass");
-			setting.setFlag("0");
-			new SettingService().save(setting);
-			System.out.println("自动审核没有参数，新建后默认为0");
-			result = "0";
-		} else {
-			result = autopass.getFlag();
-		}
 		JSONObject jsonObj = new JSONObject();
-		jsonObj.put("result", result);
+		jsonObj.put("result", getAutopass());
 
 		PrintWriter out;
 		try {
@@ -290,5 +353,23 @@ public class AccountController {
 			jsonArray.put(jsonObj);
 		}
 		return jsonArray;
+	}
+
+	/**
+	 * 设置默认的管理员账户
+	 */
+	public void setDefaultAdministrator() {
+		String email = Constants.DEFAULT_ADMINISTRATOR_EMAIL;
+		Account temp = new AccountService().find(email);
+		if (temp == null) {
+			Account account = new Account();
+			account.setEmail(email);
+			account.setAccountType("administrator");
+			account.setUsername("default_administrator");
+			account.setDepartment("SCUT");
+			account.setPassword(Constants.DEFAULT_ADMINISTRATOR_PASSWORD);
+			account.setPass("1");
+			new AccountService().save(account);
+		}
 	}
 }

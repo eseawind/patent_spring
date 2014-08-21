@@ -48,6 +48,10 @@ public class Constants {
 	public static int TECHNICAL_MATURE_RATE_NUMBER = 102;
 	// 聚类的指标号码
 	public static int CLUSTER_NUMBER = 103;
+	// 默认的管理员电子邮箱
+	public static String DEFAULT_ADMINISTRATOR_EMAIL = "default@scut.edu.cn";
+	// 默认的管理员密码
+	public static String DEFAULT_ADMINISTRATOR_PASSWORD = "scut2014";
 
 	// 聚类专利数的限制，0代表不限制
 	public static int CLUSTER_LIMIT = 100;
