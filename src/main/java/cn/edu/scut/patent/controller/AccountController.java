@@ -40,25 +40,45 @@ public class AccountController {
 
 		String email = request.getParameter("loginEmail");
 		String password = request.getParameter("loginPassword");
+		if (email == null || password == null) {
+			try {
+				System.out.println("非法进入！");
+				response.sendRedirect("index.jsp");
+				return;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
 		Account account = new AccountService().find(email);
 		RequestDispatcher re;
 		if (account != null) {
 			if (account.getPassword().equals(password)) {
-				request.getSession()
-						.setAttribute("Account", account.getEmail());
-				String accountType = account.getAccountType();
-				if (accountType.equals("user")) {
-					re = request.getRequestDispatcher("view/search.jsp");
-				} else if (accountType.equals("classifier")) {
-					re = request.getRequestDispatcher("view/search.jsp");
+				if (checkPass(email)) {
+					request.getSession().setAttribute("Account",
+							account.getEmail());
+					request.getSession().setAttribute("Permission",
+							account.getAccountType());
+					String accountType = account.getAccountType();
+					if (accountType.equals("user")) {
+						re = request.getRequestDispatcher("view/search.jsp");
+					} else if (accountType.equals("classifier")) {
+						re = request.getRequestDispatcher("view/search.jsp");
+					} else {
+						request.getSession().setAttribute("UNCHECKACCOUNT",
+								getUncheckAccount().toString());
+						re = request
+								.getRequestDispatcher("view/administrator.jsp");
+					}
+					System.out.println(email + " 登录成功");
 				} else {
-					request.getSession().setAttribute("UNCHECKACCOUNT",
-							getUncheckAccount().toString());
-					re = request.getRequestDispatcher("view/administrator.jsp");
+					request.setAttribute("checkPass", "unpass");
+					re = request.getRequestDispatcher("index.jsp");
+					System.out.println(email + " 还没有通过审核");
 				}
-				System.out.println(email + " 登录成功");
 			} else {
+				request.setAttribute("LoginError", "error");
 				re = request.getRequestDispatcher("index.jsp");
 				System.out.println(email + " 登录密码不正确");
 			}
@@ -103,44 +123,60 @@ public class AccountController {
 		String username = request.getParameter("registerName");
 		String department = request.getParameter("registerDepartment");
 		String password = request.getParameter("registerPassord");
-
-		Account account;
-		if (department == null) {
-			account = new Account(email, accountType, username, password);
-		} else {
-			account = new Account(email, accountType, username, department,
-					password);
-		}
-		// 查看是否开启了自动审核
-		Setting autopass = new SettingService().find("autopass");
-		if (autopass.getFlag().equals("0")) {
-			account.setPass("0");
-		} else if (autopass.getFlag().equals("1")) {
-			account.setPass("1");
-		}
-		new AccountService().save(account);
-		System.out.println(email + " 注册成功");
-
-		RequestDispatcher re = null;
-		if (getAutopass().equals("1")) {
-			request.getSession().setAttribute("Account", email);
-			if (accountType.equals("user")) {
-				re = request.getRequestDispatcher("view/search.jsp");
-			} else if (accountType.equals("classifier")) {
-				re = request.getRequestDispatcher("view/search.jsp");
-			} else {
-				request.getSession().setAttribute("UNCHECKACCOUNT",
-						getUncheckAccount().toString());
-				re = request.getRequestDispatcher("view/administrator.jsp");
-			}
-		} else {
-			re = request.getRequestDispatcher("index.jsp");
+		if (email == null || accountType == null || username == null
+				|| password == null) {
 			try {
-				Thread.sleep(60 * 1000);
-			} catch (InterruptedException e) {
+				System.out.println("非法进入！");
+				response.sendRedirect("index.jsp");
+				return;
+			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+
+		RequestDispatcher re = null;
+		// 如果该邮箱已被注册，则返回提示
+		if (new AccountService().find(email) == null) {
+			Account account;
+			if (department == null) {
+				account = new Account(email, accountType, username, password);
+			} else {
+				account = new Account(email, accountType, username, department,
+						password);
+			}
+			// 查看是否开启了自动审核
+			Setting autopass = new SettingService().find("autopass");
+			if (autopass.getFlag().equals("0")) {
+				account.setPass("0");
+			} else if (autopass.getFlag().equals("1")) {
+				account.setPass("1");
+			}
+			new AccountService().save(account);
+			System.out.println(email + " 注册成功");
+
+			if (checkPass(email)) {
+				request.getSession().setAttribute("Account", email);
+				request.getSession().setAttribute("Permission",
+						account.getAccountType());
+				if (accountType.equals("user")) {
+					re = request.getRequestDispatcher("view/search.jsp");
+				} else if (accountType.equals("classifier")) {
+					re = request.getRequestDispatcher("view/search.jsp");
+				} else {
+					request.getSession().setAttribute("UNCHECKACCOUNT",
+							getUncheckAccount().toString());
+					re = request.getRequestDispatcher("view/administrator.jsp");
+				}
+			} else {
+				request.setAttribute("checkPass", "unpass");
+				re = request.getRequestDispatcher("index.jsp");
+				System.out.println(email + " 还没有通过审核");
+			}
+		} else {
+			request.setAttribute("checkEmail", "repeat");
+			re = request.getRequestDispatcher("index.jsp");
+			System.out.println(email + " 已经存在，请选择其他邮箱进行注册");
 		}
 
 		try {
@@ -173,6 +209,7 @@ public class AccountController {
 		System.out
 				.println(request.getSession().getAttribute("Account") + " 退出");
 		request.getSession().removeAttribute("Account");
+		request.getSession().removeAttribute("Permission");
 		RequestDispatcher re = request.getRequestDispatcher("index.jsp");
 
 		try {
@@ -189,42 +226,12 @@ public class AccountController {
 	/**
 	 * 检查账户是否已经通过审核
 	 * 
-	 * @param request
-	 * @param response
+	 * @param email
 	 * @return
 	 */
-	@RequestMapping(value = "checkPass")
-	public void checkPass(HttpServletRequest request,
-			HttpServletResponse response) {
-		try {
-			request.setCharacterEncoding("utf-8");
-			response.setContentType("text/html;charset=utf-8");
-		} catch (UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+	public boolean checkPass(String email) {
 
-		String email = request.getParameter("Email");
-
-		String result = "";
-		if (new AccountService().isPass(email)) {
-			result = "pass";
-		} else {
-			result = "unpass";
-		}
-		JSONObject jsonObj = new JSONObject();
-		jsonObj.put("result", result);
-
-		PrintWriter out;
-		try {
-			out = response.getWriter();
-			out.write(jsonObj.toString());
-			out.flush();
-			out.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		return new AccountService().isPass(email);
 	}
 
 	/**
@@ -247,6 +254,16 @@ public class AccountController {
 
 		String email = request.getParameter("updateEmail");
 		String pass = request.getParameter("updatePass");
+		if (email == null || pass == null) {
+			try {
+				System.out.println("非法进入！");
+				response.sendRedirect("index.jsp");
+				return;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
 		Account account = new AccountService().find(email);
 		account.setPass(pass);
@@ -328,6 +345,16 @@ public class AccountController {
 		}
 
 		String flag = request.getParameter("updateFlag");
+		if (flag == null) {
+			try {
+				System.out.println("非法进入！");
+				response.sendRedirect("index.jsp");
+				return;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
 		Setting setting = new SettingService().find("autopass");
 		setting.setFlag(flag);

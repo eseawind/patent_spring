@@ -2,6 +2,7 @@
 <%@ page pageEncoding="utf-8"%>
 <%@ page language="java" import="java.sql.*,java.util.*,java.net.*"%>
 <%@ include file="path&check.jsp" %>
+<%@ include file="/permission/administratorPermission.jsp" %>
 <%
 	int count = 10;
 	String jsonArray = (String) session.getAttribute("UNCHECKACCOUNT");

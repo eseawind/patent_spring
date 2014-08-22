@@ -1,5 +1,6 @@
 package cn.edu.scut.patent.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -12,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import cn.edu.scut.patent.core.Indicator;
 import cn.edu.scut.patent.model.ClusterValueItem;
 import cn.edu.scut.patent.model.IndicatorData;
@@ -34,6 +34,17 @@ public class TechnicalDataChartController {
 			HttpServletResponse response) throws Exception {
 
 		String keyWord = request.getParameter("KEY_WORD");
+		if (keyWord == null) {
+			try {
+				System.out.println("非法进入！");
+				response.sendRedirect("index.jsp");
+				return;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 		int indicatorType = Integer.parseInt(request
 				.getParameter("INDICATOR_TYPE"));
 		IndicatorParam param = new IndicatorParam();
@@ -102,6 +113,17 @@ public class TechnicalDataChartController {
 			HttpServletResponse response) throws Exception {
 
 		String keyWord = request.getParameter("KEY_WORD");
+		if (keyWord == null) {
+			try {
+				System.out.println("非法进入！");
+				response.sendRedirect("index.jsp");
+				return;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 		int indicatorType = Integer.parseInt(request
 				.getParameter("INDICATOR_TYPE"));
 		IndicatorParam param = new IndicatorParam();

@@ -35,6 +35,17 @@ public class ClassificationController {
 
 		String PTT_NUM = request.getParameter("PTT_NUM");
 		String[] TRIZ_NUM = request.getParameterValues("triz");
+		if (PTT_NUM == null || TRIZ_NUM == null) {
+			try {
+				System.out.println("非法进入！");
+				response.sendRedirect("index.jsp");
+				return;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 		for (int i = 0; i < TRIZ_NUM.length; i++) {
 			System.out.println(i + "@@" + TRIZ_NUM[i]);
 		}
@@ -79,6 +90,17 @@ public class ClassificationController {
 		}
 
 		String pttNum = request.getParameter("pttNum");
+		if (pttNum == null) {
+			try {
+				System.out.println("非法进入！");
+				response.sendRedirect("index.jsp");
+				return;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 		List<Integer> trizNumList = new ClassificationService()
 				.getAllFromPttNum(pttNum);
 

@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=utf-8"%>
 <%@ page pageEncoding="utf-8"%>
 <%@ page language="java" import="java.sql.*"%>
+<%@ include file="/permission/userPermission.jsp" %>
 <%
 String Chart_Type = (String) session.getAttribute("Chart_Type");
 String Title = (String) session.getAttribute("Title");

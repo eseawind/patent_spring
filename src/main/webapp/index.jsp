@@ -2,6 +2,33 @@
 <%@ page pageEncoding="utf-8"%>
 <%@ page language="java" import="java.sql.*,java.util.*,java.net.*"%>
 <%@ include file="view/path&check.jsp" %>
+<%
+String loginError = (String)request.getAttribute("LoginError");
+String visibility;
+if(loginError == null){
+	visibility = "hide";
+}else{
+	visibility = "show";
+}
+%>
+<%
+String checkPass = (String)request.getAttribute("checkPass");
+String unpass;
+if(checkPass == null){
+	unpass = "hide";
+}else{
+	unpass = "show";
+}
+%>
+<%
+String checkEmail = (String)request.getAttribute("checkEmail");
+String emailExisted;
+if(checkEmail == null){
+	emailExisted = "hide";
+}else{
+	emailExisted = "show";
+}
+%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -19,7 +46,37 @@ $(document).ready(function() {
 	mediate($('.divClass'));
 	$('#login').show();
     $('#register').hide();
-	$('#loginErrorLabel').hide();
+    //判断"用户名或密码错误"应该展示还是隐藏
+    if($('#visibility').val()=='hide'){
+    	$('#loginErrorLabel').hide();
+    }else{
+    	$('#loginErrorLabel').show();
+    }
+  //设置existedEmailDialog和UnpassDialog的效果
+	$('#emailExistedDialog, #UnpassDialog').dialog({
+		autoOpen:false,
+		closeOnEscape:false,
+		draggable:false,
+		modal:true,
+		title:"警告",
+		buttons:{
+			"确定":function(){
+				$(this).dialog('close');
+			}
+		}
+	});
+    //判断"等待审核"的dialog应该展示还是隐藏
+    if($('#unpass').val()=='hide'){
+    	$('#UnpassDialog').dialog('close');
+    }else{
+    	$('#UnpassDialog').dialog('open');
+    }
+  	//判断"该邮箱已被注册"的dialog应该展示还是隐藏
+    if($('#emailExisted').val()=='hide'){
+    	$('#emailExistedDialog').dialog('close');
+    }else{
+    	$('#emailExistedDialog').dialog('open');
+    }
 	//设置载入后用cookie自动填充用户名和密码
 	fillCookie();
 	//用于登录和注册界面的切换
@@ -133,19 +190,6 @@ $(document).ready(function() {
 			}
 		}
 	});
-	//设置existedEmailDialog和UnpassDialog的效果
-	$('#existedEmailDialog, #UnpassDialog').dialog({
-		autoOpen:false,
-		closeOnEscape:false,
-		draggable:false,
-		modal:true,
-		title:"警告",
-		buttons:{
-			"确定":function(){
-				$(this).dialog('close');
-			}
-		}
-	});
 	//设置登录表单提交时的事件
 	$('#loginForm').submit(function(evt){
 		if($('#rememberUserName').prop('checked')){
@@ -158,35 +202,6 @@ $(document).ready(function() {
 		}else{
 			$.cookie('password',null,{path:'/',expires:0});
 		}
-		//检查是否已经通过审核
-		$.ajax({
-			type:'post',
-			url:'checkPass',
-			data:{Email:$('#loginEmail').val()},
-			dataType:'json',
-			async:false,
-			success:function(data){
-				if(data.result=='unpass'){
-					$('#UnpassDialog').dialog('open');
-					evt.preventDefault();
-				}
-			}
-		});
-	});
-	//设置注册表单提交时的事件
-	$('#registerForm').submit(function(evt){
-		//检查是否开启了自动审核
-		$.ajax({
-			type:'post',
-			url:'getAutopass',
-			dataType:'json',
-			async:false,
-			success:function(data){
-				if(data.result=='0'){
-					$('#UnpassDialog').dialog('open');
-				}
-			}
-		});
 	});
 });
 function fillCookie(){
@@ -210,6 +225,9 @@ function fillCookie(){
 </head>
 <body>
 <%@ include file="view/client.jsp" %>
+<input type="hidden" id="visibility" value='<%=visibility%>' />
+<input type="hidden" id="unpass" value='<%=unpass%>' />
+<input type="hidden" id="emailExisted" value='<%=emailExisted%>' />
 <p>华南理工大学专利检索系统</p>
 <div class="divClass">
 <table cellpadding="0" align="center" >
@@ -260,11 +278,11 @@ function fillCookie(){
 </td></tr>
 </table>
 </div>
-<div id="existedEmailDialog">
-对不起，该邮箱已被注册，请选择其他邮箱。
+<div id="emailExistedDialog">
+对不起，该邮箱已经存在，请使用其他邮箱进行注册。
 </div>
 <div id="UnpassDialog">
-您的账户有待审核，请耐心等候。
+您的账户正在审核，请耐心等候。
 </div>
 </body>
 </html>

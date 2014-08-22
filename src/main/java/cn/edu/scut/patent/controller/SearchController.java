@@ -31,72 +31,122 @@ public class SearchController {
 		long startTime = new Date().getTime();
 		List<String> pttTypeList = new ArrayList<String>();
 		Patent patentdao = new Patent();
-		if (request.getParameter("FMZL") != null) {
-			pttTypeList.add(request.getParameter("FMZL"));
+
+		String flag0 = null;
+		String flag = null;
+		String FMZL = request.getParameter("FMZL");
+		String SYXX = request.getParameter("SYXX");
+		String WGSJ = request.getParameter("WGSJ");
+		String applyNum = request.getParameter("APPLY_NUM");
+		String applyDate = request.getParameter("APPLY_DATE");
+		String pttName = request.getParameter("PTT_NAME");
+		String pttNum = request.getParameter("PTT_NUM");
+		String pttDate = request.getParameter("PTT_DATE");
+		String pttMainClassNum = request.getParameter("PTT_MAIN_CLASS_NUM");
+		String pttClassNum = request.getParameter("PTT_CLASS_NUM");
+		String proposer = request.getParameter("PROPOSER");
+		String proposerAddress = request.getParameter("PROPOSER_ADDRESS");
+		String inventor = request.getParameter("INVENTOR");
+		String internationalApply = request.getParameter("INTERNATIONAL_APPLY");
+		String internationalPublication = request
+				.getParameter("INTERNATIONAL_PUBLICATION");
+		String intoDate = request.getParameter("INTO_DATE");
+		String pttAgencyOrg = request.getParameter("PTT_AGENCY_ORG");
+		String pttAgencyPerson = request.getParameter("PTT_AGENCY_PERSON");
+		String pttAbstract = request.getParameter("PTT_ABSTRACT");
+
+		if (FMZL != null) {
+			pttTypeList.add(FMZL);
+			flag0 = "1";
 		}
-		if (request.getParameter("SYXX") != null) {
-			pttTypeList.add(request.getParameter("SYXX"));
+		if (SYXX != null) {
+			pttTypeList.add(SYXX);
+			flag0 = "1";
 		}
-		if (request.getParameter("WGSJ") != null) {
-			pttTypeList.add(request.getParameter("WGSJ"));
+		if (WGSJ != null) {
+			pttTypeList.add(WGSJ);
+			flag0 = "1";
 		}
-		if (request.getParameter("APPLY_NUM").replaceAll(" ", "") != "") {
-			patentdao.setApplyNum(request.getParameter("APPLY_NUM"));
+		if (applyNum != null && applyNum.replaceAll(" ", "") != "") {
+			patentdao.setApplyNum(applyNum);
+			flag = "1";
 		}
-		if (request.getParameter("APPLY_DATE").replaceAll(" ", "") != "") {
-			patentdao.setApplyDate(StringHelper.stringToDate(request
-					.getParameter("APPLY_DATE")));
+		if (applyDate != null && applyDate.replaceAll(" ", "") != "") {
+			patentdao.setApplyDate(StringHelper.stringToDate(applyDate));
+			flag = "1";
 		}
-		if (request.getParameter("PTT_NAME").replaceAll(" ", "") != "") {
-			patentdao.setPttName(request.getParameter("PTT_NAME"));
+		if (pttName != null && pttName.replaceAll(" ", "") != "") {
+			patentdao.setPttName(pttName);
+			flag = "1";
 		}
-		if (request.getParameter("PTT_NUM").replaceAll(" ", "") != "") {
-			patentdao.setPttNum(request.getParameter("PTT_NUM"));
+		if (pttNum != null && pttNum.replaceAll(" ", "") != "") {
+			patentdao.setPttNum(pttNum);
+			flag = "1";
 		}
-		if (request.getParameter("PTT_DATE").replaceAll(" ", "") != "") {
-			patentdao.setPttDate(StringHelper.stringToDate(request
-					.getParameter("PTT_DATE")));
+		if (pttDate != null && pttDate.replaceAll(" ", "") != "") {
+			patentdao.setPttDate(StringHelper.stringToDate(pttDate));
+			flag = "1";
 		}
-		if (request.getParameter("PTT_MAIN_CLASS_NUM").replaceAll(" ", "") != "") {
-			patentdao.setPttMainClassNum(request
-					.getParameter("PTT_MAIN_CLASS_NUM"));
+		if (pttMainClassNum != null
+				&& pttMainClassNum.replaceAll(" ", "") != "") {
+			patentdao.setPttMainClassNum(pttMainClassNum);
+			flag = "1";
 		}
-		if (request.getParameter("PTT_CLASS_NUM").replaceAll(" ", "") != "") {
-			patentdao.setPttClassNum(request.getParameter("PTT_CLASS_NUM"));
+		if (pttClassNum != null && pttClassNum.replaceAll(" ", "") != "") {
+			patentdao.setPttClassNum(pttClassNum);
+			flag = "1";
 		}
-		if (request.getParameter("PROPOSER").replaceAll(" ", "") != "") {
-			patentdao.setProposer(request.getParameter("PROPOSER"));
+		if (proposer != null && proposer.replaceAll(" ", "") != "") {
+			patentdao.setProposer(proposer);
+			flag = "1";
 		}
-		if (request.getParameter("PROPOSER_ADDRESS").replaceAll(" ", "") != "") {
-			patentdao.setProposerAddress(request
-					.getParameter("PROPOSER_ADDRESS"));
+		if (proposerAddress != null
+				&& proposerAddress.replaceAll(" ", "") != "") {
+			patentdao.setProposerAddress(proposerAddress);
+			flag = "1";
 		}
-		if (request.getParameter("INVENTOR").replaceAll(" ", "") != "") {
-			patentdao.setInventor(request.getParameter("INVENTOR"));
+		if (inventor != null && inventor.replaceAll(" ", "") != "") {
+			patentdao.setInventor(inventor);
+			flag = "1";
 		}
-		if (request.getParameter("INTERNATIONAL_APPLY").replaceAll(" ", "") != "") {
-			patentdao.setInternationalApply(request
-					.getParameter("INTERNATIONAL_APPLY"));
+		if (internationalApply != null
+				&& internationalApply.replaceAll(" ", "") != "") {
+			patentdao.setInternationalApply(internationalApply);
+			flag = "1";
 		}
-		if (request.getParameter("INTERNATIONAL_PUBLICATION").replaceAll(" ",
-				"") != "") {
-			patentdao.setInternationalPublication(request
-					.getParameter("INTERNATIONAL_PUBLICATION"));
+		if (internationalPublication != null
+				&& internationalPublication.replaceAll(" ", "") != "") {
+			patentdao.setInternationalPublication(internationalPublication);
+			flag = "1";
 		}
-		if (request.getParameter("INTO_DATE").replaceAll(" ", "") != "") {
-			patentdao.setPttDate(StringHelper.stringToDate(request
-					.getParameter("INTO_DATE")));
+		if (intoDate != null && intoDate.replaceAll(" ", "") != "") {
+			patentdao.setPttDate(StringHelper.stringToDate(intoDate));
+			flag = "1";
 		}
-		if (request.getParameter("PTT_AGENCY_ORG").replaceAll(" ", "") != "") {
-			patentdao.setPttAgencyOrg(request.getParameter("PTT_AGENCY_ORG"));
+		if (pttAgencyOrg != null && pttAgencyOrg.replaceAll(" ", "") != "") {
+			patentdao.setPttAgencyOrg(pttAgencyOrg);
+			flag = "1";
 		}
-		if (request.getParameter("PTT_AGENCY_PERSON").replaceAll(" ", "") != "") {
-			patentdao.setPttAgencyPerson(request
-					.getParameter("PTT_AGENCY_PERSON"));
+		if (pttAgencyPerson != null
+				&& pttAgencyPerson.replaceAll(" ", "") != "") {
+			patentdao.setPttAgencyPerson(pttAgencyPerson);
+			flag = "1";
 		}
-		if (request.getParameter("PTT_ABSTRACT").replaceAll(" ", "") != "") {
-			patentdao.setPttAbstract(request.getParameter("PTT_ABSTRACT"));
+		if (pttAbstract != null && pttAbstract.replaceAll(" ", "") != "") {
+			patentdao.setPttAbstract(pttAbstract);
+			flag = "1";
 		}
+		if (flag0 == null || flag == null) {
+			try {
+				System.out.println("缺乏参数，非法进入！");
+				response.sendRedirect("view/search.jsp");
+				return;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 		System.out.println("进入search啦！");
 		List<Patent> patentList = new Search().doSearch(patentdao, pttTypeList);
 		String timeConsume = StringHelper.timer(startTime);

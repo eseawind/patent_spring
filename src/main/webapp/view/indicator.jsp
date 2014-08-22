@@ -2,6 +2,7 @@
 <%@ page pageEncoding="utf-8"%>
 <%@ page language="java" import="java.sql.*,java.util.*,java.net.*,cn.edu.scut.patent.util.Constants"%>
 <%@ include file="path&check.jsp" %>
+<%@ include file="/permission/userPermission.jsp" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>

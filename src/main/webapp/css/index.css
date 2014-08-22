@@ -1,5 +1,6 @@
 @charset "utf-8";
 /* CSS Document */
+
 .divClass {
 	height: 200px;
 }
@@ -9,7 +10,6 @@ table {
 	background-color: #CCC;
 	text-align: center;
 }
-
 body {
 	font-family: Georgia, "Times New Roman", Times, serif;
 	font-size: 12px;
@@ -17,6 +17,10 @@ body {
 	text-align: left;
 	background-image: url(../image/background.jpg);
 	background-color: #FFF;
+}
+#loginErrorLabel {
+	font-size: 8px;
+	color: #F00;
 }
 .tableCss {
 	width: 230px;

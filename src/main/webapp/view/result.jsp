@@ -3,6 +3,7 @@
 <%@ page language="java"
 	import="java.sql.*,java.util.*,java.net.*,cn.edu.scut.patent.model.Patent" %>
 <%@ include file="path&check.jsp" %>
+<%@ include file="/permission/userPermission.jsp" %>
 <%
 	int count = 10;
 	String jsonArray = (String) session.getAttribute("PATENTLIST");
