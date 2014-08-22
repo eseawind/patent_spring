@@ -152,6 +152,10 @@ public class AccountController {
 			} else if (autopass.getFlag().equals("1")) {
 				account.setPass("1");
 			}
+			// 对于管理员账户，无论如何也不能够自动审核
+			if (account.getAccountType().equals("administrator")) {
+				account.setPass("0");
+			}
 			new AccountService().save(account);
 			System.out.println(email + " 注册成功");
 
