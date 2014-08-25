@@ -3,6 +3,15 @@
 <%@ page language="java" import="java.sql.*,java.util.*,java.net.*"%>
 <%@ include file="path&check.jsp" %>
 <%@ include file="/permission/userPermission.jsp" %>
+<%
+String noResultFoundError = (String)request.getAttribute("NoResultFoundError");
+String noResultFound;
+if(noResultFoundError == null){
+	noResultFound = "hide";
+}else{
+	noResultFound = "show";
+}
+%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -23,14 +32,20 @@ $(document).ready(function() {
 		dateFormat:'yy-mm-dd',
 		yearRange:'-100:+100'
 	});
-	//设置waitingDialog的效果
-	$('#waitingDialog').dialog({
+	//设置waitingDialog和noResultFound的效果
+	$('#waitingDialog, #noResultFoundDialog').dialog({
 		autoOpen:false,
 		closeOnEscape:false,
 		draggable:false,
 		modal:true,
 		title:"查询"
 	});
+	//判断noResultFound的dialog应该展示还是隐藏
+    if($('#noResultFound').val()=='hide'){
+    	$('#noResultFoundDialog').dialog('close');
+    }else{
+    	$('#noResultFoundDialog').dialog('open');
+    }
 	//在searchForm提交后显示等待的dialog
 	$('#searchForm').submit(function(){
 		$('#waitingDialog').dialog('open');
@@ -46,6 +61,7 @@ $(document).ready(function() {
 </head>
 <body>
 <%@ include file="client.jsp" %>
+<input type="hidden" id="noResultFound" value='<%=noResultFound%>' />
 <div class="searchDivClass">
 <form id="searchForm" name="searchForm" method="post" action="search">
 <table cellspacing="10px">
@@ -99,6 +115,9 @@ $(document).ready(function() {
 </div>
 <div id="waitingDialog">
 正在查询中，请稍候...
+</div>
+<div id="noResultFoundDialog">
+对不起，没有找到结果。
 </div>
 </body>
 </html>

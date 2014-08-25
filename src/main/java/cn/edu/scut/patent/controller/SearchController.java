@@ -151,21 +151,29 @@ public class SearchController {
 		List<Patent> patentList = new Search().doSearch(patentdao, pttTypeList);
 		String timeConsume = StringHelper.timer(startTime);
 
-		JSONArray jsonArray = new JSONArray();
-		for (Patent patent : patentList) {
-			JSONObject jsonObj = new JSONObject();
-			jsonObj.put("ApplyNum", patent.getApplyNum());
-			jsonObj.put("Inventor", patent.getInventor());
-			jsonObj.put("Proposer", patent.getProposer());
-			jsonObj.put("PttDate", patent.getPttDate());
-			jsonObj.put("PttName", patent.getPttName());
-			jsonObj.put("PttNum", patent.getPttNum());
-			jsonObj.put("PttType", patent.getPttType());
-			jsonArray.put(jsonObj);
+		RequestDispatcher re;
+		if (patentList != null && patentList.size() > 0) {
+			JSONArray jsonArray = new JSONArray();
+			for (Patent patent : patentList) {
+				JSONObject jsonObj = new JSONObject();
+				jsonObj.put("ApplyNum", patent.getApplyNum());
+				jsonObj.put("Inventor", patent.getInventor());
+				jsonObj.put("Proposer", patent.getProposer());
+				jsonObj.put("PttDate", patent.getPttDate());
+				jsonObj.put("PttName", patent.getPttName());
+				jsonObj.put("PttNum", patent.getPttNum());
+				jsonObj.put("PttType", patent.getPttType());
+				jsonArray.put(jsonObj);
+			}
+			request.getSession().setAttribute("PATENTLIST",
+					jsonArray.toString());
+			request.getSession().setAttribute("TIMECONSUME", timeConsume);
+			re = request.getRequestDispatcher("view/result.jsp");
+		} else {
+			request.setAttribute("NoResultFoundError", "NoResult");
+			re = request.getRequestDispatcher("view/search.jsp");
+			System.out.println("没有找到结果");
 		}
-		request.getSession().setAttribute("PATENTLIST", jsonArray.toString());
-		request.getSession().setAttribute("TIMECONSUME", timeConsume);
-		RequestDispatcher re = request.getRequestDispatcher("view/result.jsp");
 
 		try {
 			re.forward(request, response);
