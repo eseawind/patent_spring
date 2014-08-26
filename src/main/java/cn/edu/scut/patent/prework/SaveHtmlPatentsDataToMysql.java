@@ -83,9 +83,14 @@ public class SaveHtmlPatentsDataToMysql implements
 
 		row = tableTag.getRow(0);
 		colAry = row.getColumns();
-		pttDao.setApplyNum(colAry[1].getStringText()
+		String applyNum = colAry[1].getStringText()
 				.replace("&nbsp;<span class=\"zi_10\">", "")
-				.replace("</span>", ""));
+				.replace("</span>", "");
+		// 如果不是以CN中国专利开头的，则添加上CN字段
+		if (applyNum.indexOf("CN") == -1) {
+			applyNum = "CN" + applyNum;
+		}
+		pttDao.setApplyNum(applyNum);
 		pttDao.setApplyDate(Date.valueOf(colAry[3].getStringText()
 				.replace("&nbsp;", "").replace(".", "-")));
 

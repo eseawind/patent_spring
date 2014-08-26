@@ -190,17 +190,15 @@ public class Search implements SearchImpl {
 			String highlighterStr;
 			System.out.println("PTT_TYPE" + ":[" + d.get("PTT_TYPE") + "]");
 			pttDao.setPttType(d.get("PTT_TYPE"));
-			highlighterStr = toHighlighter(query, analyzer, d.get("APPLY_NUM"));
-			System.out.println("APPLY_NUM" + ":[" + highlighterStr + "]");
-			pttDao.setApplyNum(highlighterStr);
+			System.out.println("APPLY_NUM" + ":[" + d.get("APPLY_NUM") + "]");
+			pttDao.setApplyNum(d.get("APPLY_NUM"));
 			System.out.println("APPLY_DATE" + ":[" + d.get("APPLY_DATE") + "]");
 			pttDao.setApplyDate(StringHelper.stringToDate(d.get("APPLY_DATE")));
 			highlighterStr = toHighlighter(query, analyzer, d.get("PTT_NAME"));
 			System.out.println("PTT_NAME" + ":[" + highlighterStr + "]");
 			pttDao.setPttName(highlighterStr);
-			highlighterStr = toHighlighter(query, analyzer, d.get("PTT_NUM"));
-			System.out.println("PTT_NUM" + ":[" + highlighterStr + "]");
-			pttDao.setPttNum(highlighterStr);
+			System.out.println("PTT_NUM" + ":[" + d.get("PTT_NUM") + "]");
+			pttDao.setPttNum(d.get("PTT_NUM"));
 			System.out.println("PTT_DATE" + ":[" + d.get("PTT_DATE") + "]");
 			pttDao.setPttDate(StringHelper.stringToDate(d.get("PTT_DATE")));
 			highlighterStr = toHighlighter(query, analyzer,

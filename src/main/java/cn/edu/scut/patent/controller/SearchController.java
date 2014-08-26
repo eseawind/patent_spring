@@ -77,6 +77,10 @@ public class SearchController {
 			flag0 = "1";
 		}
 		if (applyNum != null && applyNum.replaceAll(" ", "") != "") {
+			// 如果不是以CN中国专利开头的，则添加上CN字段
+			if (applyNum.indexOf("CN") == -1) {
+				applyNum = "CN" + applyNum;
+			}
 			patentdao.setApplyNum(applyNum);
 			flag = "1";
 		}
@@ -165,7 +169,9 @@ public class SearchController {
 			JSONArray jsonArray = new JSONArray();
 			for (Patent patent : patentList) {
 				JSONObject jsonObj = new JSONObject();
-				jsonObj.put("ApplyNum", patent.getApplyNum());
+				// 去除applyNum里面的CN字段以适应佰腾网的查询要求
+				jsonObj.put("ApplyNum",
+						patent.getApplyNum().replaceAll("CN", ""));
 				jsonObj.put("Inventor", patent.getInventor());
 				jsonObj.put("Proposer", patent.getProposer());
 				jsonObj.put("PttDate", patent.getPttDate());

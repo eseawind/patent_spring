@@ -13,7 +13,7 @@
 		</id>
 		<property name="applyNum" type="java.lang.String">
 			<column name="APPLY_NUM" length="20" not-null="true">
-				<comment>专利号</comment>
+				<comment>专利申请号</comment>
 			</column>
 		</property>
 		<property name="applyDate" type="java.sql.Date">

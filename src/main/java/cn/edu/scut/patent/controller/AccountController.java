@@ -406,7 +406,9 @@ public class AccountController {
 			JSONObject jsonObj = new JSONObject();
 			jsonObj.put("PttNum", patentClassification.getPttNum());
 			jsonObj.put("PttName", patentClassification.getPttName());
-			jsonObj.put("ApplyNum", patentClassification.getApplyNum());
+			// 去除applyNum里面的CN字段以适应佰腾网的查询要求
+			jsonObj.put("ApplyNum", patentClassification.getApplyNum()
+					.replaceAll("CN", ""));
 			jsonObj.put("PttType", patentClassification.getPttType());
 			jsonObj.put("PttDate", patentClassification.getPttDate());
 			jsonObj.put("ClassNumG06Q", patentClassification.getClassNumG06Q());
