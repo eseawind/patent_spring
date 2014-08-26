@@ -6,6 +6,7 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import cn.edu.scut.patent.model.Patent;
+import cn.edu.scut.patent.model.PatentClassification;
 
 public class PatentDao extends TotalDao {
 
@@ -77,6 +78,49 @@ public class PatentDao extends TotalDao {
 		Query query = session.createQuery("from Patent");
 		session.getTransaction().commit();
 		List<Patent> list = query.list();
+		return list;
+	}
+
+	/**
+	 * 获取所有的专利数据,包含分类的数据
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PatentClassification> getAllPatentsWithClassification(
+			Session session) {
+		List<PatentClassification> list = new ArrayList<PatentClassification>();
+		session.beginTransaction();
+		Query query = session
+				.createSQLQuery("select patent.PTT_NUM, patent.PTT_NAME, patent.APPLY_NUM, patent.PTT_TYPE, patent.PTT_DATE, patent.CLASS_NUM_G06Q, classification.TRIZ_NUM from PATENTS as patent left join CLASSIFICATION as classification on patent.PTT_NUM = classification.PTT_NUM");
+		session.getTransaction().commit();
+		List<Object[]> templist = query.list();
+
+		for (int i = 0; i < templist.size(); i++) {
+			Object[] object = templist.get(i);
+			PatentClassification patentClassification = new PatentClassification();
+			if (object[6] != null) {
+				String trizNum = String.valueOf(object[6]);
+				while (true) {
+					if (((String) templist.get(i + 1)[0])
+							.equals((String) object[0])) {
+						trizNum += ", "
+								+ String.valueOf(templist.get(i + 1)[6]);
+						i++;
+					} else {
+						break;
+					}
+				}
+				patentClassification.setTrizNum(trizNum);
+			}
+			patentClassification.setPttNum((String) object[0]);
+			patentClassification.setPttName((String) object[1]);
+			patentClassification.setApplyNum((String) object[2]);
+			patentClassification.setPttType((String) object[3]);
+			patentClassification.setPttDate((Date) object[4]);
+			patentClassification.setClassNumG06Q((String) object[5]);
+			list.add(patentClassification);
+		}
 		return list;
 	}
 

@@ -13,6 +13,7 @@ import org.apache.lucene.document.TextField;
 import ICTCLAS2014.Nlpir;
 import cn.edu.scut.patent.dao.PatentDao;
 import cn.edu.scut.patent.model.Patent;
+import cn.edu.scut.patent.model.PatentClassification;
 
 public class PatentService extends TotalService {
 
@@ -57,6 +58,15 @@ public class PatentService extends TotalService {
 	 */
 	public List<Patent> getAllPatents() {
 		return new PatentDao().getAllPatents(session);
+	}
+
+	/**
+	 * 获取所有的专利数据,包含分类的数据
+	 * 
+	 * @return
+	 */
+	public List<PatentClassification> getAllPatentsWithClassification() {
+		return new PatentDao().getAllPatentsWithClassification(session);
 	}
 
 	/**

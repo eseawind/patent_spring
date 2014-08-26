@@ -3,7 +3,7 @@
 <%@ page language="java"
 	import="java.util.*,java.io.*,java.sql.*,java.net.*"%>
 <%@ include file="path&check.jsp" %>
-<%@ include file="/permission/userPermission.jsp" %>
+<%@ include file="/permission/userAndClassifierPermission.jsp" %>
 <%
 	String path_dir = "http://so.baiten.cn/detail/patentdetail?";
 	String APPLY_NUM = java.net.URLEncoder.encode(

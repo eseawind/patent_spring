@@ -13,8 +13,10 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import cn.edu.scut.patent.model.Account;
+import cn.edu.scut.patent.model.PatentClassification;
 import cn.edu.scut.patent.model.Setting;
 import cn.edu.scut.patent.service.AccountService;
+import cn.edu.scut.patent.service.PatentService;
 import cn.edu.scut.patent.service.SettingService;
 import cn.edu.scut.patent.util.Constants;
 
@@ -64,7 +66,10 @@ public class AccountController {
 					if (accountType.equals("user")) {
 						re = request.getRequestDispatcher("view/search.jsp");
 					} else if (accountType.equals("classifier")) {
-						re = request.getRequestDispatcher("view/search.jsp");
+						request.getSession().setAttribute(
+								"PATENTCLASSIFICATION",
+								getAllPatentClassification().toString());
+						re = request.getRequestDispatcher("view/classify.jsp");
 					} else {
 						request.getSession().setAttribute("UNCHECKACCOUNT",
 								getUncheckAccount().toString());
@@ -166,7 +171,9 @@ public class AccountController {
 				if (accountType.equals("user")) {
 					re = request.getRequestDispatcher("view/search.jsp");
 				} else if (accountType.equals("classifier")) {
-					re = request.getRequestDispatcher("view/search.jsp");
+					request.getSession().setAttribute("PATENTCLASSIFICATION",
+							getAllPatentClassification().toString());
+					re = request.getRequestDispatcher("view/classify.jsp");
 				} else {
 					request.getSession().setAttribute("UNCHECKACCOUNT",
 							getUncheckAccount().toString());
@@ -381,6 +388,29 @@ public class AccountController {
 			jsonObj.put("Username", account.getUsername());
 			jsonObj.put("Department", account.getDepartment());
 			jsonObj.put("Pass", account.getPass());
+			jsonArray.put(jsonObj);
+		}
+		return jsonArray;
+	}
+
+	/**
+	 * 获取所有的patent的分类信息
+	 * 
+	 * @return
+	 */
+	public JSONArray getAllPatentClassification() {
+		List<PatentClassification> list = new PatentService()
+				.getAllPatentsWithClassification();
+		JSONArray jsonArray = new JSONArray();
+		for (PatentClassification patentClassification : list) {
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("PttNum", patentClassification.getPttNum());
+			jsonObj.put("PttName", patentClassification.getPttName());
+			jsonObj.put("ApplyNum", patentClassification.getApplyNum());
+			jsonObj.put("PttType", patentClassification.getPttType());
+			jsonObj.put("PttDate", patentClassification.getPttDate());
+			jsonObj.put("ClassNumG06Q", patentClassification.getClassNumG06Q());
+			jsonObj.put("TrizNum", patentClassification.getTrizNum());
 			jsonArray.put(jsonObj);
 		}
 		return jsonArray;

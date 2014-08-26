@@ -3,7 +3,6 @@ package cn.edu.scut.patent.core;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
@@ -19,7 +18,6 @@ import cn.edu.scut.patent.prework.SaveHtmlPatentsDataToMysql;
 import cn.edu.scut.patent.service.PatentService;
 import cn.edu.scut.patent.util.Constants;
 import cn.edu.scut.patent.util.FileHelper;
-import cn.edu.scut.patent.util.PDFHelper;
 import cn.edu.scut.patent.util.StringHelper;
 
 /**
@@ -30,6 +28,7 @@ import cn.edu.scut.patent.util.StringHelper;
  */
 public class Index implements IndexImpl {
 
+	@SuppressWarnings("resource")
 	public void doIndexFromDatabase() throws Exception {
 		doIndexPrework();
 		// 索引开始的时间
@@ -59,36 +58,6 @@ public class Index implements IndexImpl {
 		indexWriter.commit();
 		indexWriter.close();
 		System.out.println("一共花费了" + StringHelper.timer(startTime) + "完成索引！");
-	}
-
-	public void doIndexFromPDF() throws Exception {
-		Map<String, String> map = FileHelper
-				.readfile(Constants.FILE_DIR_STRING);
-		int i = 1;
-		for (Map.Entry<String, String> entry : map.entrySet()) {
-			System.out.println(i++ + "#######################################");
-			// 索引文件(夹)的位置
-			File fileDir = new File(entry.getValue());
-			Analyzer analyzer = new ICTCLASAnalyzer(Version.LUCENE_46);
-			// 存放索引文件的位置
-			Directory directory = FSDirectory.open(new File(
-					Constants.INDEX_DIR_STRING));
-			IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_46,
-					analyzer);
-			// 设置打开索引模式为创建或追加
-			config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
-			IndexWriter indexWriter = new IndexWriter(directory, config);
-			// 索引开始的时间
-			long startTime = new Date().getTime();
-			Document document = PDFHelper.getDocumentFromPDF(fileDir, analyzer);
-			indexWriter.addDocument(document);
-			// 提交事务
-			indexWriter.commit();
-			indexWriter.close();
-			// 索引结束的时间
-			long endTime = new Date().getTime();
-			System.out.println("一共花费了" + (endTime - startTime) + "毫秒完成索引！");
-		}
 	}
 
 	public void doIndexPrework() {

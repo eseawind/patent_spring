@@ -1,6 +1,7 @@
 package cn.edu.scut.patent.controller;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +28,14 @@ public class SearchController {
 	@RequestMapping(value = "search")
 	public void search(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
+		try {
+			request.setCharacterEncoding("utf-8");
+			response.setContentType("text/html;charset=utf-8");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 		// 检索开始的时间
 		long startTime = new Date().getTime();
 		List<String> pttTypeList = new ArrayList<String>();

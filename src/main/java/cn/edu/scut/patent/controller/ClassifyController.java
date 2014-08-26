@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import cn.edu.scut.patent.service.ClassificationService;
 
 @Controller
-public class ClassificationController {
+public class ClassifyController {
 
 	/**
 	 * 更新Triz号码

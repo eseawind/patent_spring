@@ -52,6 +52,8 @@ public class Constants {
 	public static String DEFAULT_ADMINISTRATOR_EMAIL = "default@scut.edu.cn";
 	// 默认的管理员密码
 	public static String DEFAULT_ADMINISTRATOR_PASSWORD = "scut2014";
+	// 最多显示的检索结果
+	public static int MAX_SEARCH_RESULT = 1000000;
 
 	// 聚类专利数的限制，0代表不限制
 	public static int CLUSTER_LIMIT = 100;

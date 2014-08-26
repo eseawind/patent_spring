@@ -43,8 +43,8 @@ import cn.edu.scut.patent.ICTCLASAnalyzer.ICTCLASAnalyzer;
 public class Search implements SearchImpl {
 
 	@SuppressWarnings("resource")
-	public List<Patent> doSearch(Patent patentdao,
-			List<String> pttTypeList) throws IOException {
+	public List<Patent> doSearch(Patent patentdao, List<String> pttTypeList)
+			throws IOException {
 		TopDocs td = null;
 		Query query = null;
 		Directory directory = FSDirectory.open(new File(
@@ -54,7 +54,7 @@ public class Search implements SearchImpl {
 		Analyzer analyzer = new ICTCLASAnalyzer(Version.LUCENE_46);
 		query = htmlConditionsToQuery(patentdao, pttTypeList);
 		if (query != null) {
-			td = searcher.search(query, 1000000);// 这里填写最大输出结果数量
+			td = searcher.search(query, Constants.MAX_SEARCH_RESULT);
 			if (td.totalHits > 0) {
 				System.out.println("找到：" + td.totalHits + "个结果！");
 				return searchResultToPatentdao(td, searcher, query, analyzer);
@@ -68,9 +68,9 @@ public class Search implements SearchImpl {
 		}
 	}
 
-	public Query htmlConditionsToQuery(Patent patent,
-			List<String> pttTypeList) {
-		Map<String, String> map = new PatentService().getAllPatentProperties(patent);
+	public Query htmlConditionsToQuery(Patent patent, List<String> pttTypeList) {
+		Map<String, String> map = new PatentService()
+				.getAllPatentProperties(patent);
 		if (map.size() > 0) {
 			System.out.println("size:" + map.size());
 			BooleanQuery booleanQuery = new BooleanQuery();
