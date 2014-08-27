@@ -69,6 +69,8 @@ public class Search implements SearchImpl {
 	}
 
 	public Query htmlConditionsToQuery(Patent patent, List<String> pttTypeList) {
+		// 使用ICTCLAS中文分词系统过滤Patent
+		patent = new PatentService().getNlpirPatent(patent);
 		Map<String, String> map = new PatentService()
 				.getAllPatentProperties(patent);
 		if (map.size() > 0) {
@@ -99,10 +101,18 @@ public class Search implements SearchImpl {
 					Query tempQuery = new TermQuery(new Term(key, value));
 					booleanQuery.add(tempQuery, Occur.MUST);
 				} else if (key == "PTT_MAIN_CLASS_NUM") {
-					Query tempQuery = new TermQuery(new Term(key, value));
+					PhraseQuery tempQuery = new PhraseQuery();
+					for (String word : value.split(" ")) {
+						tempQuery.add(new Term(key, word));
+					}
+					tempQuery.setSlop(20);
 					booleanQuery.add(tempQuery, Occur.MUST);
 				} else if (key == "PTT_CLASS_NUM") {
-					Query tempQuery = new TermQuery(new Term(key, value));
+					PhraseQuery tempQuery = new PhraseQuery();
+					for (String word : value.split(" ")) {
+						tempQuery.add(new Term(key, word));
+					}
+					tempQuery.setSlop(20);
 					booleanQuery.add(tempQuery, Occur.MUST);
 				} else if (key == "PROPOSER") {
 					PhraseQuery tempQuery = new PhraseQuery();

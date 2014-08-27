@@ -133,7 +133,7 @@ public class SearchController {
 			flag = "1";
 		}
 		if (intoDate != null && intoDate.replaceAll(" ", "") != "") {
-			patentdao.setPttDate(StringHelper.stringToDate(intoDate));
+			patentdao.setIntoDate(StringHelper.stringToDate(intoDate));
 			flag = "1";
 		}
 		if (pttAgencyOrg != null && pttAgencyOrg.replaceAll(" ", "") != "") {

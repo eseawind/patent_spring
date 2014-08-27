@@ -79,6 +79,60 @@ public class PatentService extends TotalService {
 	}
 
 	/**
+	 * 使用ICTCLAS中文分词系统过滤Patent
+	 * 
+	 * @param patent
+	 * @return
+	 */
+	public Patent getNlpirPatent(Patent patent) {
+		if (patent.getPttName() != null) {
+			patent.setPttName(Nlpir.doNlpirString(patent.getPttName(), 0, null,
+					null));
+		}
+		if (patent.getPttMainClassNum() != null) {
+			patent.setPttMainClassNum(Nlpir.doNlpirString(
+					patent.getPttMainClassNum(), 0, null, null));
+		}
+		if (patent.getPttClassNum() != null) {
+			patent.setPttClassNum(Nlpir.doNlpirString(patent.getPttClassNum(),
+					0, null, null));
+		}
+		if (patent.getProposer() != null) {
+			patent.setProposer(Nlpir.doNlpirString(patent.getProposer(), 0,
+					null, null));
+		}
+		if (patent.getProposerAddress() != null) {
+			patent.setProposerAddress(Nlpir.doNlpirString(
+					patent.getProposerAddress(), 0, null, null));
+		}
+		if (patent.getInventor() != null) {
+			patent.setInventor(Nlpir.doNlpirString(patent.getInventor(), 0,
+					null, null));
+		}
+		if (patent.getInternationalApply() != null) {
+			patent.setInternationalApply(Nlpir.doNlpirString(
+					patent.getInternationalApply(), 0, null, null));
+		}
+		if (patent.getInternationalPublication() != null) {
+			patent.setInternationalPublication(Nlpir.doNlpirString(
+					patent.getInternationalPublication(), 0, null, null));
+		}
+		if (patent.getPttAgencyOrg() != null) {
+			patent.setPttAgencyOrg(Nlpir.doNlpirString(
+					patent.getPttAgencyOrg(), 0, null, null));
+		}
+		if (patent.getPttAgencyPerson() != null) {
+			patent.setPttAgencyPerson(Nlpir.doNlpirString(
+					patent.getPttAgencyPerson(), 0, null, null));
+		}
+		if (patent.getPttAbstract() != null) {
+			patent.setPttAbstract(Nlpir.doNlpirString(patent.getPttAbstract(),
+					0, null, null));
+		}
+		return patent;
+	}
+
+	/**
 	 * 从数据库获取索引数据
 	 * 
 	 * @param analyzer
@@ -92,49 +146,44 @@ public class PatentService extends TotalService {
 			return null;
 		}
 		List<Document> listDocument = new ArrayList<Document>();
-		for (int i = 0; i < listPatent.size(); i++) {
-			Patent pttDao = listPatent.get(i);
+		for (Patent patent : listPatent) {
+			// 使用ICTCLAS中文分词系统过滤Patent
+			patent = getNlpirPatent(patent);
 			Document document = new Document();
-			document.add(new TextField("PTT_TYPE", pttDao.getPttType(),
+			document.add(new TextField("PTT_TYPE", patent.getPttType(),
 					Field.Store.YES));
-			document.add(new TextField("APPLY_NUM", pttDao.getApplyNum(),
+			document.add(new TextField("APPLY_NUM", patent.getApplyNum(),
 					Field.Store.YES));
-			document.add(new TextField("APPLY_DATE", pttDao.getApplyDate()
+			document.add(new TextField("APPLY_DATE", patent.getApplyDate()
 					.toString(), Field.Store.YES));
-			System.out.println(pttDao.getPttName());
-			document.add(new TextField("PTT_NAME", Nlpir.doNlpirString(
-					pttDao.getPttName(), 0, null, null), Field.Store.YES));
-			document.add(new TextField("PTT_NUM", pttDao.getPttNum(),
+			document.add(new TextField("PTT_NAME", patent.getPttName(),
 					Field.Store.YES));
-			document.add(new TextField("PTT_DATE", pttDao.getPttDate()
+			document.add(new TextField("PTT_NUM", patent.getPttNum(),
+					Field.Store.YES));
+			document.add(new TextField("PTT_DATE", patent.getPttDate()
 					.toString(), Field.Store.YES));
-			document.add(new TextField("PTT_MAIN_CLASS_NUM", Nlpir
-					.doNlpirString(pttDao.getPttMainClassNum(), 0, null, null),
+			document.add(new TextField("PTT_MAIN_CLASS_NUM", patent
+					.getPttMainClassNum(), Field.Store.YES));
+			document.add(new TextField("PTT_CLASS_NUM",
+					patent.getPttClassNum(), Field.Store.YES));
+			document.add(new TextField("PROPOSER", patent.getProposer(),
 					Field.Store.YES));
-			document.add(new TextField("PTT_CLASS_NUM", Nlpir.doNlpirString(
-					pttDao.getPttClassNum(), 0, null, null), Field.Store.YES));
-			document.add(new TextField("PROPOSER", Nlpir.doNlpirString(
-					pttDao.getProposer(), 0, null, null), Field.Store.YES));
-			document.add(new TextField("PROPOSER_ADDRESS", Nlpir.doNlpirString(
-					pttDao.getProposerAddress(), 0, null, null),
+			document.add(new TextField("PROPOSER_ADDRESS", patent
+					.getProposerAddress(), Field.Store.YES));
+			document.add(new TextField("INVENTOR", patent.getInventor(),
 					Field.Store.YES));
-			document.add(new TextField("INVENTOR", Nlpir.doNlpirString(
-					pttDao.getInventor(), 0, null, null), Field.Store.YES));
-			document.add(new TextField("INTERNATIONAL_APPLY", Nlpir
-					.doNlpirString(pttDao.getInternationalApply(), 0, null,
-							null), Field.Store.YES));
-			document.add(new TextField("INTERNATIONAL_PUBLICATION", Nlpir
-					.doNlpirString(pttDao.getInternationalPublication(), 0,
-							null, null), Field.Store.YES));
-			document.add(new TextField("INTO_DATE", pttDao.getIntoDate()
+			document.add(new TextField("INTERNATIONAL_APPLY", patent
+					.getInternationalApply(), Field.Store.YES));
+			document.add(new TextField("INTERNATIONAL_PUBLICATION", patent
+					.getInternationalPublication(), Field.Store.YES));
+			document.add(new TextField("INTO_DATE", patent.getIntoDate()
 					.toString(), Field.Store.YES));
-			document.add(new TextField("PTT_AGENCY_ORG", Nlpir.doNlpirString(
-					pttDao.getPttAgencyOrg(), 0, null, null), Field.Store.YES));
-			document.add(new TextField("PTT_AGENCY_PERSON", Nlpir
-					.doNlpirString(pttDao.getPttAgencyPerson(), 0, null, null),
+			document.add(new TextField("PTT_AGENCY_ORG", patent
+					.getPttAgencyOrg(), Field.Store.YES));
+			document.add(new TextField("PTT_AGENCY_PERSON", patent
+					.getPttAgencyPerson(), Field.Store.YES));
+			document.add(new TextField("PTT_ABSTRACT", patent.getPttAbstract(),
 					Field.Store.YES));
-			document.add(new TextField("PTT_ABSTRACT", Nlpir.doNlpirString(
-					pttDao.getPttAbstract(), 0, null, null), Field.Store.YES));
 			listDocument.add(document);
 		}
 		return listDocument;
