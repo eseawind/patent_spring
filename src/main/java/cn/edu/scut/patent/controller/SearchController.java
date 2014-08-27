@@ -39,7 +39,7 @@ public class SearchController {
 		// 检索开始的时间
 		long startTime = new Date().getTime();
 		List<String> pttTypeList = new ArrayList<String>();
-		Patent patentdao = new Patent();
+		Patent patent = new Patent();
 
 		String flag0 = null;
 		String flag = null;
@@ -76,77 +76,86 @@ public class SearchController {
 			pttTypeList.add(WGSJ);
 			flag0 = "1";
 		}
-		if (applyNum != null && applyNum.replaceAll(" ", "") != "") {
+		if (applyNum != null && StringHelper.replaceSpace(applyNum) != "") {
 			// 如果不是以CN中国专利开头的，则添加上CN字段
 			if (applyNum.indexOf("CN") == -1) {
 				applyNum = "CN" + applyNum;
 			}
-			patentdao.setApplyNum(applyNum);
+			patent.setApplyNum(StringHelper.replaceSpace(applyNum));
 			flag = "1";
 		}
-		if (applyDate != null && applyDate.replaceAll(" ", "") != "") {
-			patentdao.setApplyDate(StringHelper.stringToDate(applyDate));
+		if (applyDate != null && StringHelper.replaceSpace(applyDate) != "") {
+			patent.setApplyDate(StringHelper.stringToDate(StringHelper
+					.replaceSpace(applyDate)));
 			flag = "1";
 		}
-		if (pttName != null && pttName.replaceAll(" ", "") != "") {
-			patentdao.setPttName(pttName);
+		if (pttName != null && StringHelper.replaceSpace(pttName) != "") {
+			patent.setPttName(StringHelper.replaceSpace(pttName));
 			flag = "1";
 		}
-		if (pttNum != null && pttNum.replaceAll(" ", "") != "") {
-			patentdao.setPttNum(pttNum);
+		if (pttNum != null && StringHelper.replaceSpace(pttNum) != "") {
+			patent.setPttNum(StringHelper.replaceSpace(pttNum));
 			flag = "1";
 		}
-		if (pttDate != null && pttDate.replaceAll(" ", "") != "") {
-			patentdao.setPttDate(StringHelper.stringToDate(pttDate));
+		if (pttDate != null && StringHelper.replaceSpace(pttDate) != "") {
+			patent.setPttDate(StringHelper.stringToDate(StringHelper
+					.replaceSpace(pttDate)));
 			flag = "1";
 		}
 		if (pttMainClassNum != null
-				&& pttMainClassNum.replaceAll(" ", "") != "") {
-			patentdao.setPttMainClassNum(pttMainClassNum);
+				&& StringHelper.replaceSpace(pttMainClassNum) != "") {
+			patent.setPttMainClassNum(StringHelper
+					.replaceSpace(pttMainClassNum));
 			flag = "1";
 		}
-		if (pttClassNum != null && pttClassNum.replaceAll(" ", "") != "") {
-			patentdao.setPttClassNum(pttClassNum);
+		if (pttClassNum != null && StringHelper.replaceSpace(pttClassNum) != "") {
+			patent.setPttClassNum(StringHelper.replaceSpace(pttClassNum));
 			flag = "1";
 		}
-		if (proposer != null && proposer.replaceAll(" ", "") != "") {
-			patentdao.setProposer(proposer);
+		if (proposer != null && StringHelper.replaceSpace(proposer) != "") {
+			patent.setProposer(StringHelper.replaceSpace(proposer));
 			flag = "1";
 		}
 		if (proposerAddress != null
-				&& proposerAddress.replaceAll(" ", "") != "") {
-			patentdao.setProposerAddress(proposerAddress);
+				&& StringHelper.replaceSpace(proposerAddress) != "") {
+			patent.setProposerAddress(StringHelper
+					.replaceSpace(proposerAddress));
 			flag = "1";
 		}
-		if (inventor != null && inventor.replaceAll(" ", "") != "") {
-			patentdao.setInventor(inventor);
+		if (inventor != null && StringHelper.replaceSpace(inventor) != "") {
+			patent.setInventor(StringHelper.replaceSpace(inventor));
 			flag = "1";
 		}
 		if (internationalApply != null
-				&& internationalApply.replaceAll(" ", "") != "") {
-			patentdao.setInternationalApply(internationalApply);
+				&& StringHelper.replaceSpace(internationalApply) != "") {
+			patent.setInternationalApply(StringHelper
+					.replaceSpace(internationalApply));
 			flag = "1";
 		}
 		if (internationalPublication != null
-				&& internationalPublication.replaceAll(" ", "") != "") {
-			patentdao.setInternationalPublication(internationalPublication);
+				&& StringHelper.replaceSpace(internationalPublication) != "") {
+			patent.setInternationalPublication(StringHelper
+					.replaceSpace(internationalPublication));
 			flag = "1";
 		}
-		if (intoDate != null && intoDate.replaceAll(" ", "") != "") {
-			patentdao.setIntoDate(StringHelper.stringToDate(intoDate));
+		if (intoDate != null && StringHelper.replaceSpace(intoDate) != "") {
+			patent.setIntoDate(StringHelper.stringToDate(StringHelper
+					.replaceSpace(intoDate)));
 			flag = "1";
 		}
-		if (pttAgencyOrg != null && pttAgencyOrg.replaceAll(" ", "") != "") {
-			patentdao.setPttAgencyOrg(pttAgencyOrg);
+		if (pttAgencyOrg != null
+				&& StringHelper.replaceSpace(pttAgencyOrg) != "") {
+			patent.setPttAgencyOrg(StringHelper.replaceSpace(pttAgencyOrg));
 			flag = "1";
 		}
 		if (pttAgencyPerson != null
-				&& pttAgencyPerson.replaceAll(" ", "") != "") {
-			patentdao.setPttAgencyPerson(pttAgencyPerson);
+				&& StringHelper.replaceSpace(pttAgencyPerson) != "") {
+			patent.setPttAgencyPerson(StringHelper
+					.replaceSpace(pttAgencyPerson));
 			flag = "1";
 		}
-		if (pttAbstract != null && pttAbstract.replaceAll(" ", "") != "") {
-			patentdao.setPttAbstract(pttAbstract);
+		if (pttAbstract != null && StringHelper.replaceSpace(pttAbstract) != "") {
+			patent.setPttAbstract(StringHelper.replaceSpace(pttAbstract));
 			flag = "1";
 		}
 		if (flag0 == null || flag == null) {
@@ -161,23 +170,22 @@ public class SearchController {
 		}
 
 		System.out.println("进入search啦！");
-		List<Patent> patentList = new Search().doSearch(patentdao, pttTypeList);
+		List<Patent> patentList = new Search().doSearch(patent, pttTypeList);
 		String timeConsume = StringHelper.timer(startTime);
 
 		RequestDispatcher re;
 		if (patentList != null && patentList.size() > 0) {
 			JSONArray jsonArray = new JSONArray();
-			for (Patent patent : patentList) {
+			for (Patent temp : patentList) {
 				JSONObject jsonObj = new JSONObject();
 				// 去除applyNum里面的CN字段以适应佰腾网的查询要求
-				jsonObj.put("ApplyNum",
-						patent.getApplyNum().replaceAll("CN", ""));
-				jsonObj.put("Inventor", patent.getInventor());
-				jsonObj.put("Proposer", patent.getProposer());
-				jsonObj.put("PttDate", patent.getPttDate());
-				jsonObj.put("PttName", patent.getPttName());
-				jsonObj.put("PttNum", patent.getPttNum());
-				jsonObj.put("PttType", patent.getPttType());
+				jsonObj.put("ApplyNum", temp.getApplyNum().replaceAll("CN", ""));
+				jsonObj.put("Inventor", temp.getInventor());
+				jsonObj.put("Proposer", temp.getProposer());
+				jsonObj.put("PttDate", temp.getPttDate());
+				jsonObj.put("PttName", temp.getPttName());
+				jsonObj.put("PttNum", temp.getPttNum());
+				jsonObj.put("PttType", temp.getPttType());
 				jsonArray.put(jsonObj);
 			}
 			request.getSession().setAttribute("PATENTLIST",

@@ -11,6 +11,9 @@ public class StringHelper {
 
 	/**
 	 * 把String转换成Date
+	 * 
+	 * @param str
+	 * @return
 	 */
 	public static java.sql.Date stringToDate(String str) {
 		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -28,6 +31,9 @@ public class StringHelper {
 
 	/**
 	 * 去除String字符串中的空格、回车、换行符、制表符
+	 * 
+	 * @param str
+	 * @return
 	 */
 	public static String replaceSpecialCharacters(String str) {
 		String dest = "";
@@ -37,6 +43,16 @@ public class StringHelper {
 			dest = m.replaceAll("");
 		}
 		return dest;
+	}
+
+	/**
+	 * 去除String字符串中的空格
+	 * 
+	 * @param str
+	 * @return
+	 */
+	public static String replaceSpace(String str) {
+		return str.replaceAll(" ", "");
 	}
 
 	/**
